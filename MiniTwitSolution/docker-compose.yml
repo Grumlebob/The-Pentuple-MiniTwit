@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: MiniTwit.Api/Dockerfile
+    ports:
+      - "5000:80"
+    volumes:
+      # Map the local Infrastructure folder (which contains minitwit.db and migrations)
+      # to the container's /app/Infrastructure folder.
+      - ./MiniTwit.Api/Infrastructure:/app/Infrastructure
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+
+  client:
+    build:
+      context: .
+      dockerfile: MiniTwit.Client/Dockerfile
+    ports:
+      - "5001:80"
