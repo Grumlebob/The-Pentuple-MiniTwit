@@ -51,7 +51,7 @@ Stop server:
 
 ### First considerations
 
-* We want to use a language, everyone in the group is familiar with
+* We want to use a language, everyone in the group is familiar with. This is also the technology we want to work with professionally, and therefore to increase our skills in this technology, is valuable for us.
 * We want to make it simple to work with different database vendors, therefore we use EF Core, as everyone in the group is familiar.
 * We want to use tools that simplies work. Such as generating appropiate gitignores through https://www.toptal.com/developers/gitignore/
 * We want to setup an empty .net solution, with 3 projects.
