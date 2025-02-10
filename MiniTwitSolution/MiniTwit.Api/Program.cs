@@ -2,6 +2,7 @@
 
 using MiniTwit.Api.Features.Followers.FollowUser;
 using MiniTwit.Api.Features.Followers.UnfollowUser;
+using MiniTwit.Api.Features.Messages.PostMessage;
 using MiniTwit.Api.Features.Timeline.GetPrivateTimeline;
 using MiniTwit.Api.Features.Timeline.GetPublicTimeline;
 using MiniTwit.Api.Features.Timeline.GetUserTimeline;
@@ -53,6 +54,9 @@ app.MapUnfollowUserEndpoints(); // registers DELETE "/follow"
 app.MapRegisterUserEndpoints(); // registers POST "/register"
 app.MapLoginUserEndpoints(); // registers POST "/login"
 app.MapLogoutUserEndpoints(); // registers POST "/logout"
+
+// Map messages endpoints
+app.MapPostMessageEndpoints(); // registers POST "/message" endpoint.
 
 app.Run();
 
