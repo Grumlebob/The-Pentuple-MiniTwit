@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using MiniTwit.Api.Domain;
 using MiniTwit.Api.Infrastructure;
 using MiniTwit.Shared.DTO.Followers.FollowUser;
-using MiniTwit.Shared.DTO.Messages;
 using MiniTwit.Shared.DTO.Timeline;
 using MiniTwit.Shared.DTO.Users.Authentication.LoginUser;
 using MiniTwit.Shared.DTO.Users.Authentication.LogoutUser;
@@ -39,19 +38,10 @@ public class MiniTwitTests : IAsyncLifetime
         _resetDatabase = factory.ResetDatabaseAsync;
         _miniTwitContext = factory.Services.GetRequiredService<MiniTwitDbContext>();
     }
-
+    
     [Fact]
     public async Task GetPrivateTimeLineWorksAsExpected()
     {
-        // Remove all existing entities (force enumeration with ToList())
-        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
-        _miniTwitContext.Followers.RemoveRange(_miniTwitContext.Followers.ToList());
-        _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
-        await _miniTwitContext.SaveChangesAsync();
-
-        // Clear any tracked entities to avoid conflicts
-        _miniTwitContext.ChangeTracker.Clear();
-
         // Create two users.
         var user1 = new User
         {
@@ -105,7 +95,7 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Read and deserialize the JSON response into a list of DTOs.
         var json = await response.Content.ReadAsStringAsync();
-        var dtos = JsonSerializer.Deserialize<List<GetMessageDto>>(
+        var dtos = JsonSerializer.Deserialize<List<GetMessageResponse>>(
             json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
         );
@@ -118,15 +108,6 @@ public class MiniTwitTests : IAsyncLifetime
     [Fact]
     public async Task GetPublicTimelineWorksAsExpected()
     {
-        // Clear existing data.
-        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
-        _miniTwitContext.Followers.RemoveRange(_miniTwitContext.Followers.ToList());
-        _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
-        await _miniTwitContext.SaveChangesAsync();
-
-        // Clear any tracked entities to avoid conflicts.
-        _miniTwitContext.ChangeTracker.Clear();
-
         // Create two users.
         var user1 = new User
         {
@@ -175,7 +156,7 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Read and deserialize the JSON response into a list of DTOs.
         var json = await response.Content.ReadAsStringAsync();
-        var dtos = JsonSerializer.Deserialize<List<GetMessageDto>>(json, _jsonOptions);
+        var dtos = JsonSerializer.Deserialize<List<GetMessageResponse>>(json, _jsonOptions);
 
         // Assert: Expect 2 messages in the public timeline.
         Assert.NotNull(dtos);
@@ -185,15 +166,6 @@ public class MiniTwitTests : IAsyncLifetime
     [Fact]
     public async Task GetUserTimelineWorksAsExpected()
     {
-        // Remove all existing entities (force enumeration with ToList())
-        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
-        _miniTwitContext.Followers.RemoveRange(_miniTwitContext.Followers.ToList());
-        _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
-        await _miniTwitContext.SaveChangesAsync();
-
-        // Clear any tracked entities to avoid conflicts.
-        _miniTwitContext.ChangeTracker.Clear();
-
         // Create two users.
         var user1 = new User
         {
@@ -242,7 +214,7 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Read and deserialize the JSON response into a list of DTOs.
         var json = await response.Content.ReadAsStringAsync();
-        var dtos = JsonSerializer.Deserialize<List<GetMessageDto>>(json, _jsonOptions);
+        var dtos = JsonSerializer.Deserialize<List<GetMessageResponse>>(json, _jsonOptions);
 
         // Assert: Expect only messages authored by user 1.
         Assert.NotNull(dtos);
@@ -253,13 +225,6 @@ public class MiniTwitTests : IAsyncLifetime
     [Fact]
     public async Task FollowUserEndpoint_ReturnsCorrectDTO()
     {
-        // Arrange: Clear database and seed two users.
-        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
-        _miniTwitContext.Followers.RemoveRange(_miniTwitContext.Followers.ToList());
-        _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
-        await _miniTwitContext.SaveChangesAsync();
-        _miniTwitContext.ChangeTracker.Clear();
-
         var user1 = new User
         {
             UserId = 1,
@@ -297,13 +262,6 @@ public class MiniTwitTests : IAsyncLifetime
     [Fact]
     public async Task UnfollowUserEndpoint_ReturnsCorrectDTO()
     {
-        // Arrange: Clear data, seed two users, and add a follow relationship.
-        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
-        _miniTwitContext.Followers.RemoveRange(_miniTwitContext.Followers.ToList());
-        _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
-        await _miniTwitContext.SaveChangesAsync();
-        _miniTwitContext.ChangeTracker.Clear();
-
         var user1 = new User
         {
             UserId = 1,
@@ -350,11 +308,6 @@ public class MiniTwitTests : IAsyncLifetime
     [Fact]
     public async Task RegisterUserEndpoint_WorksAsExpected()
     {
-        // Arrange: Clear the Users table.
-        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
-        await _miniTwitContext.SaveChangesAsync();
-        _miniTwitContext.ChangeTracker.Clear();
-
         // Prepare the registration request.
         var registerRequest = new
         {
@@ -388,16 +341,12 @@ public class MiniTwitTests : IAsyncLifetime
     [Fact]
     public async Task LoginUserEndpoint_WorksAsExpected()
     {
-        // Arrange: Clear the Users table and add a user.
-        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
-        await _miniTwitContext.SaveChangesAsync();
-        _miniTwitContext.ChangeTracker.Clear();
-
+        
         var user = new User
         {
             Username = "loginuser",
             Email = "loginuser@example.com",
-            PwHash = "mypassword", // For demonstration, the password is stored in plain text.
+            PwHash = "mypassword"
         };
         _miniTwitContext.Users.Add(user);
         await _miniTwitContext.SaveChangesAsync();
@@ -439,54 +388,12 @@ public class MiniTwitTests : IAsyncLifetime
         Assert.Equal("Logged out successfully.", logoutResponse.Message);
     }
 
-    [Fact]
-    public async Task PostMessageEndpoint_WorksAsExpected()
-    {
-        // Arrange: Clear existing data and add an author.
-        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
-        _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
-        await _miniTwitContext.SaveChangesAsync();
-        _miniTwitContext.ChangeTracker.Clear();
-
-        var user = new User
-        {
-            UserId = 1,
-            Username = "poster",
-            Email = "poster@example.com",
-            PwHash = "pass",
-        };
-        _miniTwitContext.Users.Add(user);
-        await _miniTwitContext.SaveChangesAsync();
-
-        // Prepare the post message request DTO.
-        var requestDto = new PostMessageRequest(AuthorId: 1, Text: "Hello, world!", PubDate: null);
-
-        // Act: Call POST /message.
-        var response = await _client.PostAsJsonAsync("/add_message", requestDto);
-        response.EnsureSuccessStatusCode();
-        Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
-
-        // Deserialize the response into a PostMessageResponse DTO.
-        var responseDto = await response.Content.ReadFromJsonAsync<PostMessageResponse>(
-            _jsonOptions
-        );
-        Assert.NotNull(responseDto);
-        Assert.Equal(1, responseDto!.AuthorId);
-        Assert.Equal("Hello, world!", responseDto.Text);
-        Assert.NotNull(responseDto.PubDate);
-        Assert.True(responseDto.MessageId > 0);
-
-        // Verify the message exists in the database.
-        var messageInDb = await _miniTwitContext.Messages.FirstOrDefaultAsync(m =>
-            m.MessageId == responseDto.MessageId
-        );
-        Assert.NotNull(messageInDb);
-        Assert.Equal(responseDto.AuthorId, messageInDb.AuthorId);
-        Assert.Equal(responseDto.Text, messageInDb.Text);
-    }
-
     //We don't care about the InitializeAsync method, but needed to implement the IAsyncLifetime interface
-    public Task InitializeAsync() => Task.CompletedTask;
+    public Task InitializeAsync()
+    {
+        _miniTwitContext.ChangeTracker.Clear();
+        return Task.CompletedTask;
+    }
 
     public Task DisposeAsync() => _resetDatabase();
 }

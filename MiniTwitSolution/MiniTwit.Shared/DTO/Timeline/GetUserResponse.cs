@@ -1,6 +1,6 @@
 ﻿namespace MiniTwit.Shared.DTO.Timeline;
 
-public record GetUserDto
+public record GetUserResponse
 {
     public int UserId { get; init; }
     public string Username { get; init; } = string.Empty;

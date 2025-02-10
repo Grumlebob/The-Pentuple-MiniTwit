@@ -55,13 +55,13 @@ namespace MiniTwit.Api.Features.Timeline.GetPrivateTimeline
 
                     // Map Message entities to DTOs.
                     var dtos = messages
-                        .Select(m => new GetMessageDto
+                        .Select(m => new GetMessageResponse
                         {
                             MessageId = m.MessageId,
                             Text = m.Text,
                             PubDate = m.PubDate,
                             Author = m.Author is not null
-                                ? new GetUserDto
+                                ? new GetUserResponse
                                 {
                                     UserId = m.Author.UserId,
                                     Username = m.Author.Username,
