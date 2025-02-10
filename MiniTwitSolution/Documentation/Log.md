@@ -126,3 +126,11 @@ Adding dependencies agreed upon above:
 * Setup Respawn together with Testcontainers
 * When running program normally, it will use SQLite
 * Adds CSharpier
+
+
+## Testing
+
+The added tests are not complete. We plan to rely on the already given python tests, after
+the initial first versions of the C# is being done.
+The tests mostly server to see if we setup EF core relationships correctly,
+such as the common tricky many-to-many cases, where we need to avoid cyclic dependencies.
