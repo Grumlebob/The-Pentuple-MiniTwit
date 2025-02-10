@@ -462,7 +462,7 @@ public class MiniTwitTests : IAsyncLifetime
         var requestDto = new PostMessageRequest(AuthorId: 1, Text: "Hello, world!", PubDate: null);
 
         // Act: Call POST /message.
-        var response = await _client.PostAsJsonAsync("/message", requestDto);
+        var response = await _client.PostAsJsonAsync("/add_message", requestDto);
         response.EnsureSuccessStatusCode();
         Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
 

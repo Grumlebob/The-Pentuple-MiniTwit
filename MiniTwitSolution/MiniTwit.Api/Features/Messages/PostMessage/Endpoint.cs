@@ -7,7 +7,7 @@ public static class Endpoint
     public static IEndpointRouteBuilder MapPostMessageEndpoints(this IEndpointRouteBuilder routes)
     {
         routes.MapPost(
-            "/message",
+            "/add_message",
             async (PostMessageRequest request, MiniTwitDbContext db) =>
             {
                 // Validate that the author exists.
