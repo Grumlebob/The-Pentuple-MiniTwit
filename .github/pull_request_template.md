@@ -9,4 +9,4 @@ fixes (issue)
 
 - [ ] Formatted C# code using csharpier.
 - [ ] Added ```/Timespent Xh Ym``` in the last line of issue description.
-- [ ] Linked issue to this pull request by replacing "(issue)" with the issue name in description above.
+- [ ] Linked issue to this pull request by replacing "(issue)" with ```#issueNumber``` in description above.
