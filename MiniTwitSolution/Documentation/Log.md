@@ -116,3 +116,13 @@ We started from v1.0 which was the initial project we got through scp.
 * Small changes increment the right digit. (For example using 2to3 on the python files went from v1.0 to v1.1).
 * Large changes increment the left digit and sets the right to 0. (For example changing from python to C# took us from v1.1 to v2.0)
 Whether a change is small or large is agreed upon by the group before a release.
+
+
+# 10.02.2025
+
+Adding dependencies agreed upon above:
+* Configures EFCore models
+* Setup for Testcontainers using Postgres
+* Setup Respawn together with Testcontainers
+* When running program normally, it will use SQLite
+* Adds CSharpier
