@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using MiniTwit.Api.Domain;
 using MiniTwit.Api.Infrastructure;
+using MiniTwit.Shared.DTO.Timeline;
 using Xunit;
 
 namespace MiniTwit.Test;
@@ -26,7 +27,7 @@ public class MiniTwitTests : IAsyncLifetime
         _resetDatabase = factory.ResetDatabaseAsync;
         _miniTwitContext = factory.Services.GetRequiredService<MiniTwitDbContext>();
     }
-    
+
     [Fact]
     public async Task GetPrivateTimeLineWorksAsExpected()
     {
@@ -85,33 +86,33 @@ public class MiniTwitTests : IAsyncLifetime
         );
         await _miniTwitContext.SaveChangesAsync();
 
-        // --- Call the API Endpoint ---
+        // --- Act: Call the private timeline endpoint ---
         // The private timeline endpoint is at "/" and expects a query parameter "userId".
         var response = await _client.GetAsync("/?userId=1&offset=0");
         response.EnsureSuccessStatusCode();
 
-        // Read and deserialize the JSON response.
+        // Read and deserialize the JSON response into a list of DTOs.
         var json = await response.Content.ReadAsStringAsync();
-        var messages = JsonSerializer.Deserialize<List<Message>>(
+        var dtos = JsonSerializer.Deserialize<List<MessageDto>>(
             json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
         );
 
-        Assert.NotNull(messages);
+        Assert.NotNull(dtos);
         // We expect 2 messages: one from user1 and one from user2.
-        Assert.Equal(2, messages!.Count);
+        Assert.Equal(2, dtos!.Count);
     }
 
     [Fact]
     public async Task GetPublicTimelineWorksAsExpected()
     {
-        // Clear existing data
+        // Clear existing data.
         _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
         _miniTwitContext.Followers.RemoveRange(_miniTwitContext.Followers.ToList());
         _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
         await _miniTwitContext.SaveChangesAsync();
 
-        // Clear any tracked entities to avoid conflicts
+        // Clear any tracked entities to avoid conflicts.
         _miniTwitContext.ChangeTracker.Clear();
 
         // Create two users.
@@ -160,16 +161,16 @@ public class MiniTwitTests : IAsyncLifetime
         var response = await _client.GetAsync("/public?offset=0");
         response.EnsureSuccessStatusCode();
 
-        // Read and deserialize the JSON response.
+        // Read and deserialize the JSON response into a list of DTOs.
         var json = await response.Content.ReadAsStringAsync();
-        var messages = JsonSerializer.Deserialize<List<Message>>(
+        var dtos = JsonSerializer.Deserialize<List<MessageDto>>(
             json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
         );
 
         // Assert: Expect 2 messages in the public timeline.
-        Assert.NotNull(messages);
-        Assert.Equal(2, messages!.Count);
+        Assert.NotNull(dtos);
+        Assert.Equal(2, dtos!.Count);
     }
 
     [Fact]
@@ -181,7 +182,7 @@ public class MiniTwitTests : IAsyncLifetime
         _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
         await _miniTwitContext.SaveChangesAsync();
 
-        // Clear any tracked entities to avoid conflicts
+        // Clear any tracked entities to avoid conflicts.
         _miniTwitContext.ChangeTracker.Clear();
 
         // Create two users.
@@ -230,17 +231,17 @@ public class MiniTwitTests : IAsyncLifetime
         var response = await _client.GetAsync("/user/1?offset=0");
         response.EnsureSuccessStatusCode();
 
-        // Read and deserialize the JSON response.
+        // Read and deserialize the JSON response into a list of DTOs.
         var json = await response.Content.ReadAsStringAsync();
-        var messages = JsonSerializer.Deserialize<List<Message>>(
+        var dtos = JsonSerializer.Deserialize<List<MessageDto>>(
             json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
         );
 
         // Assert: Expect only messages authored by user 1.
-        Assert.NotNull(messages);
-        Assert.Single(messages);
-        Assert.Equal(1, messages![0].AuthorId);
+        Assert.NotNull(dtos);
+        Assert.Single(dtos!);
+        Assert.Equal(1, dtos![0].Author?.UserId);
     }
 
     //We don't care about the InitializeAsync method, but needed to implement the IAsyncLifetime interface
