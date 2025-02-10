@@ -56,7 +56,7 @@ app.MapLoginUserEndpoints(); // registers POST "/login"
 app.MapLogoutUserEndpoints(); // registers POST "/logout"
 
 // Map messages endpoints
-app.MapPostMessageEndpoints();  // registers POST "/message" endpoint.
+app.MapPostMessageEndpoints(); // registers POST "/message" endpoint.
 
 app.Run();
 
