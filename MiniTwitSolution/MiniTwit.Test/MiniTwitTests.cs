@@ -257,8 +257,20 @@ public class MiniTwitTests : IAsyncLifetime
         await _miniTwitContext.SaveChangesAsync();
         _miniTwitContext.ChangeTracker.Clear();
 
-        var user1 = new User { UserId = 1, Username = "user1", Email = "user1@example.com", PwHash = "hash1" };
-        var user2 = new User { UserId = 2, Username = "user2", Email = "user2@example.com", PwHash = "hash2" };
+        var user1 = new User
+        {
+            UserId = 1,
+            Username = "user1",
+            Email = "user1@example.com",
+            PwHash = "hash1",
+        };
+        var user2 = new User
+        {
+            UserId = 2,
+            Username = "user2",
+            Email = "user2@example.com",
+            PwHash = "hash2",
+        };
         _miniTwitContext.Users.AddRange(user1, user2);
         await _miniTwitContext.SaveChangesAsync();
 
@@ -290,8 +302,20 @@ public class MiniTwitTests : IAsyncLifetime
         await _miniTwitContext.SaveChangesAsync();
         _miniTwitContext.ChangeTracker.Clear();
 
-        var user1 = new User { UserId = 1, Username = "user1", Email = "user1@example.com", PwHash = "hash1" };
-        var user2 = new User { UserId = 2, Username = "user2", Email = "user2@example.com", PwHash = "hash2" };
+        var user1 = new User
+        {
+            UserId = 1,
+            Username = "user1",
+            Email = "user1@example.com",
+            PwHash = "hash1",
+        };
+        var user2 = new User
+        {
+            UserId = 2,
+            Username = "user2",
+            Email = "user2@example.com",
+            PwHash = "hash2",
+        };
         _miniTwitContext.Users.AddRange(user1, user2);
         await _miniTwitContext.SaveChangesAsync();
 
@@ -299,7 +323,9 @@ public class MiniTwitTests : IAsyncLifetime
         _miniTwitContext.Followers.Add(follow);
         await _miniTwitContext.SaveChangesAsync();
 
-        bool existsBefore = await _miniTwitContext.Followers.AnyAsync(f => f.WhoId == 1 && f.WhomId == 2);
+        bool existsBefore = await _miniTwitContext.Followers.AnyAsync(f =>
+            f.WhoId == 1 && f.WhomId == 2
+        );
         Assert.True(existsBefore);
 
         // Act: Call DELETE /follow?followerId=1&followedId=2.
@@ -314,7 +340,9 @@ public class MiniTwitTests : IAsyncLifetime
         Assert.True(unfollowDto!.Success);
         Assert.Contains("Unfollowed", unfollowDto.Message);
 
-        bool existsAfter = await _miniTwitContext.Followers.AnyAsync(f => f.WhoId == 1 && f.WhomId == 2);
+        bool existsAfter = await _miniTwitContext.Followers.AnyAsync(f =>
+            f.WhoId == 1 && f.WhomId == 2
+        );
         Assert.False(existsAfter);
     }
 
