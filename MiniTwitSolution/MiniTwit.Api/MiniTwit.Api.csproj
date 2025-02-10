@@ -25,6 +25,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Features\Messages\PostMessage\" />
-    <Folder Include="Features\Users\Authentication\RegisterUser\" />
   </ItemGroup>
 </Project>
