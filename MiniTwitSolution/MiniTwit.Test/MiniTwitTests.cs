@@ -26,20 +26,7 @@ public class MiniTwitTests : IAsyncLifetime
         _resetDatabase = factory.ResetDatabaseAsync;
         _miniTwitContext = factory.Services.GetRequiredService<MiniTwitDbContext>();
     }
-
-    [Fact]
-    public async Task HelloEndpoint_ReturnsHelloMessage()
-    {
-        // Act: Call the /hello endpoint.
-        var response = await _client.GetAsync("/hello");
-        response.EnsureSuccessStatusCode();
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        // Assert: Verify that the response is the expected string.
-        Assert.Equal("Hello, MiniTwit API is running!", content);
-    }
-
+    
     [Fact]
     public async Task GetPrivateTimeLineWorksAsExpected()
     {

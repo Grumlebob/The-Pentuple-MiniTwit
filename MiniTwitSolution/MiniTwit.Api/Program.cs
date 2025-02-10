@@ -34,9 +34,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//Test endpoint
-app.MapGet("/hello", () => "Hello, MiniTwit API is running!");
-
 //Timeline endpoints
 app.MapGetPrivateTimelineEndpoints(); // Registers GET "/" with timeline logic.
 app.MapGetPublicTimelineEndpoints(); // registers GET "/public"

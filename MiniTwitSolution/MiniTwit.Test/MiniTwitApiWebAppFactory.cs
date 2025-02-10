@@ -12,14 +12,20 @@ using Xunit;
 
 namespace MiniTwit.Test;
 
+//WebApplicationFactory is a class that allows us to create a test server for our application in memory,
+//but setup with real dependencies.
 public class MiniTwitApiWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    //Tests use a single DB connection.
+    //Between each test, "Respawn" will handle DB setup.
+    //This is an extra check, to ensure ALL tests finish within x minutes
     private const int MaxWaitTimeMinutes = 5;
 
     private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
         .WithImage("postgres:latest")
         .Build();
 
+    //Default! cause we are not initializing it here, but in the InitializeAsync method
     private DbConnection _dbConnection = default!;
     private Respawner _respawner = default!;
     public HttpClient HttpClient { get; private set; } = default!;
@@ -57,7 +63,7 @@ public class MiniTwitApiWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
         HttpClient = CreateClient();
         HttpClient.Timeout = TimeSpan.FromMinutes(MaxWaitTimeMinutes);
 
-        // Initialize database
+        // Initialize database - THIS IS WHERE YOU CAN ADD SEED DATA
         using (var scope = Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<MiniTwitDbContext>();
@@ -80,6 +86,7 @@ public class MiniTwitApiWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
         );
     }
 
+    //"New": to tell compiler that this is a new DisposeAsync method
     public new async Task DisposeAsync()
     {
         if (_dbConnection.State == System.Data.ConnectionState.Open)
