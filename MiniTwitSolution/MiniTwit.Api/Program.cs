@@ -1,20 +1,31 @@
-using MiniTwit.Api.Domain;
-using MiniTwit.Api.Infrastructure;
+// Program.cs
+using MiniTwit.Api.Features.Timeline.GetPrivateTimeline;
+using MiniTwit.Api.Features.Timeline.GetPublicTimeline;
+using MiniTwit.Api.Features.Timeline.GetUserTimeline;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<MiniTwitDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+//TESTING MODE
+builder.Environment.EnvironmentName = "Testing";
 
+// Only configure database if we're not in test mode
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<MiniTwitDbContext>(options =>
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+    );
+
+    builder.Services.AddScoped<IMiniTwitDbContext>(provider =>
+        provider.GetRequiredService<MiniTwitDbContext>()
+    );
+}
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -23,7 +34,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Simple test endpoint
-app.MapGet("/", () => "Hello, MiniTwit API is running!");
+//Timeline endpoints
+app.MapGetPrivateTimelineEndpoints(); // Registers GET "/" with timeline logic.
+app.MapGetPublicTimelineEndpoints(); // registers GET "/public"
+app.MapGetUserTimelineEndpoints(); // registers GET "/user/{id:int}"
 
 app.Run();
+
+public partial class Program { }

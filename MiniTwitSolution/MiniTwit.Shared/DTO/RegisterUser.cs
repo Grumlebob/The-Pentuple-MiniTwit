@@ -1,6 +1,3 @@
 namespace MiniTwit.Shared.DTO;
 
-public class RegisterUser
-{
-    
-}
+public class RegisterUser { }
