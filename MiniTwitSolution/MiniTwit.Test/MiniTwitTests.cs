@@ -38,7 +38,7 @@ public class MiniTwitTests : IAsyncLifetime
         _resetDatabase = factory.ResetDatabaseAsync;
         _miniTwitContext = factory.Services.GetRequiredService<MiniTwitDbContext>();
     }
-    
+
     [Fact]
     public async Task GetPrivateTimeLineWorksAsExpected()
     {
@@ -341,12 +341,11 @@ public class MiniTwitTests : IAsyncLifetime
     [Fact]
     public async Task LoginUserEndpoint_WorksAsExpected()
     {
-        
         var user = new User
         {
             Username = "loginuser",
             Email = "loginuser@example.com",
-            PwHash = "mypassword"
+            PwHash = "mypassword",
         };
         _miniTwitContext.Users.Add(user);
         await _miniTwitContext.SaveChangesAsync();
