@@ -1,7 +1,4 @@
 // Program.cs
-using MiniTwit.Api.Domain;
-using MiniTwit.Api.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using MiniTwit.Api.Features.Timeline.GetPrivateTimeline;
 using MiniTwit.Api.Features.Timeline.GetPublicTimeline;
 using MiniTwit.Api.Features.Timeline.GetUserTimeline;

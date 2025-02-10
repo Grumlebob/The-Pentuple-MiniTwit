@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace MiniTwit.Api.Domain;
+﻿namespace MiniTwit.Api.Domain;
 
 [Table("message")]
 public partial class Message

@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace MiniTwit.Api.Domain;
+﻿namespace MiniTwit.Api.Domain;
 
 [Table("user")]
 public partial class User
