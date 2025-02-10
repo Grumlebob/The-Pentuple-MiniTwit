@@ -1,7 +1,10 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http.Json;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MiniTwit.Api.Domain;
 using MiniTwit.Api.Infrastructure;
+using MiniTwit.Shared.DTO.Followers.FollowUser;
 using MiniTwit.Shared.DTO.Timeline;
 using Xunit;
 
@@ -242,6 +245,77 @@ public class MiniTwitTests : IAsyncLifetime
         Assert.NotNull(dtos);
         Assert.Single(dtos!);
         Assert.Equal(1, dtos![0].Author?.UserId);
+    }
+
+    [Fact]
+    public async Task FollowUserEndpoint_ReturnsCorrectDTO()
+    {
+        // Arrange: Clear database and seed two users.
+        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
+        _miniTwitContext.Followers.RemoveRange(_miniTwitContext.Followers.ToList());
+        _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
+        await _miniTwitContext.SaveChangesAsync();
+        _miniTwitContext.ChangeTracker.Clear();
+
+        var user1 = new User { UserId = 1, Username = "user1", Email = "user1@example.com", PwHash = "hash1" };
+        var user2 = new User { UserId = 2, Username = "user2", Email = "user2@example.com", PwHash = "hash2" };
+        _miniTwitContext.Users.AddRange(user1, user2);
+        await _miniTwitContext.SaveChangesAsync();
+
+        // Act: Call POST /follow with a JSON body.
+        var followRequest = new { FollowerId = 1, FollowedId = 2 };
+        var response = await _client.PostAsJsonAsync("/follow", followRequest);
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
+
+        // Deserialize the response into the DTO.
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var dto = await response.Content.ReadFromJsonAsync<FollowResponse>(options);
+        Assert.NotNull(dto);
+        Assert.Equal(1, dto!.FollowerId);
+        Assert.Equal(2, dto.FollowedId);
+
+        // Verify directly in the database.
+        bool exists = await _miniTwitContext.Followers.AnyAsync(f => f.WhoId == 1 && f.WhomId == 2);
+        Assert.True(exists);
+    }
+
+    [Fact]
+    public async Task UnfollowUserEndpoint_ReturnsCorrectDTO()
+    {
+        // Arrange: Clear data, seed two users, and add a follow relationship.
+        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
+        _miniTwitContext.Followers.RemoveRange(_miniTwitContext.Followers.ToList());
+        _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
+        await _miniTwitContext.SaveChangesAsync();
+        _miniTwitContext.ChangeTracker.Clear();
+
+        var user1 = new User { UserId = 1, Username = "user1", Email = "user1@example.com", PwHash = "hash1" };
+        var user2 = new User { UserId = 2, Username = "user2", Email = "user2@example.com", PwHash = "hash2" };
+        _miniTwitContext.Users.AddRange(user1, user2);
+        await _miniTwitContext.SaveChangesAsync();
+
+        var follow = new Follower { WhoId = 1, WhomId = 2 };
+        _miniTwitContext.Followers.Add(follow);
+        await _miniTwitContext.SaveChangesAsync();
+
+        bool existsBefore = await _miniTwitContext.Followers.AnyAsync(f => f.WhoId == 1 && f.WhomId == 2);
+        Assert.True(existsBefore);
+
+        // Act: Call DELETE /follow?followerId=1&followedId=2.
+        var response = await _client.DeleteAsync("/follow?followerId=1&followedId=2");
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+
+        // Deserialize the response into the unfollow DTO.
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var unfollowDto = await response.Content.ReadFromJsonAsync<UnfollowResponse>(options);
+        Assert.NotNull(unfollowDto);
+        Assert.True(unfollowDto!.Success);
+        Assert.Contains("Unfollowed", unfollowDto.Message);
+
+        bool existsAfter = await _miniTwitContext.Followers.AnyAsync(f => f.WhoId == 1 && f.WhomId == 2);
+        Assert.False(existsAfter);
     }
 
     //We don't care about the InitializeAsync method, but needed to implement the IAsyncLifetime interface

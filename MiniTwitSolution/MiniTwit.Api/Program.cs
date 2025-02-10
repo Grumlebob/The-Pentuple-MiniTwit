@@ -1,4 +1,7 @@
 // Program.cs
+
+using MiniTwit.Api.Features.Followers.FollowUser;
+using MiniTwit.Api.Features.Followers.UnfollowUser;
 using MiniTwit.Api.Features.Timeline.GetPrivateTimeline;
 using MiniTwit.Api.Features.Timeline.GetPublicTimeline;
 using MiniTwit.Api.Features.Timeline.GetUserTimeline;
@@ -38,6 +41,10 @@ app.UseHttpsRedirection();
 app.MapGetPrivateTimelineEndpoints(); // Registers GET "/" with timeline logic.
 app.MapGetPublicTimelineEndpoints(); // registers GET "/public"
 app.MapGetUserTimelineEndpoints(); // registers GET "/user/{id:int}"
+
+// Map follow/unfollow endpoints.
+app.MapFollowUserEndpoints(); // registers POST "/follow"
+app.MapUnfollowUserEndpoints(); // registers DELETE "/follow"
 
 app.Run();
 

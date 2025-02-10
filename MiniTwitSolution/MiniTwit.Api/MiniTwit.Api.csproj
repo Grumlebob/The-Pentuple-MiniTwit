@@ -26,7 +26,5 @@
   <ItemGroup>
     <Folder Include="Features\Messages\PostMessage\" />
     <Folder Include="Features\Users\Authentication\RegisterUser\" />
-    <Folder Include="Features\Users\Followers\FollowUser\" />
-    <Folder Include="Features\Users\Followers\UnfollowUser\" />
   </ItemGroup>
 </Project>
