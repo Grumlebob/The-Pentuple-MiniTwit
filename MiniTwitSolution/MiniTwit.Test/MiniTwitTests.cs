@@ -439,49 +439,47 @@ public class MiniTwitTests : IAsyncLifetime
         Assert.Equal("Logged out successfully.", logoutResponse.Message);
     }
     
-     [Fact]
-        public async Task PostMessageEndpoint_WorksAsExpected()
-        {
-            // Arrange: Clear existing data and add an author.
-            _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
-            _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
-            await _miniTwitContext.SaveChangesAsync();
-            _miniTwitContext.ChangeTracker.Clear();
+    [Fact]
+    public async Task PostMessageEndpoint_WorksAsExpected()
+    {
+        // Arrange: Clear existing data and add an author.
+        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
+        _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
+        await _miniTwitContext.SaveChangesAsync();
+        _miniTwitContext.ChangeTracker.Clear();
 
-            var user = new User 
-            { 
-                UserId = 1, 
-                Username = "poster", 
-                Email = "poster@example.com", 
-                PwHash = "pass" 
-            };
-            _miniTwitContext.Users.Add(user);
-            await _miniTwitContext.SaveChangesAsync();
+        var user = new User 
+        { 
+            UserId = 1, 
+            Username = "poster", 
+            Email = "poster@example.com", 
+            PwHash = "pass" 
+        };
+        _miniTwitContext.Users.Add(user);
+        await _miniTwitContext.SaveChangesAsync();
 
-            // Prepare the post message request DTO.
-            var requestDto = new PostMessageRequest(AuthorId: 1, Text: "Hello, world!", PubDate: null);
+        // Prepare the post message request DTO.
+        var requestDto = new PostMessageRequest(AuthorId: 1, Text: "Hello, world!", PubDate: null);
 
-            // Act: Call POST /message.
-            var response = await _client.PostAsJsonAsync("/message", requestDto);
-            response.EnsureSuccessStatusCode();
-            Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
+        // Act: Call POST /message.
+        var response = await _client.PostAsJsonAsync("/message", requestDto);
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
 
-            // Deserialize the response into a PostMessageResponse DTO.
-            var responseDto = await response.Content.ReadFromJsonAsync<PostMessageResponse>(_jsonOptions);
-            Assert.NotNull(responseDto);
-            Assert.Equal(1, responseDto!.AuthorId);
-            Assert.Equal("Hello, world!", responseDto.Text);
-            Assert.NotNull(responseDto.PubDate);
-            Assert.True(responseDto.MessageId > 0);
+        // Deserialize the response into a PostMessageResponse DTO.
+        var responseDto = await response.Content.ReadFromJsonAsync<PostMessageResponse>(_jsonOptions);
+        Assert.NotNull(responseDto);
+        Assert.Equal(1, responseDto!.AuthorId);
+        Assert.Equal("Hello, world!", responseDto.Text);
+        Assert.NotNull(responseDto.PubDate);
+        Assert.True(responseDto.MessageId > 0);
 
-            // Verify the message exists in the database.
-            var messageInDb = await _miniTwitContext.Messages.FirstOrDefaultAsync(m => m.MessageId == responseDto.MessageId);
-            Assert.NotNull(messageInDb);
-            Assert.Equal(responseDto.AuthorId, messageInDb.AuthorId);
-            Assert.Equal(responseDto.Text, messageInDb.Text);
-        }
-
-
+        // Verify the message exists in the database.
+        var messageInDb = await _miniTwitContext.Messages.FirstOrDefaultAsync(m => m.MessageId == responseDto.MessageId);
+        Assert.NotNull(messageInDb);
+        Assert.Equal(responseDto.AuthorId, messageInDb.AuthorId);
+        Assert.Equal(responseDto.Text, messageInDb.Text);
+    }
 
     //We don't care about the InitializeAsync method, but needed to implement the IAsyncLifetime interface
     public Task InitializeAsync() => Task.CompletedTask;
