@@ -93,7 +93,7 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Read and deserialize the JSON response into a list of DTOs.
         var json = await response.Content.ReadAsStringAsync();
-        var dtos = JsonSerializer.Deserialize<List<MessageDto>>(
+        var dtos = JsonSerializer.Deserialize<List<GetMessageDto>>(
             json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
         );
@@ -163,7 +163,7 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Read and deserialize the JSON response into a list of DTOs.
         var json = await response.Content.ReadAsStringAsync();
-        var dtos = JsonSerializer.Deserialize<List<MessageDto>>(
+        var dtos = JsonSerializer.Deserialize<List<GetMessageDto>>(
             json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
         );
@@ -233,7 +233,7 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Read and deserialize the JSON response into a list of DTOs.
         var json = await response.Content.ReadAsStringAsync();
-        var dtos = JsonSerializer.Deserialize<List<MessageDto>>(
+        var dtos = JsonSerializer.Deserialize<List<GetMessageDto>>(
             json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
         );
