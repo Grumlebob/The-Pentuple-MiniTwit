@@ -26,8 +26,11 @@ public class MiniTwitTests : IAsyncLifetime
     private readonly Func<Task> _resetDatabase;
 
     private readonly MiniTwitDbContext _miniTwitContext;
-    
-    private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
+
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
 
     public MiniTwitTests(MiniTwitApiWebAppFactory factory)
     {
@@ -171,10 +174,7 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Read and deserialize the JSON response into a list of DTOs.
         var json = await response.Content.ReadAsStringAsync();
-        var dtos = JsonSerializer.Deserialize<List<GetMessageDto>>(
-            json,
-            _jsonOptions
-        );
+        var dtos = JsonSerializer.Deserialize<List<GetMessageDto>>(json, _jsonOptions);
 
         // Assert: Expect 2 messages in the public timeline.
         Assert.NotNull(dtos);
@@ -241,10 +241,7 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Read and deserialize the JSON response into a list of DTOs.
         var json = await response.Content.ReadAsStringAsync();
-        var dtos = JsonSerializer.Deserialize<List<GetMessageDto>>(
-            json,
-            _jsonOptions
-        );
+        var dtos = JsonSerializer.Deserialize<List<GetMessageDto>>(json, _jsonOptions);
 
         // Assert: Expect only messages authored by user 1.
         Assert.NotNull(dtos);
@@ -348,92 +345,98 @@ public class MiniTwitTests : IAsyncLifetime
         );
         Assert.False(existsAfter);
     }
-    
-     [Fact]
-        public async Task RegisterUserEndpoint_WorksAsExpected()
+
+    [Fact]
+    public async Task RegisterUserEndpoint_WorksAsExpected()
+    {
+        // Arrange: Clear the Users table.
+        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
+        await _miniTwitContext.SaveChangesAsync();
+        _miniTwitContext.ChangeTracker.Clear();
+
+        // Prepare the registration request.
+        var registerRequest = new
         {
-            // Arrange: Clear the Users table.
-            _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
-            await _miniTwitContext.SaveChangesAsync();
-            _miniTwitContext.ChangeTracker.Clear();
+            Username = "newuser",
+            Email = "newuser@example.com",
+            Password = "secret",
+        };
 
-            // Prepare the registration request.
-            var registerRequest = new 
-            { 
-                Username = "newuser", 
-                Email = "newuser@example.com", 
-                Password = "secret" 
-            };
+        // Act: Call POST /register.
+        var response = await _client.PostAsJsonAsync("/register", registerRequest);
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
 
-            // Act: Call POST /register.
-            var response = await _client.PostAsJsonAsync("/register", registerRequest);
-            response.EnsureSuccessStatusCode();
-            Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
+        // Deserialize the response into the DTO.
+        var registerResponse = await response.Content.ReadFromJsonAsync<RegisterUserResponse>(
+            _jsonOptions
+        );
+        Assert.NotNull(registerResponse);
+        Assert.Equal("newuser", registerResponse!.Username);
+        Assert.Equal("newuser@example.com", registerResponse.Email);
+        Assert.True(registerResponse.UserId > 0);
 
-            // Deserialize the response into the DTO.
-            var registerResponse = await response.Content.ReadFromJsonAsync<RegisterUserResponse>(_jsonOptions);
-            Assert.NotNull(registerResponse);
-            Assert.Equal("newuser", registerResponse!.Username);
-            Assert.Equal("newuser@example.com", registerResponse.Email);
-            Assert.True(registerResponse.UserId > 0);
+        // Verify that the user exists in the database.
+        var userInDb = await _miniTwitContext.Users.FirstOrDefaultAsync(u =>
+            u.UserId == registerResponse.UserId
+        );
+        Assert.NotNull(userInDb);
+        Assert.Equal("newuser", userInDb!.Username);
+    }
 
-            // Verify that the user exists in the database.
-            var userInDb = await _miniTwitContext.Users.FirstOrDefaultAsync(u => u.UserId == registerResponse.UserId);
-            Assert.NotNull(userInDb);
-            Assert.Equal("newuser", userInDb!.Username);
-        }
+    [Fact]
+    public async Task LoginUserEndpoint_WorksAsExpected()
+    {
+        // Arrange: Clear the Users table and add a user.
+        _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
+        await _miniTwitContext.SaveChangesAsync();
+        _miniTwitContext.ChangeTracker.Clear();
 
-        [Fact]
-        public async Task LoginUserEndpoint_WorksAsExpected()
+        var user = new User
         {
-            // Arrange: Clear the Users table and add a user.
-            _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
-            await _miniTwitContext.SaveChangesAsync();
-            _miniTwitContext.ChangeTracker.Clear();
+            Username = "loginuser",
+            Email = "loginuser@example.com",
+            PwHash = "mypassword", // For demonstration, the password is stored in plain text.
+        };
+        _miniTwitContext.Users.Add(user);
+        await _miniTwitContext.SaveChangesAsync();
 
-            var user = new User 
-            { 
-                Username = "loginuser", 
-                Email = "loginuser@example.com", 
-                PwHash = "mypassword"  // For demonstration, the password is stored in plain text.
-            };
-            _miniTwitContext.Users.Add(user);
-            await _miniTwitContext.SaveChangesAsync();
+        // Act: Successful login.
+        var loginRequest = new { Email = "loginuser@example.com", Password = "mypassword" };
+        var response = await _client.PostAsJsonAsync("/login", loginRequest);
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
 
-            // Act: Successful login.
-            var loginRequest = new { Email = "loginuser@example.com", Password = "mypassword" };
-            var response = await _client.PostAsJsonAsync("/login", loginRequest);
-            response.EnsureSuccessStatusCode();
-            Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+        var loginResponse = await response.Content.ReadFromJsonAsync<LoginUserResponse>(
+            _jsonOptions
+        );
+        Assert.NotNull(loginResponse);
+        Assert.Equal(user.UserId, loginResponse!.UserId);
+        Assert.Equal("loginuser", loginResponse.Username);
+        Assert.Equal("loginuser@example.com", loginResponse.Email);
+        Assert.Equal("fake-token", loginResponse.Token);
 
-            var loginResponse = await response.Content.ReadFromJsonAsync<LoginUserResponse>(_jsonOptions);
-            Assert.NotNull(loginResponse);
-            Assert.Equal(user.UserId, loginResponse!.UserId);
-            Assert.Equal("loginuser", loginResponse.Username);
-            Assert.Equal("loginuser@example.com", loginResponse.Email);
-            Assert.Equal("fake-token", loginResponse.Token);
+        // Act: Failed login (wrong password).
+        var wrongLoginRequest = new { Email = "loginuser@example.com", Password = "wrongpassword" };
+        var responseWrong = await _client.PostAsJsonAsync("/login", wrongLoginRequest);
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, responseWrong.StatusCode);
+    }
 
-            // Act: Failed login (wrong password).
-            var wrongLoginRequest = new { Email = "loginuser@example.com", Password = "wrongpassword" };
-            var responseWrong = await _client.PostAsJsonAsync("/login", wrongLoginRequest);
-            Assert.Equal(System.Net.HttpStatusCode.Unauthorized, responseWrong.StatusCode);
-        }
+    [Fact]
+    public async Task LogoutUserEndpoint_WorksAsExpected()
+    {
+        // Act: Call POST /logout.
+        var response = await _client.PostAsync("/logout", null);
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
 
-        [Fact]
-        public async Task LogoutUserEndpoint_WorksAsExpected()
-        {
-            // Act: Call POST /logout.
-            var response = await _client.PostAsync("/logout", null);
-            response.EnsureSuccessStatusCode();
-            Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
-
-            var logoutResponse = await response.Content.ReadFromJsonAsync<LogoutUserResponse>(_jsonOptions);
-            Assert.NotNull(logoutResponse);
-            Assert.True(logoutResponse!.Success);
-            Assert.Equal("Logged out successfully.", logoutResponse.Message);
-        }
-    
-    
+        var logoutResponse = await response.Content.ReadFromJsonAsync<LogoutUserResponse>(
+            _jsonOptions
+        );
+        Assert.NotNull(logoutResponse);
+        Assert.True(logoutResponse!.Success);
+        Assert.Equal("Logged out successfully.", logoutResponse.Message);
+    }
 
     //We don't care about the InitializeAsync method, but needed to implement the IAsyncLifetime interface
     public Task InitializeAsync() => Task.CompletedTask;
