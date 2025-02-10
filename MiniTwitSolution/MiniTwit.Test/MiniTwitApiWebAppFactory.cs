@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MiniTwit.Api.Infrastructure;
-using Respawn;
 using Npgsql;
+using Respawn;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -38,7 +38,8 @@ public class MiniTwitApiWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
             });
 
             services.AddScoped<IMiniTwitDbContext>(provider =>
-                provider.GetRequiredService<MiniTwitDbContext>());
+                provider.GetRequiredService<MiniTwitDbContext>()
+            );
         });
     }
 
@@ -50,9 +51,9 @@ public class MiniTwitApiWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();
-        
+
         _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
-        
+
         HttpClient = CreateClient();
         HttpClient.Timeout = TimeSpan.FromMinutes(MaxWaitTimeMinutes);
 
@@ -62,7 +63,7 @@ public class MiniTwitApiWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
             var context = scope.ServiceProvider.GetRequiredService<MiniTwitDbContext>();
             await context.Database.EnsureCreatedAsync();
         }
-        
+
         await InitializeRespawner();
     }
 
@@ -74,7 +75,7 @@ public class MiniTwitApiWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
             new RespawnerOptions
             {
                 DbAdapter = DbAdapter.Postgres,
-                SchemasToInclude = new[] { "public" }
+                SchemasToInclude = new[] { "public" },
             }
         );
     }

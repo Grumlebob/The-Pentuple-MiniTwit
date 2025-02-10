@@ -10,16 +10,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //TESTING MODE
-builder.Environment.EnvironmentName = "Testing"; 
+builder.Environment.EnvironmentName = "Testing";
 
 // Only configure database if we're not in test mode
 if (!builder.Environment.IsEnvironment("Testing"))
 {
     builder.Services.AddDbContext<MiniTwitDbContext>(options =>
-        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-        
-    builder.Services.AddScoped<IMiniTwitDbContext>(provider => 
-        provider.GetRequiredService<MiniTwitDbContext>());
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+    );
+
+    builder.Services.AddScoped<IMiniTwitDbContext>(provider =>
+        provider.GetRequiredService<MiniTwitDbContext>()
+    );
 }
 
 var app = builder.Build();
@@ -36,9 +38,9 @@ app.UseHttpsRedirection();
 app.MapGet("/hello", () => "Hello, MiniTwit API is running!");
 
 //Timeline endpoints
-app.MapGetPrivateTimelineEndpoints();    // Registers GET "/" with timeline logic.
-app.MapGetPublicTimelineEndpoints();     // registers GET "/public"
-app.MapGetUserTimelineEndpoints();       // registers GET "/user/{id:int}"
+app.MapGetPrivateTimelineEndpoints(); // Registers GET "/" with timeline logic.
+app.MapGetPublicTimelineEndpoints(); // registers GET "/public"
+app.MapGetUserTimelineEndpoints(); // registers GET "/user/{id:int}"
 
 app.Run();
 

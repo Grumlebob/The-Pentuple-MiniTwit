@@ -1,6 +1,3 @@
 namespace MiniTwit.Shared.DTO;
 
-public class PostMessage
-{
-    
-}
+public class PostMessage { }

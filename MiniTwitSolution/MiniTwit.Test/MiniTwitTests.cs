@@ -43,19 +43,30 @@ public class MiniTwitTests : IAsyncLifetime
     [Fact]
     public async Task GetPrivateTimeLineWorksAsExpected()
     {
-// Remove all existing entities (force enumeration with ToList())
+        // Remove all existing entities (force enumeration with ToList())
         _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
         _miniTwitContext.Followers.RemoveRange(_miniTwitContext.Followers.ToList());
         _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
         await _miniTwitContext.SaveChangesAsync();
 
-// Clear any tracked entities to avoid conflicts
+        // Clear any tracked entities to avoid conflicts
         _miniTwitContext.ChangeTracker.Clear();
 
-
         // Create two users.
-        var user1 = new User { UserId = 1, Username = "user1", Email = "user1@example.com", PwHash = "hash1" };
-        var user2 = new User { UserId = 2, Username = "user2", Email = "user2@example.com", PwHash = "hash2" };
+        var user1 = new User
+        {
+            UserId = 1,
+            Username = "user1",
+            Email = "user1@example.com",
+            PwHash = "hash1",
+        };
+        var user2 = new User
+        {
+            UserId = 2,
+            Username = "user2",
+            Email = "user2@example.com",
+            PwHash = "hash2",
+        };
         _miniTwitContext.Users.AddRange(user1, user2);
         await _miniTwitContext.SaveChangesAsync();
 
@@ -65,22 +76,26 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Insert messages for both users.
         var currentTime = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        _miniTwitContext.Messages.Add(new Message
-        {
-            MessageId = 1,
-            AuthorId = 1,
-            Text = "Hello from user1",
-            PubDate = currentTime,
-            Flagged = 0
-        });
-        _miniTwitContext.Messages.Add(new Message
-        {
-            MessageId = 2,
-            AuthorId = 2,
-            Text = "Hello from user2",
-            PubDate = currentTime,
-            Flagged = 0
-        });
+        _miniTwitContext.Messages.Add(
+            new Message
+            {
+                MessageId = 1,
+                AuthorId = 1,
+                Text = "Hello from user1",
+                PubDate = currentTime,
+                Flagged = 0,
+            }
+        );
+        _miniTwitContext.Messages.Add(
+            new Message
+            {
+                MessageId = 2,
+                AuthorId = 2,
+                Text = "Hello from user2",
+                PubDate = currentTime,
+                Flagged = 0,
+            }
+        );
         await _miniTwitContext.SaveChangesAsync();
 
         // --- Call the API Endpoint ---
@@ -90,10 +105,10 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Read and deserialize the JSON response.
         var json = await response.Content.ReadAsStringAsync();
-        var messages = JsonSerializer.Deserialize<List<Message>>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var messages = JsonSerializer.Deserialize<List<Message>>(
+            json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
 
         Assert.NotNull(messages);
         // We expect 2 messages: one from user1 and one from user2.
@@ -109,34 +124,49 @@ public class MiniTwitTests : IAsyncLifetime
         _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
         await _miniTwitContext.SaveChangesAsync();
 
-// Clear any tracked entities to avoid conflicts
+        // Clear any tracked entities to avoid conflicts
         _miniTwitContext.ChangeTracker.Clear();
 
-
         // Create two users.
-        var user1 = new User { UserId = 1, Username = "user1", Email = "user1@example.com", PwHash = "hash1" };
-        var user2 = new User { UserId = 2, Username = "user2", Email = "user2@example.com", PwHash = "hash2" };
+        var user1 = new User
+        {
+            UserId = 1,
+            Username = "user1",
+            Email = "user1@example.com",
+            PwHash = "hash1",
+        };
+        var user2 = new User
+        {
+            UserId = 2,
+            Username = "user2",
+            Email = "user2@example.com",
+            PwHash = "hash2",
+        };
         _miniTwitContext.Users.AddRange(user1, user2);
         await _miniTwitContext.SaveChangesAsync();
 
         // Insert messages for both users (both flagged=0).
         var currentTime = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        _miniTwitContext.Messages.Add(new Message
-        {
-            MessageId = 1,
-            AuthorId = 1,
-            Text = "Hello from user1",
-            PubDate = currentTime,
-            Flagged = 0
-        });
-        _miniTwitContext.Messages.Add(new Message
-        {
-            MessageId = 2,
-            AuthorId = 2,
-            Text = "Hello from user2",
-            PubDate = currentTime,
-            Flagged = 0
-        });
+        _miniTwitContext.Messages.Add(
+            new Message
+            {
+                MessageId = 1,
+                AuthorId = 1,
+                Text = "Hello from user1",
+                PubDate = currentTime,
+                Flagged = 0,
+            }
+        );
+        _miniTwitContext.Messages.Add(
+            new Message
+            {
+                MessageId = 2,
+                AuthorId = 2,
+                Text = "Hello from user2",
+                PubDate = currentTime,
+                Flagged = 0,
+            }
+        );
         await _miniTwitContext.SaveChangesAsync();
 
         // --- Act: Call the public timeline endpoint (GET "/public?offset=0") ---
@@ -145,10 +175,10 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Read and deserialize the JSON response.
         var json = await response.Content.ReadAsStringAsync();
-        var messages = JsonSerializer.Deserialize<List<Message>>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var messages = JsonSerializer.Deserialize<List<Message>>(
+            json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
 
         // Assert: Expect 2 messages in the public timeline.
         Assert.NotNull(messages);
@@ -158,40 +188,55 @@ public class MiniTwitTests : IAsyncLifetime
     [Fact]
     public async Task GetUserTimelineWorksAsExpected()
     {
-// Remove all existing entities (force enumeration with ToList())
+        // Remove all existing entities (force enumeration with ToList())
         _miniTwitContext.Users.RemoveRange(_miniTwitContext.Users.ToList());
         _miniTwitContext.Followers.RemoveRange(_miniTwitContext.Followers.ToList());
         _miniTwitContext.Messages.RemoveRange(_miniTwitContext.Messages.ToList());
         await _miniTwitContext.SaveChangesAsync();
 
-// Clear any tracked entities to avoid conflicts
+        // Clear any tracked entities to avoid conflicts
         _miniTwitContext.ChangeTracker.Clear();
 
-
         // Create two users.
-        var user1 = new User { UserId = 1, Username = "user1", Email = "user1@example.com", PwHash = "hash1" };
-        var user2 = new User { UserId = 2, Username = "user2", Email = "user2@example.com", PwHash = "hash2" };
+        var user1 = new User
+        {
+            UserId = 1,
+            Username = "user1",
+            Email = "user1@example.com",
+            PwHash = "hash1",
+        };
+        var user2 = new User
+        {
+            UserId = 2,
+            Username = "user2",
+            Email = "user2@example.com",
+            PwHash = "hash2",
+        };
         _miniTwitContext.Users.AddRange(user1, user2);
         await _miniTwitContext.SaveChangesAsync();
 
         // Insert messages for both users.
         var currentTime = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        _miniTwitContext.Messages.Add(new Message
-        {
-            MessageId = 1,
-            AuthorId = 1,
-            Text = "Hello from user1",
-            PubDate = currentTime,
-            Flagged = 0
-        });
-        _miniTwitContext.Messages.Add(new Message
-        {
-            MessageId = 2,
-            AuthorId = 2,
-            Text = "Hello from user2",
-            PubDate = currentTime,
-            Flagged = 0
-        });
+        _miniTwitContext.Messages.Add(
+            new Message
+            {
+                MessageId = 1,
+                AuthorId = 1,
+                Text = "Hello from user1",
+                PubDate = currentTime,
+                Flagged = 0,
+            }
+        );
+        _miniTwitContext.Messages.Add(
+            new Message
+            {
+                MessageId = 2,
+                AuthorId = 2,
+                Text = "Hello from user2",
+                PubDate = currentTime,
+                Flagged = 0,
+            }
+        );
         await _miniTwitContext.SaveChangesAsync();
 
         // --- Act: Call the user timeline endpoint (GET "/user/1?offset=0") ---
@@ -200,17 +245,16 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Read and deserialize the JSON response.
         var json = await response.Content.ReadAsStringAsync();
-        var messages = JsonSerializer.Deserialize<List<Message>>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var messages = JsonSerializer.Deserialize<List<Message>>(
+            json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
 
         // Assert: Expect only messages authored by user 1.
         Assert.NotNull(messages);
         Assert.Single(messages);
         Assert.Equal(1, messages![0].AuthorId);
     }
-
 
     //We don't care about the InitializeAsync method, but needed to implement the IAsyncLifetime interface
     public Task InitializeAsync() => Task.CompletedTask;

@@ -5,7 +5,7 @@ public partial class Follower
 {
     [Key]
     [Column("who_id", Order = 0)]
-    public int WhoId { get; set; }  // The user who follows
+    public int WhoId { get; set; } // The user who follows
 
     [Key]
     [Column("whom_id", Order = 1)]
