@@ -20,9 +20,11 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+        include-prerelease: true  # Enables preview versions so .NET 9.0 is available
+        
     - name: Restore dependencies
       run: dotnet restore MiniTwitSolution/MiniTwitSolution.sln
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build MiniTwitSolution/MiniTwitSolution.sln --no-restore --configuration Release
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test MiniTwitSolution/MiniTwitSolution.sln --collect:"XPlat Code Coverage"
