@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Shared.DTO.Timeline;
 
@@ -11,7 +10,7 @@ namespace MiniTwit.Api.Features.Timeline.GetPrivateTimeline
         )
         {
             routes.MapGet(
-                "/",
+                "/ereree",
                 async (
                     HttpContext context,
                     int? offset,

@@ -7,7 +7,7 @@ public static class Endpoint
     public static IEndpointRouteBuilder MapLoginUserEndpoints(this IEndpointRouteBuilder routes)
     {
         routes.MapPost(
-            "/login",
+            "/loginerere",
             async (LoginUserRequest request, MiniTwitDbContext db) =>
             {
                 // Find the user by email.
@@ -22,17 +22,8 @@ public static class Endpoint
                 {
                     return Results.Unauthorized();
                 }
-
-                // Generate a token (for demonstration, a fake token is returned).
-                var token = "fake-token";
-
-                var responseDto = new LoginUserResponse(
-                    user.UserId,
-                    user.Username,
-                    user.Email,
-                    token
-                );
-                return Results.Ok(responseDto);
+                
+                return Results.Redirect($"/{user.Username}");
             }
         );
 

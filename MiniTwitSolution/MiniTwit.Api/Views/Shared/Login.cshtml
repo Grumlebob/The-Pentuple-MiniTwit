@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Sign In";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Sign In</h2>
+
+@if (TempData["FlashMessage"] != null)
+{
+    <div class="flash">@TempData["FlashMessage"]</div>
+}
+
+<form asp-action="Login" method="post">
+    <dl>
+        <dt>Username:</dt>
+        <dd><input type="text" name="Username" /></dd>
+        <dt>Password:</dt>
+        <dd><input type="password" name="Password" /></dd>
+    </dl>
+    <div class="actions">
+        <input type="submit" value="Sign In" />
+    </div>
+</form>

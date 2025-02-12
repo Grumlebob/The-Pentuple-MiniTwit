@@ -1,0 +1,140 @@
+﻿@model MiniTwit.Api.Features.Timeline.TimelineViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>
+        @if (Model.ProfileUser != null)
+        {
+            @($"{Model.ProfileUser.Username}'s Timeline")
+        }
+        else if (User.Identity.IsAuthenticated)
+        {
+            @("My Timeline")
+        }
+        else
+        {
+            @("Public Timeline")
+        }
+        - MiniTwit
+    </title>
+    <link rel="stylesheet" type="text/css" href="~/style.css"/>
+</head>
+<body>
+<div class="page">
+    <h1>MiniTwit</h1>
+    <div class="navigation">
+        @if (User.Identity.IsAuthenticated)
+        {
+            <a href="@Url.Action("Index", "Timeline")">My Timeline</a>
+            <a href="@Url.Action("PublicTimeline", "Timeline")">Public Timeline</a>
+            <a href="@Url.Action("Logout", "Account")">Sign Out [@User.Identity.Name]</a>
+        }
+        else
+        {
+            <a href="@Url.Action("PublicTimeline", "Timeline")">Public Timeline</a>
+            <a href="@Url.Action("Register", "Account")">Sign Up</a>
+            <a href="@Url.Action("Login", "Account")">Sign In</a>
+        }
+    </div>
+
+    @if (TempData["FlashMessage"] != null)
+    {
+        <ul class="flashes">
+            <li>@TempData["FlashMessage"]</li>
+        </ul>
+    }
+
+    <div class="body">
+        @if (Model.ProfileUser != null)
+        {
+            <h2>@Model.ProfileUser.Username's Timeline</h2>
+            @if (User.Identity.IsAuthenticated)
+            {
+                if (Model.CurrentUserId.HasValue && Model.CurrentUserId.Value != Model.ProfileUser.UserId)
+                {
+                    if (Model.Followed)
+                    {
+                        <div class="followstatus">
+                            You are currently following @Model.ProfileUser.Username.
+                            <a href="/@Model.ProfileUser.Username/unfollow">Unfollow</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="followstatus">
+                            You are not following @Model.ProfileUser.Username.
+                            <a href="/@Model.ProfileUser.Username/follow">Follow</a>
+                        </div>
+                    }
+                }
+                else if (Model.CurrentUserId.HasValue && Model.CurrentUserId.Value == Model.ProfileUser.UserId)
+                {
+                    <div class="twitbox">
+                        <h3>What's on your mind?</h3>
+                        <form method="post" action="/add_message">
+                            <input type="text" name="text" size="60"/>
+                            <input type="hidden" name="AuthorId" value="@Model.CurrentUserId"/>
+                            <input type="submit" value="Share"/>
+                        </form>
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            <h2>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    @("My Timeline")
+                }
+                else
+                {
+                    @("Public Timeline")
+                }
+            </h2>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="twitbox">
+                    <h3>What's on your mind?</h3>
+                    <form method="post" action="/add_message">
+                        <input type="text" name="text" size="60"/>
+                        <input type="hidden" name="AuthorId" value="@Model.CurrentUserId"/>
+                        <input type="submit" value="Share"/>
+                    </form>
+                </div>
+            }
+        }
+
+        <ul class="messages">
+            @if (Model.Messages.Any())
+            {
+                foreach (var message in Model.Messages)
+                {
+                    <li>
+                        <strong>
+                            <a href="@Url.Action("UserTimeline", "Timeline", new { username = message.Author.Username })">
+                                @message.Author.Username
+                            </a>
+                        </strong>: @message.Text
+                        <small>&mdash; @(new DateTime((long)(message.PubDate ?? 0)))</small>
+                    </li>
+                }
+            }
+            else
+            {
+                <li>
+                    <em>There's no message so far.</em>
+                </li>
+            }
+        </ul>
+
+
+    </div>
+
+    <div class="footer">
+        MiniTwit &mdash; An ASP.NET Core Application
+    </div>
+</div>
+</body>
+</html>

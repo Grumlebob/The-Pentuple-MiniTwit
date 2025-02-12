@@ -23,6 +23,7 @@
     <None Update="Infrastructure\minitwit.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="wwwroot\style.css" />
   </ItemGroup>
   <ItemGroup>
       <Folder Include="Features\Messages\PostMessage\" />

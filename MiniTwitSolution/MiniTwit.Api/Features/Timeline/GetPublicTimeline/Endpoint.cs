@@ -11,7 +11,7 @@ namespace MiniTwit.Api.Features.Timeline.GetPublicTimeline
         )
         {
             routes.MapGet(
-                "/public",
+                "/publicerere",
                 async (
                     HttpContext context,
                     int? offset,

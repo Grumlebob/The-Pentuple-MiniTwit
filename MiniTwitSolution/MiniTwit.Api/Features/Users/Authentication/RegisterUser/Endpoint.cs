@@ -7,7 +7,7 @@ public static class Endpoint
     public static IEndpointRouteBuilder MapRegisterUserEndpoints(this IEndpointRouteBuilder routes)
     {
         routes.MapPost(
-            "/register",
+            "/registerereere",
             async (RegisterUserRequest request, MiniTwitDbContext db) =>
             {
                 // Check if a user with the same email or username already exists.
@@ -30,13 +30,7 @@ public static class Endpoint
                 };
                 db.Users.Add(newUser);
                 await db.SaveChangesAsync();
-
-                var responseDto = new RegisterUserResponse(
-                    newUser.UserId,
-                    newUser.Username,
-                    newUser.Email
-                );
-                return Results.Created($"/register/{newUser.UserId}", responseDto);
+                return Results.Redirect("/login");
             }
         );
 

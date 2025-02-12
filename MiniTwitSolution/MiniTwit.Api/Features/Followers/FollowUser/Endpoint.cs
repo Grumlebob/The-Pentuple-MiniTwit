@@ -11,7 +11,7 @@ namespace MiniTwit.Api.Features.Followers.FollowUser
         {
             // POST /follow : Follow a user.
             routes.MapPost(
-                "/follow",
+                "/followerere",
                 async (
                     FollowRequest request,
                     MiniTwitDbContext db,

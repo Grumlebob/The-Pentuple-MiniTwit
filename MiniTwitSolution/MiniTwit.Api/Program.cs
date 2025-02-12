@@ -13,8 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddControllersWithViews();
+builder.Services.AddSession();  // if you need session for flash messages
 builder.Services.AddSwaggerGen();
-
 //TESTING MODE
 //If outcommented, we use SQLite in-memory database
 //Otherwise it uses Postgres
@@ -31,6 +32,15 @@ if (!builder.Environment.IsEnvironment("Testing"))
         provider.GetRequiredService<MiniTwitDbContext>()
     );
 }
+
+// In Program.cs:
+builder.Services.AddAuthentication("CookieAuth")
+    .AddCookie("CookieAuth", options =>
+    {
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
+    });
+
 
 // Register basic caching services
 builder.Services.AddMemoryCache();
@@ -57,6 +67,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseSession();
+app.MapControllers();
+app.UseAuthentication();
+app.UseAuthorization();
 
 //Timeline endpoints
 app.MapGetPrivateTimelineEndpoints(); // Registers GET "/" with timeline logic.

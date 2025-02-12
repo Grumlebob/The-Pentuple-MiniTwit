@@ -11,7 +11,7 @@ namespace MiniTwit.Api.Features.Followers.UnfollowUser
         {
             // DELETE /follow : Unfollow a user.
             routes.MapDelete(
-                "/follow",
+                "/followerere",
                 async (
                     HttpRequest request,
                     MiniTwitDbContext db,

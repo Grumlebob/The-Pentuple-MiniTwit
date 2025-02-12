@@ -14,7 +14,7 @@ import tempfile
 import minitwit
 import requests
 
-BASE_URL = "http://localhost:5000"
+BASE_URL = "http://localhost:5064"
 
 class MiniTwitTestCase(unittest.TestCase):
 

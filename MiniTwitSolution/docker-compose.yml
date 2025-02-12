@@ -13,10 +13,3 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-
-  client:
-    build:
-      context: .
-      dockerfile: MiniTwit.Client/Dockerfile
-    ports:
-      - "5001:80"

@@ -8,7 +8,7 @@ public static class LogoutUserEndpoints
     {
         // For demonstration, we use POST /logout.
         routes.MapPost(
-            "/logout",
+            "/logouterere",
             (HttpContext context) =>
             {
                 // In a real application, you might clear authentication cookies or invalidate a token.

@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>@ViewData["Title"] - MiniTwit</title>
+    <link rel="stylesheet" type="text/css" href="~/style.css"/>
+</head>
+<body>
+<div class="page">
+    <h1>MiniTwit</h1>
+    <div class="navigation">
+        @if (User.Identity.IsAuthenticated)
+        {
+        <a href="@Url.Action("Index", "Timeline", new { userId = User.FindFirst("UserId")?.Value })">My Timeline</a> 
+        <a href="@Url.Action("PublicTimeline", "Timeline")">Public Timeline</a> 
+        <form id="logoutForm" asp-action="Logout" asp-controller="Account" method="post" style="display:inline">
+        <button type="submit" style="background:none;border:none;padding:0;cursor:pointer;color:blue;text-decoration:underline;">
+        Sign Out [@User.Identity.Name]
+        </button>
+        </form>
+        }
+        else
+        {
+        <a href="@Url.Action("PublicTimeline", "Timeline")">Public Timeline</a> 
+        <a href="@Url.Action("Register", "Account")">Sign Up</a> 
+        <a href="@Url.Action("Login", "Account")">Sign In</a>
+        }
+
+
+    </div>
+
+    @if (TempData["FlashMessage"] != null)
+    {
+        <ul class="flashes">
+            <li>@TempData["FlashMessage"]</li>
+        </ul>
+    }
+
+    <div class="body">
+        @RenderBody()
+    </div>
+
+    <div class="footer">
+        MiniTwit &mdash; An ASP.NET Core Application
+    </div>
+</div>
+</body>
+</html>
