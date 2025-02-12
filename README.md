@@ -10,7 +10,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/Grumlebob/The-Pentuple-MiniTwit/badge.svg?branch=main)](https://coveralls.io/github/Grumlebob/The-Pentuple-MiniTwit?branch=main)
 
 **CII Best Practices badge**
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/PROJECT_ID/badge)](https://bestpractices.coreinfrastructure.org/projects/PROJECT_ID)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/10014/badge)](https://bestpractices.coreinfrastructure.org/projects/PROJECT_ID)
 
 
 **Github badges**
