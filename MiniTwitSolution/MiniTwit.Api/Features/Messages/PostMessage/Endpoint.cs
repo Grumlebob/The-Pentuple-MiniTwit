@@ -9,11 +9,18 @@ public static class Endpoint
     {
         routes.MapPost(
             "/add_message",
-            async (PostMessageRequest request, MiniTwitDbContext db, HybridCache hybridCache,
-                CancellationToken cancellationToken) =>
+            async (
+                PostMessageRequest request,
+                MiniTwitDbContext db,
+                HybridCache hybridCache,
+                CancellationToken cancellationToken
+            ) =>
             {
                 // Validate that the author exists.
-                var author = await db.Users.FindAsync(new object[] { request.AuthorId }, cancellationToken);
+                var author = await db.Users.FindAsync(
+                    new object[] { request.AuthorId },
+                    cancellationToken
+                );
                 if (author == null)
                 {
                     return Results.BadRequest("Author not found.");
@@ -38,15 +45,21 @@ public static class Endpoint
                 // - Public timeline (first page)
                 await hybridCache.RemoveAsync("publicTimeline:0", cancellationToken);
                 // - Author's own timeline (first page)
-                await hybridCache.RemoveAsync($"userTimeline:{request.AuthorId}:0", cancellationToken);
+                await hybridCache.RemoveAsync(
+                    $"userTimeline:{request.AuthorId}:0",
+                    cancellationToken
+                );
                 // - Private timelines of all followers of the author (first page)
-                var followerIds = await db.Followers
-                    .Where(f => f.WhomId == request.AuthorId)
+                var followerIds = await db
+                    .Followers.Where(f => f.WhomId == request.AuthorId)
                     .Select(f => f.WhoId)
                     .ToListAsync(cancellationToken);
                 foreach (var followerId in followerIds)
                 {
-                    await hybridCache.RemoveAsync($"privateTimeline:{followerId}:0", cancellationToken);
+                    await hybridCache.RemoveAsync(
+                        $"privateTimeline:{followerId}:0",
+                        cancellationToken
+                    );
                 }
 
                 // Build the response DTO.

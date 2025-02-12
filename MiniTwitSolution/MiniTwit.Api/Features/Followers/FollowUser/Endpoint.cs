@@ -12,11 +12,22 @@ namespace MiniTwit.Api.Features.Followers.FollowUser
             // POST /follow : Follow a user.
             routes.MapPost(
                 "/follow",
-                async (FollowRequest request, MiniTwitDbContext db, HybridCache hybridCache, CancellationToken cancellationToken) =>
+                async (
+                    FollowRequest request,
+                    MiniTwitDbContext db,
+                    HybridCache hybridCache,
+                    CancellationToken cancellationToken
+                ) =>
                 {
                     // Validate that both users exist.
-                    var follower = await db.Users.FindAsync(new object[] { request.FollowerId }, cancellationToken);
-                    var followed = await db.Users.FindAsync(new object[] { request.FollowedId }, cancellationToken);
+                    var follower = await db.Users.FindAsync(
+                        new object[] { request.FollowerId },
+                        cancellationToken
+                    );
+                    var followed = await db.Users.FindAsync(
+                        new object[] { request.FollowedId },
+                        cancellationToken
+                    );
                     if (follower == null || followed == null)
                     {
                         return Results.BadRequest("Invalid user IDs.");
@@ -43,7 +54,10 @@ namespace MiniTwit.Api.Features.Followers.FollowUser
                     await db.SaveChangesAsync(cancellationToken);
 
                     // Invalidate the follower’s private timeline (first page).
-                    await hybridCache.RemoveAsync($"privateTimeline:{request.FollowerId}:0", cancellationToken);
+                    await hybridCache.RemoveAsync(
+                        $"privateTimeline:{request.FollowerId}:0",
+                        cancellationToken
+                    );
 
                     // Return a simple DTO.
                     var dto = new FollowResponse(newFollower.WhoId, newFollower.WhomId);

@@ -12,7 +12,12 @@ namespace MiniTwit.Api.Features.Followers.UnfollowUser
             // DELETE /follow : Unfollow a user.
             routes.MapDelete(
                 "/follow",
-                async (HttpRequest request, MiniTwitDbContext db, HybridCache hybridCache, CancellationToken cancellationToken) =>
+                async (
+                    HttpRequest request,
+                    MiniTwitDbContext db,
+                    HybridCache hybridCache,
+                    CancellationToken cancellationToken
+                ) =>
                 {
                     // Expect query parameters: followerId and followedId.
                     if (
@@ -37,7 +42,10 @@ namespace MiniTwit.Api.Features.Followers.UnfollowUser
                     await db.SaveChangesAsync(cancellationToken);
 
                     // Invalidate the follower’s private timeline (first page).
-                    await hybridCache.RemoveAsync($"privateTimeline:{followerId}:0", cancellationToken);
+                    await hybridCache.RemoveAsync(
+                        $"privateTimeline:{followerId}:0",
+                        cancellationToken
+                    );
 
                     // Return a DTO indicating success.
                     var dto = new UnfollowResponse(true, "Unfollowed successfully.");
