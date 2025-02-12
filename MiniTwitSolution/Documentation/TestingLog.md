@@ -22,6 +22,9 @@ builder.Environment.EnvironmentName = "Testing";
 This makes test use Postgres.
 If line is outcommented, we use SQLite.
 
+
+Both TestContainers and Respawn used this guide: https://www.youtube.com/watch?v=tj5ZCtvgXKY
+
 ### Respawn
 
 This helps us with dealing with concurrency and performance issues, when running tests.
