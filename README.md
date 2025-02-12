@@ -5,3 +5,4 @@
 [![Code scanning alerts](https://img.shields.io/github/code-scanning/alerts/Grumlebob/The-Pentuple-MiniTwit?branch=main)](https://github.com/Grumlebob/The-Pentuple-MiniTwit/security/code-scanning)
 [![GitHub issues](https://img.shields.io/github/issues/Grumlebob/The-Pentuple-MiniTwit.svg)](https://github.com/Grumlebob/The-Pentuple-MiniTwit/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/Grumlebob/The-Pentuple-MiniTwit.svg)](https://github.com/Grumlebob/The-Pentuple-MiniTwit/commits/main)
+[![Coverage Status](https://coveralls.io/repos/github/Grumlebob/The-Pentuple-MiniTwit/badge.svg?branch=main)](https://coveralls.io/github/Grumlebob/The-Pentuple-MiniTwit?branch=main)
