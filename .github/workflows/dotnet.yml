@@ -56,6 +56,12 @@ jobs:
           output: both
           thresholds: "20 80"
 
+      - name: Upload Coverage to Coveralls
+        uses: coverallsapp/coveralls-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: "MiniTwitSolution/MiniTwit.Test/TestResults/**/coverage.cobertura.xml"
+
 
       - name: Write to Job Summary
         run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
