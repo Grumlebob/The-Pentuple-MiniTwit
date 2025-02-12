@@ -1,5 +1,3 @@
-// Program.cs
-
 using MiniTwit.Api.Features.Followers.FollowUser;
 using MiniTwit.Api.Features.Followers.UnfollowUser;
 using MiniTwit.Api.Features.Messages.PostMessage;
@@ -17,7 +15,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //TESTING MODE
-builder.Environment.EnvironmentName = "Testing";
+//If outcommented, we use SQLite in-memory database
+//Otherwise it uses Postgres
+//builder.Environment.EnvironmentName = "Testing";
 
 // Only configure database if we're not in test mode
 if (!builder.Environment.IsEnvironment("Testing"))

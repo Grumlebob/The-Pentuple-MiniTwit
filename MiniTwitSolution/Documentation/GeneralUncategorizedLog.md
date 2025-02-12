@@ -117,7 +117,6 @@ We started from v1.0 which was the initial project we got through scp.
 * Large changes increment the left digit and sets the right to 0. (For example changing from python to C# took us from v1.1 to v2.0)
 Whether a change is small or large is agreed upon by the group before a release.
 
-
 # 10.02.2025
 
 Adding dependencies agreed upon above:
@@ -134,3 +133,17 @@ The added tests are not complete. We plan to rely on the already given python te
 the initial first versions of the C# is being done.
 The tests mostly server to see if we setup EF core relationships correctly,
 such as the common tricky many-to-many cases, where we need to avoid cyclic dependencies.
+
+## Docker
+To run:
+Go to root of director
+docker-compose up --build
+
+To stop:
+docker-compose down
+
+To open API:
+http://localhost:5000/
+
+to open Client:
+http://localhost:5001/
