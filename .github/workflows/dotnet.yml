@@ -46,7 +46,7 @@ jobs:
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: MiniTwitSolution/TestResults/**/coverage.cobertura.xml
+          filename: MiniTwitSolution/MiniTwit.Test/TestResults/**/coverage.cobertura.xml
           badge: true
           fail_below_min: true
           format: markdown
@@ -55,6 +55,7 @@ jobs:
           indicators: true
           output: both
           thresholds: "20 80"
+
 
       - name: Write to Job Summary
         run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
