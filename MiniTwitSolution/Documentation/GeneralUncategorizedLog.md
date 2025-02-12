@@ -147,3 +147,9 @@ http://localhost:5000/
 
 to open Client:
 http://localhost:5001/
+
+
+## CodeQL
+
+Added github security scanning to pipeline called CodeQL Advanced.
+Ensures we don't try to leak sensitive information, such as keys.
