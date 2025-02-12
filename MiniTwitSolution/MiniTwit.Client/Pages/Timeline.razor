@@ -1,0 +1,89 @@
+﻿@page "/"
+@page "/public"
+@page "/{username}"
+@using MiniTwit.Shared.DTO.Timeline
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<title>@if (IsPublic)
+        {
+            <text>Public Timeline</text>
+        }
+        else if (Username != null)
+        {
+            <text>@Username's Timeline</text>
+        }
+        else
+        {
+            <text>My Timeline</text>
+        }</title>
+
+    <h2>
+        @if (IsPublic)
+        {
+            <text>Public Timeline</text>
+        }
+        else if (Username != null)
+        {
+            <text>@Username's Timeline</text>
+        }
+        else
+        {
+            <text>My Timeline</text>
+        }
+    </h2>
+
+    @if (Messages.Any())
+    {
+        <ul>
+            @foreach (var message in Messages)
+            {
+                <li>
+                    <strong>@message.Author.Username</strong>: @message.Text
+                    <small>@message.PubDate.ToString()</small>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No messages to display.</p>
+    }
+@code {
+    // Define the model properties
+    private bool IsPublic { get; set; }
+    private string? Username { get; set; }
+    private List<GetMessageResponse> Messages { get; set; }
+
+    // Fetch data when the page is loaded
+    protected override async Task OnInitializedAsync()
+    {
+        var path = NavigationManager.Uri;
+
+        if (Username != null)
+        {
+            Messages = await GetMessagesForUser(Username);
+        }
+        else if (path.Contains("/public"))
+        {
+            Messages = await GetPublicMessages();
+        }
+        else
+        {
+            Messages = await GetMessagesForUser("");
+        }
+    }
+
+    // Mock methods to get messages
+    private async Task<List<GetMessageResponse>> GetMessagesForUser(string username)
+    {
+        var response = await Http.GetFromJsonAsync<List<GetMessageResponse>>($"/{username}");
+        return response ?? [];
+    }
+
+    private async Task<List<GetMessageResponse>> GetPublicMessages()
+    {
+        var response = await Http.GetFromJsonAsync<List<GetMessageResponse>>("/public");
+        return response ?? [];
+    }
+}
