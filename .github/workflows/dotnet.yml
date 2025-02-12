@@ -1,30 +1,61 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+---
+# spell-checker: disable
+name: Build and Test
 
-name: .NET
+env:
+  api-key: ${{ secrets.GITHUB_TOKEN }} # Navn på evn variable er "api-key"
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+    paths-ignore:
+      - "*.md"
+
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+    paths-ignore:
+      - "*.md"
+
+  workflow_dispatch:
 
 jobs:
   build:
-
+    name: Build & Test
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-        include-prerelease: true  # Enables preview versions so .NET 9.0 is available
-        
-    - name: Restore dependencies
-      run: dotnet restore MiniTwitSolution/MiniTwitSolution.sln
-    - name: Build
-      run: dotnet build MiniTwitSolution/MiniTwitSolution.sln --no-restore --configuration Release
-    - name: Test
-      run: dotnet test MiniTwitSolution/MiniTwitSolution.sln --collect:"XPlat Code Coverage"
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 9.0.x
+          include-prerelease: true  # Enable preview SDKs so that .NET 9.0 is supported
+
+      - name: Restore
+        run: dotnet restore MiniTwitSolution/MiniTwitSolution.sln
+
+      - name: Build
+        run: dotnet build MiniTwitSolution/MiniTwitSolution.sln --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test MiniTwitSolution/MiniTwitSolution.sln --collect:"XPlat Code Coverage"
+
+      - name: Code Coverage Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: MiniTwitSolution/TestResults/**/coverage.cobertura.xml
+          badge: true
+          fail_below_min: true
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: "20 80"
+
+      - name: Write to Job Summary
+        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+# spell-checker: enable
