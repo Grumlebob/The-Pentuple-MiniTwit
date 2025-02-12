@@ -1,4 +1,5 @@
-﻿using MiniTwit.Shared.DTO.Followers.FollowUser;
+﻿using Microsoft.Extensions.Caching.Hybrid;
+using MiniTwit.Shared.DTO.Followers.FollowUser;
 
 namespace MiniTwit.Api.Features.Followers.UnfollowUser
 {
@@ -11,7 +12,12 @@ namespace MiniTwit.Api.Features.Followers.UnfollowUser
             // DELETE /follow : Unfollow a user.
             routes.MapDelete(
                 "/follow",
-                async (HttpRequest request, MiniTwitDbContext db) =>
+                async (
+                    HttpRequest request,
+                    MiniTwitDbContext db,
+                    HybridCache hybridCache,
+                    CancellationToken cancellationToken
+                ) =>
                 {
                     // Expect query parameters: followerId and followedId.
                     if (
@@ -23,8 +29,9 @@ namespace MiniTwit.Api.Features.Followers.UnfollowUser
                     }
 
                     // Locate the follow relationship.
-                    var followRecord = await db.Followers.FirstOrDefaultAsync(f =>
-                        f.WhoId == followerId && f.WhomId == followedId
+                    var followRecord = await db.Followers.FirstOrDefaultAsync(
+                        f => f.WhoId == followerId && f.WhomId == followedId,
+                        cancellationToken
                     );
                     if (followRecord == null)
                     {
@@ -32,14 +39,19 @@ namespace MiniTwit.Api.Features.Followers.UnfollowUser
                     }
 
                     db.Followers.Remove(followRecord);
-                    await db.SaveChangesAsync();
+                    await db.SaveChangesAsync(cancellationToken);
+
+                    // Invalidate the follower’s private timeline (first page).
+                    await hybridCache.RemoveAsync(
+                        $"privateTimeline:{followerId}:0",
+                        cancellationToken
+                    );
 
                     // Return a DTO indicating success.
                     var dto = new UnfollowResponse(true, "Unfollowed successfully.");
                     return Results.Ok(dto);
                 }
             );
-
             return routes;
         }
     }

@@ -1,9 +1,5 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using MiniTwit.Api.Domain;
-using MiniTwit.Api.Features.Timeline;
-using MiniTwit.Api.Infrastructure;
+using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Shared.DTO.Timeline;
 
 namespace MiniTwit.Api.Features.Timeline.GetPublicTimeline
@@ -16,35 +12,51 @@ namespace MiniTwit.Api.Features.Timeline.GetPublicTimeline
         {
             routes.MapGet(
                 "/public",
-                async (HttpContext context, int? offset, MiniTwitDbContext db) =>
+                async (
+                    HttpContext context,
+                    int? offset,
+                    MiniTwitDbContext db,
+                    HybridCache hybridCache,
+                    CancellationToken cancellationToken
+                ) =>
                 {
                     const int perPage = 30;
                     int skip = offset ?? 0;
 
-                    // For the public timeline, return all messages that are not flagged.
-                    var messages = await db
-                        .Messages.Where(m => (m.Flagged ?? 0) == 0)
-                        .OrderByDescending(m => m.PubDate)
-                        .Skip(skip)
-                        .Take(perPage)
-                        .Include(m => m.Author)
-                        .ToListAsync();
+                    // Construct a unique cache key.
+                    string cacheKey = $"publicTimeline:{skip}";
 
-                    var dtos = messages
-                        .Select(m => new GetMessageResponse
+                    // Retrieve from cache or execute the factory delegate.
+                    var dtos = await hybridCache.GetOrCreateAsync<List<GetMessageResponse>>(
+                        cacheKey,
+                        async ct =>
                         {
-                            MessageId = m.MessageId,
-                            Text = m.Text,
-                            PubDate = m.PubDate,
-                            Author = m.Author is not null
-                                ? new GetUserResponse
+                            var messages = await db
+                                .Messages.Where(m => (m.Flagged ?? 0) == 0)
+                                .OrderByDescending(m => m.PubDate)
+                                .Skip(skip)
+                                .Take(perPage)
+                                .Include(m => m.Author)
+                                .ToListAsync(ct);
+
+                            return messages
+                                .Select(m => new GetMessageResponse
                                 {
-                                    UserId = m.Author.UserId,
-                                    Username = m.Author.Username,
-                                }
-                                : null,
-                        })
-                        .ToList();
+                                    MessageId = m.MessageId,
+                                    Text = m.Text,
+                                    PubDate = m.PubDate,
+                                    Author = m.Author is not null
+                                        ? new GetUserResponse
+                                        {
+                                            UserId = m.Author.UserId,
+                                            Username = m.Author.Username,
+                                        }
+                                        : null,
+                                })
+                                .ToList();
+                        },
+                        cancellationToken: cancellationToken
+                    );
 
                     return Results.Ok(dtos);
                 }

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.Features.Followers.FollowUser;
 using MiniTwit.Api.Features.Followers.UnfollowUser;
 using MiniTwit.Api.Features.Messages.PostMessage;
@@ -30,6 +31,22 @@ if (!builder.Environment.IsEnvironment("Testing"))
         provider.GetRequiredService<MiniTwitDbContext>()
     );
 }
+
+// Register basic caching services
+builder.Services.AddMemoryCache();
+
+// Register HybridCache (using the new .NET 9 API or a preview package)
+#pragma warning disable EXTEXP0018
+builder.Services.AddHybridCache(options =>
+{
+    options.DefaultEntryOptions = new HybridCacheEntryOptions()
+    {
+        LocalCacheExpiration = TimeSpan.FromMinutes(5),
+        Expiration = TimeSpan.FromMinutes(5),
+    };
+});
+#pragma warning restore EXTEXP0018
+
 
 var app = builder.Build();
 
