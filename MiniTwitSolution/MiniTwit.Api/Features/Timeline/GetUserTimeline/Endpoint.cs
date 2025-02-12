@@ -1,50 +1,47 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using MiniTwit.Api.Domain;
-using MiniTwit.Api.Features.Timeline;
-using MiniTwit.Api.Infrastructure;
 using MiniTwit.Shared.DTO.Timeline;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace MiniTwit.Api.Features.Timeline.GetUserTimeline
 {
     public static class Endpoint
     {
-        public static IEndpointRouteBuilder MapGetUserTimelineEndpoints(
-            this IEndpointRouteBuilder routes
-        )
+        public static IEndpointRouteBuilder MapGetUserTimelineEndpoints(this IEndpointRouteBuilder routes)
         {
-            // This endpoint expects a user ID in the URL, e.g. /user/1
             routes.MapGet(
                 "/user/{id:int}",
-                async (int id, int? offset, MiniTwitDbContext db) =>
+                async (int id, int? offset, MiniTwitDbContext db, HybridCache hybridCache, CancellationToken cancellationToken) =>
                 {
                     const int perPage = 30;
                     int skip = offset ?? 0;
+                    string cacheKey = $"userTimeline:{id}:{skip}";
 
-                    // Return messages authored by the specified user that are not flagged.
-                    var messages = await db
-                        .Messages.Where(m => m.AuthorId == id && (m.Flagged ?? 0) == 0)
-                        .OrderByDescending(m => m.PubDate)
-                        .Skip(skip)
-                        .Take(perPage)
-                        .Include(m => m.Author)
-                        .ToListAsync();
-
-                    var dtos = messages
-                        .Select(m => new GetMessageResponse
+                    var dtos = await hybridCache.GetOrCreateAsync<List<GetMessageResponse>>(
+                        cacheKey,
+                        async ct =>
                         {
-                            MessageId = m.MessageId,
-                            Text = m.Text,
-                            PubDate = m.PubDate,
-                            Author = m.Author is not null
-                                ? new GetUserResponse
+                            var messages = await db.Messages
+                                .Where(m => m.AuthorId == id && (m.Flagged ?? 0) == 0)
+                                .OrderByDescending(m => m.PubDate)
+                                .Skip(skip)
+                                .Take(perPage)
+                                .Include(m => m.Author)
+                                .ToListAsync(ct);
+
+                            return messages.Select(m => new GetMessageResponse
+                            {
+                                MessageId = m.MessageId,
+                                Text = m.Text,
+                                PubDate = m.PubDate,
+                                Author = m.Author is not null ? new GetUserResponse
                                 {
                                     UserId = m.Author.UserId,
                                     Username = m.Author.Username,
-                                }
-                                : null,
-                        })
-                        .ToList();
+                                } : null,
+                            }).ToList();
+                        },
+                        cancellationToken: cancellationToken
+                    );
 
                     return Results.Ok(dtos);
                 }
