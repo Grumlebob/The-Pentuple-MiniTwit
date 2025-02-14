@@ -1,4 +1,4 @@
-﻿namespace MiniTwit.Shared.DTO.Timeline;
+﻿namespace MiniTwit.Shared.DTO.Messages;
 
 public record GetMessageResponse(
     int MessageId,

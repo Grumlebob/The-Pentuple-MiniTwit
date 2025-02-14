@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Hybrid;
-using MiniTwit.Shared.DTO.Timeline;
+using MiniTwit.Shared.DTO.Messages;
 
 namespace MiniTwit.Api.Features.Messages.GetMessages
 {
