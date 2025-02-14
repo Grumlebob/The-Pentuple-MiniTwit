@@ -219,7 +219,7 @@ public class MiniTwitTests : IAsyncLifetime
         // Assert: Expect only messages authored by user 1.
         Assert.NotNull(dtos);
         Assert.Single(dtos!);
-        Assert.Equal(1, dtos![0].Author?.UserId);
+        Assert.Equal("user1", dtos![0].AuthorUsername);
     }
 
     [Fact]

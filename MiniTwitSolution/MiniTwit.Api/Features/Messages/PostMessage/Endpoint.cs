@@ -8,8 +8,9 @@ public static class Endpoint
     public static IEndpointRouteBuilder MapPostMessageEndpoints(this IEndpointRouteBuilder routes)
     {
         routes.MapPost(
-            "/add_message",
+            "/msgs/{username}",
             async (
+                string username,
                 PostMessageRequest request,
                 MiniTwitDbContext db,
                 HybridCache hybridCache,
@@ -18,22 +19,20 @@ public static class Endpoint
             {
                 // Validate that the author exists.
                 var author = await db.Users.FindAsync(
-                    new object[] { request.AuthorId },
+                    [username],
                     cancellationToken
                 );
                 if (author == null)
                 {
                     return Results.BadRequest("Author not found.");
                 }
-
-                // Determine publication date.
-                int pubDate = request.PubDate ?? (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-                // Create and save the new message.
+                
+                var pubDate = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                
                 var message = new Message
                 {
-                    AuthorId = request.AuthorId,
-                    Text = request.Text,
+                    AuthorId = author.UserId,
+                    Text = request.TextContent,
                     PubDate = pubDate,
                     Flagged = 0,
                 };
@@ -46,12 +45,12 @@ public static class Endpoint
                 await hybridCache.RemoveAsync("publicTimeline:0", cancellationToken);
                 // - Author's own timeline (first page)
                 await hybridCache.RemoveAsync(
-                    $"userTimeline:{request.AuthorId}:0",
+                    $"userTimeline:{author.UserId}:0",
                     cancellationToken
                 );
                 // - Private timelines of all followers of the author (first page)
                 var followerIds = await db
-                    .Followers.Where(f => f.WhomId == request.AuthorId)
+                    .Followers.Where(f => f.WhomId == author.UserId)
                     .Select(f => f.WhoId)
                     .ToListAsync(cancellationToken);
                 foreach (var followerId in followerIds)
@@ -62,14 +61,7 @@ public static class Endpoint
                     );
                 }
 
-                // Build the response DTO.
-                var responseDto = new PostMessageResponse(
-                    message.MessageId,
-                    message.AuthorId,
-                    message.Text,
-                    message.PubDate
-                );
-                return Results.Created($"/message/{message.MessageId}", responseDto);
+                return Results.NoContent();
             }
         );
 

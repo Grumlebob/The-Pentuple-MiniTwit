@@ -1,3 +1,3 @@
 namespace MiniTwit.Shared.DTO.Messages;
 
-public record PostMessageRequest(string AuthorUsername, string Text, int? PubDate);
+public record PostMessageRequest(string TextContent);

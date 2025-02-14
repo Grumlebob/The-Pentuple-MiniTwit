@@ -1,10 +1,8 @@
 using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.Features.Followers.FollowUser;
-using MiniTwit.Api.Features.Followers.UnfollowUser;
+using MiniTwit.Api.Features.Messages.GetMessages;
+using MiniTwit.Api.Features.Messages.GetUserMessages;
 using MiniTwit.Api.Features.Messages.PostMessage;
-using MiniTwit.Api.Features.Timeline.GetPrivateTimeline;
-using MiniTwit.Api.Features.Timeline.GetPublicTimeline;
-using MiniTwit.Api.Features.Timeline.GetUserTimeline;
 using MiniTwit.Api.Features.Users.Authentication.LoginUser;
 using MiniTwit.Api.Features.Users.Authentication.LogoutUser;
 using MiniTwit.Api.Features.Users.Authentication.RegisterUser;
@@ -58,22 +56,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//Timeline endpoints
-app.MapGetPrivateTimelineEndpoints(); // Registers GET "/" with timeline logic.
-app.MapGetPublicTimelineEndpoints(); // registers GET "/public"
-app.MapGetUserTimelineEndpoints(); // registers GET "/user/{id:int}"
+//Message endpoints
+app.MapPostMessageEndpoints(); // registers POST "/msgs/{username}" endpoint.
+app.MapGetMessagesEndpoints(); // registers GET "/msgs" endpoint.
+app.MapGetUserMessagesEndpoints(); // registers GET "/msgs/{username}" endpoint.
 
 // Map follow/unfollow endpoints.
-app.MapFollowUserEndpoints(); // registers POST "/follow"
-app.MapUnfollowUserEndpoints(); // registers DELETE "/follow"
+app.MapFollowUserEndpoints(); // registers POST "/fllws/{username}"
 
 // Map user endpoints.
 app.MapRegisterUserEndpoints(); // registers POST "/register"
 app.MapLoginUserEndpoints(); // registers POST "/login"
 app.MapLogoutUserEndpoints(); // registers POST "/logout"
-
-// Map messages endpoints
-app.MapPostMessageEndpoints(); // registers POST "/message" endpoint.
 
 app.Run();
 

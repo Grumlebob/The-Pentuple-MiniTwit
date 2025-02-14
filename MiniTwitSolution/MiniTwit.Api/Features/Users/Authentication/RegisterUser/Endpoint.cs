@@ -31,12 +31,7 @@ public static class Endpoint
                 db.Users.Add(newUser);
                 await db.SaveChangesAsync();
 
-                var responseDto = new RegisterUserResponse(
-                    newUser.UserId,
-                    newUser.Username,
-                    newUser.Email
-                );
-                return Results.Created($"/register/{newUser.UserId}", responseDto);
+                return Results.NoContent();
             }
         );
 

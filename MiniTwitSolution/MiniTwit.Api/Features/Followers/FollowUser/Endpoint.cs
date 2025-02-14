@@ -1,41 +1,74 @@
-﻿using Microsoft.Extensions.Caching.Hybrid;
+﻿using System.Text.Json;
 using MiniTwit.Shared.DTO.Followers.FollowUser;
 
 namespace MiniTwit.Api.Features.Followers.FollowUser
 {
     public static class FollowUserEndpoints
     {
+        /// <summary>
+        /// Handles both follow and unfollow depending on the request body.
+        /// </summary>
         public static IEndpointRouteBuilder MapFollowUserEndpoints(
             this IEndpointRouteBuilder routes
         )
         {
-            // POST /follow : Follow a user.
             routes.MapPost(
-                "/follow",
+                "/fllws/{username}",
                 async (
-                    FollowRequest request,
+                    string username,
+                    HttpRequest request,
                     MiniTwitDbContext db,
-                    HybridCache hybridCache,
                     CancellationToken cancellationToken
                 ) =>
                 {
-                    // Validate that both users exist.
-                    var follower = await db.Users.FindAsync(
-                        new object[] { request.FollowerId },
-                        cancellationToken
-                    );
-                    var followed = await db.Users.FindAsync(
-                        new object[] { request.FollowedId },
-                        cancellationToken
-                    );
-                    if (follower == null || followed == null)
+                    using var doc = await JsonDocument.ParseAsync(request.Body, cancellationToken: cancellationToken);
+                    var json = doc.RootElement.GetRawText();
+                    var targetUsername = "";
+                    var followAction = FollowAction.Follow;
+                    try
                     {
-                        return Results.BadRequest("Invalid user IDs.");
+                        var followRequest = JsonSerializer.Deserialize<FollowRequest>(json);
+                        targetUsername = followRequest!.Follow;
+                    }
+                    catch (JsonException)
+                    {
+                        try
+                        {
+                            var unfollowRequest = JsonSerializer.Deserialize<UnfollowRequest>(json);
+                            targetUsername = unfollowRequest!.Unfollow;
+                            followAction = FollowAction.Unfollow;
+                        }
+                        catch (JsonException)
+                        {
+                            return Results.BadRequest("Invalid request body.");
+                        }
+                        
+                    }
+
+                    var currentUser = await db.Users.Where(u => u.Username == username)
+                        .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+                    var targetUser = await db.Users.Where(u => u.Username == targetUsername)
+                        .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+
+                    if (currentUser == null || targetUser == null)
+                    {
+                        return Results.BadRequest("Invalid usernames.");
+                    }
+
+                    if (followAction == FollowAction.Unfollow)
+                    {
+                        db.Followers.Remove(new Follower
+                        {
+                            WhoId = currentUser.UserId,
+                            WhomId = targetUser.UserId
+                        });
+                        await db.SaveChangesAsync(cancellationToken);
+                        return Results.NoContent();
                     }
 
                     // Check if the follow relationship already exists.
-                    bool alreadyFollowing = await db.Followers.AnyAsync(
-                        f => f.WhoId == request.FollowerId && f.WhomId == request.FollowedId,
+                    var alreadyFollowing = await db.Followers.AnyAsync(
+                        f => f.WhoId == currentUser.UserId && f.WhomId == targetUser.UserId,
                         cancellationToken
                     );
                     if (alreadyFollowing)
@@ -46,29 +79,25 @@ namespace MiniTwit.Api.Features.Followers.FollowUser
                     // Create the follow relationship.
                     var newFollower = new Follower
                     {
-                        WhoId = request.FollowerId,
-                        WhomId = request.FollowedId,
+                        WhoId = currentUser.UserId,
+                        WhomId = targetUser.UserId
                     };
 
                     db.Followers.Add(newFollower);
                     await db.SaveChangesAsync(cancellationToken);
 
-                    // Invalidate the follower’s private timeline (first page).
-                    await hybridCache.RemoveAsync(
-                        $"privateTimeline:{request.FollowerId}:0",
-                        cancellationToken
-                    );
-
-                    // Return a simple DTO.
-                    var dto = new FollowResponse(newFollower.WhoId, newFollower.WhomId);
-                    return Results.Created(
-                        $"/follow?followerId={request.FollowerId}&followedId={request.FollowedId}",
-                        dto
-                    );
+                    return Results.NoContent();
                 }
             );
 
             return routes;
         }
     }
+    
+}
+
+internal enum FollowAction
+{
+    Follow,
+    Unfollow
 }
