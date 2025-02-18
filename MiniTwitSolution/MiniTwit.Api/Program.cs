@@ -14,6 +14,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+
 //TESTING MODE
 //If outcommented, we use SQLite in-memory database
 //Otherwise it uses Postgres
@@ -47,7 +50,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins(clientBaseUrl) // Replace with your client URL.
+                .WithOrigins(clientBaseUrl)
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         }
@@ -78,7 +81,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors("AllowBlazorClient");
 

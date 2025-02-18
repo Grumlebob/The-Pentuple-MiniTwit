@@ -1,11 +1,12 @@
 version: "3.8"
+
 services:
   api:
     build:
       context: .
       dockerfile: MiniTwit.Api/Dockerfile
     ports:
-      - "5000:80"         # Host port 5000 → container port 80 (HTTP)
+      - "5000:80"
     volumes:
       - ./MiniTwit.Api/Infrastructure:/app/Infrastructure
     environment:
@@ -14,14 +15,14 @@ services:
 
   client:
     build:
-      context: .
+      context: .                 # <--- The entire solution is the build context
       dockerfile: MiniTwit.Client/Dockerfile
     ports:
-      - "5001:80"         # Host port 5001 → container port 80 (Nginx serving the Blazor client)
+      - "5001:80"
 
   simulator:
     build:
       context: ./Simulator
       dockerfile: Dockerfile
     environment:
-      - SIMULATOR_HOST=http://api:80   # Use the service name 'api' to reach the API container on port 80
+      - SIMULATOR_HOST=http://api:80
