@@ -10,8 +10,8 @@ public static class Endpoint
             "/login",
             async (LoginUserRequest request, MiniTwitDbContext db) =>
             {
-                // Find the user by email.
-                var user = await db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+                // Find the user by username.
+                var user = await db.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
                 if (user is null)
                 {
                     return Results.NotFound("User not found.");

@@ -1,0 +1,34 @@
+﻿<ul class="messages">
+    @foreach (var message in Messages)
+    {
+        <li>
+            <p>
+                <strong>
+                    <a href="/timeline/@message.AuthorUsername">
+                        @message.AuthorUsername
+                    </a>
+                </strong>: @message.Text
+                <br/>
+                <small>
+                    @if (message.PubDate.HasValue)
+                    {
+                        @UnixTimeStampToDateTime(message.PubDate.Value).ToString("g")
+                    }
+                    else
+                    {
+                        <span>N/A</span>
+                    }
+                </small>
+            </p>
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter] public IEnumerable<GetMessageResponse> Messages { get; set; } = [];
+
+    private DateTime UnixTimeStampToDateTime(int unixTimeStamp)
+        => DateTimeOffset.FromUnixTimeSeconds(unixTimeStamp).LocalDateTime;
+    
+
+}

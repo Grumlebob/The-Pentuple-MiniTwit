@@ -1,10 +1,9 @@
 using Microsoft.Extensions.Caching.Hybrid;
-using MiniTwit.Api.Features.Followers.FollowUser;
-using MiniTwit.Api.Features.Followers.UnfollowUser;
+using MiniTwit.Api.Features.Followers.GetFollowers;
+using MiniTwit.Api.Features.Followers.PostFollowUser;
+using MiniTwit.Api.Features.Messages.GetMessages;
+using MiniTwit.Api.Features.Messages.GetUserMessages;
 using MiniTwit.Api.Features.Messages.PostMessage;
-using MiniTwit.Api.Features.Timeline.GetPrivateTimeline;
-using MiniTwit.Api.Features.Timeline.GetPublicTimeline;
-using MiniTwit.Api.Features.Timeline.GetUserTimeline;
 using MiniTwit.Api.Features.Users.Authentication.LoginUser;
 using MiniTwit.Api.Features.Users.Authentication.LogoutUser;
 using MiniTwit.Api.Features.Users.Authentication.RegisterUser;
@@ -32,6 +31,29 @@ if (!builder.Environment.IsEnvironment("Testing"))
     );
 }
 
+var clientBaseUrl = builder.Configuration["ClientBaseUrl"];
+if (string.IsNullOrEmpty(clientBaseUrl))
+{
+    throw new Exception(
+        "API base URL is not configured. Please set ApiBaseUrl in appsettings.json."
+    );
+}
+
+//allow client to use api
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "AllowBlazorClient",
+        policy =>
+        {
+            policy
+                .WithOrigins(clientBaseUrl) // Replace with your client URL.
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    );
+});
+
 // Register basic caching services
 builder.Services.AddMemoryCache();
 
@@ -58,22 +80,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//Timeline endpoints
-app.MapGetPrivateTimelineEndpoints(); // Registers GET "/" with timeline logic.
-app.MapGetPublicTimelineEndpoints(); // registers GET "/public"
-app.MapGetUserTimelineEndpoints(); // registers GET "/user/{id:int}"
+app.UseCors("AllowBlazorClient");
+
+//Message endpoints
+app.MapPostMessageEndpoints(); // registers POST "/msgs/{username}" endpoint.
+app.MapGetMessagesEndpoints(); // registers GET "/msgs" endpoint.
+app.MapGetUserMessagesEndpoints(); // registers GET "/msgs/{username}" endpoint.
 
 // Map follow/unfollow endpoints.
-app.MapFollowUserEndpoints(); // registers POST "/follow"
-app.MapUnfollowUserEndpoints(); // registers DELETE "/follow"
+app.MapFollowUserEndpoints(); // registers POST "/fllws/{username}"
+app.MapGetFollowersEndpoints(); // registers GET "/fllws/{username}"
 
 // Map user endpoints.
 app.MapRegisterUserEndpoints(); // registers POST "/register"
 app.MapLoginUserEndpoints(); // registers POST "/login"
 app.MapLogoutUserEndpoints(); // registers POST "/logout"
-
-// Map messages endpoints
-app.MapPostMessageEndpoints(); // registers POST "/message" endpoint.
 
 app.Run();
 

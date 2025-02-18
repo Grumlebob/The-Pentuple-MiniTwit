@@ -1,0 +1,60 @@
+﻿@using Blazored.LocalStorage
+@inherits LayoutComponentBase
+@inject NavigationManager NavManager
+@inject ILocalStorageService LocalStorage
+@inject UserSession Session
+
+<div class="page">
+    <h1>MiniTwit</h1>
+    <nav class="navigation">
+        @if (Session.IsLoggedIn)
+        {
+            <NavLink href="/">My Timeline</NavLink>
+            <span>&#124;</span>
+            <NavLink href="/timeline">Public Timeline</NavLink>
+            <span>&#124;</span>
+            <button class="nav-link" @onclick="Logout">Sign Out (@Session.Username)</button>
+        }
+        else
+        {
+            <NavLink href="/timeline">Public Timeline</NavLink>
+            <span>&#124;</span>
+            <NavLink href="/register">Sign Up</NavLink>
+            <span>&#124;</span>
+            <NavLink href="/login">Sign In</NavLink>
+        }
+    </nav>
+    <div class="body">
+        @Body
+    </div>
+    <footer class="footer">
+    </footer>
+</div>
+
+@code {
+    [Inject] MiniTwitClient MiniTwitClient { get; set; } = default!;
+ 
+    protected override async Task OnInitializedAsync()
+    {
+        var loadedSession = await UserSession.LoadAsync(LocalStorage);
+        Session.IsLoggedIn = loadedSession.IsLoggedIn;
+        Session.Username = loadedSession.Username;
+    }
+
+    private async Task Logout()
+    {
+        
+        var response = await MiniTwitClient.LogoutUserAsync();
+        if (response.IsSuccessStatusCode)
+        {
+            Session.IsLoggedIn = false;
+            Session.Username = "";
+            await Session.SaveAsync(LocalStorage);
+            NavManager.NavigateTo("/timeline");
+        }
+        else
+        {
+            // Optionally, handle error cases (show a message, etc.)
+        }
+    }
+}

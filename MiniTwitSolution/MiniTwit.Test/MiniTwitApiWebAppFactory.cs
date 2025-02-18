@@ -1,16 +1,4 @@
-﻿using System.Data.Common;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using MiniTwit.Api.Infrastructure;
-using Npgsql;
-using Respawn;
-using Testcontainers.PostgreSql;
-using Xunit;
-
-namespace MiniTwit.Test;
+﻿namespace MiniTwit.Test;
 
 //WebApplicationFactory is a class that allows us to create a test server for our application in memory,
 //but setup with real dependencies.
