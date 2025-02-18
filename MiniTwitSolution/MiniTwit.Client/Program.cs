@@ -19,7 +19,9 @@ builder.Services.AddScoped(sp => new HttpClient
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"];
 if (string.IsNullOrEmpty(apiBaseUrl))
 {
-    throw new Exception("API base URL is not configured. Please set ApiBaseUrl in appsettings.json.");
+    throw new Exception(
+        "API base URL is not configured. Please set ApiBaseUrl in appsettings.json."
+    );
 }
 
 builder.Services.AddScoped<MiniTwitClient>(sp =>
@@ -34,6 +36,5 @@ builder.Services.AddScoped<IMessageService>(sp => sp.GetRequiredService<MiniTwit
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddSingleton<UserSession>();
-
 
 await builder.Build().RunAsync();

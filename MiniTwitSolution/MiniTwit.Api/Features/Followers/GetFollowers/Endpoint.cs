@@ -7,7 +7,9 @@ namespace MiniTwit.Api.Features.Followers.GetFollowers
 {
     public static class Endpoint
     {
-        public static IEndpointRouteBuilder MapGetFollowersEndpoints(this IEndpointRouteBuilder routes)
+        public static IEndpointRouteBuilder MapGetFollowersEndpoints(
+            this IEndpointRouteBuilder routes
+        )
         {
             routes.MapGet(
                 "/fllws/{username}",
@@ -16,10 +18,14 @@ namespace MiniTwit.Api.Features.Followers.GetFollowers
                     MiniTwitDbContext db,
                     HybridCache hybridCache,
                     CancellationToken cancellationToken,
-                    [FromQuery] int no = 100) =>
+                    [FromQuery] int no = 100
+                ) =>
                 {
                     // Retrieve the user by username.
-                    var user = await db.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+                    var user = await db.Users.FirstOrDefaultAsync(
+                        u => u.Username == username,
+                        cancellationToken
+                    );
                     if (user == null)
                     {
                         return Results.NotFound("User not found.");
@@ -46,7 +52,9 @@ namespace MiniTwit.Api.Features.Followers.GetFollowers
                                 join u in db.Users on f.WhomId equals u.UserId
                                 where f.WhoId == user.UserId
                                 select u.Username
-                            ).Take(no).ToListAsync(ct);
+                            )
+                                .Take(no)
+                                .ToListAsync(ct);
 
                             return new GetFollowersResponse(followUsernames);
                         },

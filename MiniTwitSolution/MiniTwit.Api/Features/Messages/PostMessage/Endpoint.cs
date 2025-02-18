@@ -5,7 +5,9 @@ namespace MiniTwit.Api.Features.Messages.PostMessage
 {
     public static class Endpoint
     {
-        public static IEndpointRouteBuilder MapPostMessageEndpoints(this IEndpointRouteBuilder routes)
+        public static IEndpointRouteBuilder MapPostMessageEndpoints(
+            this IEndpointRouteBuilder routes
+        )
         {
             routes.MapPost(
                 "/msgs/{username}",
@@ -18,14 +20,17 @@ namespace MiniTwit.Api.Features.Messages.PostMessage
                 ) =>
                 {
                     // Validate that the author exists.
-                    var author = await db.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+                    var author = await db.Users.FirstOrDefaultAsync(
+                        u => u.Username == username,
+                        cancellationToken
+                    );
                     if (author == null)
                     {
                         return Results.BadRequest("Author not found.");
                     }
-                    
+
                     var pubDate = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                    
+
                     var message = new Message
                     {
                         AuthorId = author.UserId,
@@ -41,15 +46,21 @@ namespace MiniTwit.Api.Features.Messages.PostMessage
                     // - Public timeline (all caches tagged with "publicTimeline")
                     await hybridCache.RemoveByTagAsync("publicTimeline", cancellationToken);
                     // - Author's own timeline (all caches tagged with "userTimeline:{author.Username}")
-                    await hybridCache.RemoveByTagAsync($"userTimeline:{author.Username}", cancellationToken);
+                    await hybridCache.RemoveByTagAsync(
+                        $"userTimeline:{author.Username}",
+                        cancellationToken
+                    );
                     // - Private timelines of all followers of the author (assuming you tag them with "privateTimeline:{followerId}")
-                    var followerIds = await db.Followers
-                        .Where(f => f.WhomId == author.UserId)
+                    var followerIds = await db
+                        .Followers.Where(f => f.WhomId == author.UserId)
                         .Select(f => f.WhoId)
                         .ToListAsync(cancellationToken);
                     foreach (var followerId in followerIds)
                     {
-                        await hybridCache.RemoveByTagAsync($"privateTimeline:{followerId}", cancellationToken);
+                        await hybridCache.RemoveByTagAsync(
+                            $"privateTimeline:{followerId}",
+                            cancellationToken
+                        );
                     }
 
                     return Results.NoContent();

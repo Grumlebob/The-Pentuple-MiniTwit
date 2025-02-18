@@ -7,10 +7,16 @@ namespace MiniTwit.Shared.EndpointContracts.Followers
 {
     public interface IFollowerService
     {
-        Task<HttpResponseMessage> FollowUserAsync(string currentUsername, FollowRequest followRequest);
-        
-        Task<HttpResponseMessage> UnfollowUserAsync(string currentUsername, UnfollowRequest unfollowRequest);
-        
+        Task<HttpResponseMessage> FollowUserAsync(
+            string currentUsername,
+            FollowRequest followRequest
+        );
+
+        Task<HttpResponseMessage> UnfollowUserAsync(
+            string currentUsername,
+            UnfollowRequest unfollowRequest
+        );
+
         /// <returns>List of usernames that follow current user </returns>
         Task<GetFollowersResponse> GetFollowersAsync(string currentUsername, int limit = 100);
     }

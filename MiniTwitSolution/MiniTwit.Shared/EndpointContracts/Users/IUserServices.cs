@@ -7,6 +7,6 @@ public interface IUserServices
 {
     Task<HttpResponseMessage> RegisterUserAsync(RegisterUserRequest registerRequest);
     Task<HttpResponseMessage> LoginUserAsync(LoginUserRequest loginRequest);
-    
+
     Task<HttpResponseMessage> LogoutUserAsync();
 }

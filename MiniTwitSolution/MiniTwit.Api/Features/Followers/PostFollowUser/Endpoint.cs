@@ -34,7 +34,9 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
                     {
                         targetUsername = followElement.GetString();
                     }
-                    else if (document.RootElement.TryGetProperty("unfollow", out var unfollowElement))
+                    else if (
+                        document.RootElement.TryGetProperty("unfollow", out var unfollowElement)
+                    )
                     {
                         targetUsername = unfollowElement.GetString();
                         followAction = FollowAction.Unfollow;
@@ -44,16 +46,26 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
                         return Results.BadRequest("Invalid request body.");
                     }
 
-                    var currentUser = await db.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
-                    var targetUser = await db.Users.FirstOrDefaultAsync(u => u.Username == targetUsername, cancellationToken);
+                    var currentUser = await db.Users.FirstOrDefaultAsync(
+                        u => u.Username == username,
+                        cancellationToken
+                    );
+                    var targetUser = await db.Users.FirstOrDefaultAsync(
+                        u => u.Username == targetUsername,
+                        cancellationToken
+                    );
 
                     if (currentUser == null || targetUser == null)
                     {
                         return Results.BadRequest("Invalid usernames.");
                     }
-                    
+
                     // Build the follow relationship.
-                    var followRelation = new Follower { WhoId = currentUser.UserId, WhomId = targetUser.UserId };
+                    var followRelation = new Follower
+                    {
+                        WhoId = currentUser.UserId,
+                        WhomId = targetUser.UserId,
+                    };
                     // Check if the follow relationship already exists.
                     var alreadyFollowing = await db.Followers.AnyAsync(
                         f => f.WhoId == currentUser.UserId && f.WhomId == targetUser.UserId,
@@ -65,10 +77,13 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
                         db.Followers.Remove(followRelation);
                         await db.SaveChangesAsync(cancellationToken);
                         // Invalidate all cache entries for the current user's follows.
-                        await hybridCache.RemoveByTagAsync($"followers:{username}", cancellationToken);
+                        await hybridCache.RemoveByTagAsync(
+                            $"followers:{username}",
+                            cancellationToken
+                        );
                         return Results.NoContent();
                     }
-                    
+
                     if (followAction == FollowAction.Follow && alreadyFollowing)
                     {
                         return Results.Conflict("Already following this user.");
@@ -85,10 +100,10 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
             return routes;
         }
     }
-    
+
     internal enum FollowAction
     {
         Follow,
-        Unfollow
+        Unfollow,
     }
 }

@@ -6,7 +6,9 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
 {
     public static class Endpoint
     {
-        public static IEndpointRouteBuilder MapGetUserMessagesEndpoints(this IEndpointRouteBuilder routes)
+        public static IEndpointRouteBuilder MapGetUserMessagesEndpoints(
+            this IEndpointRouteBuilder routes
+        )
         {
             routes.MapGet(
                 "/msgs/{username}",
@@ -15,15 +17,19 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                     MiniTwitDbContext db,
                     HybridCache hybridCache,
                     CancellationToken cancellationToken,
-                    [FromQuery] int no = 100) =>
+                    [FromQuery] int no = 100
+                ) =>
                 {
                     // First, check if the user exists.
-                    var user = await db.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+                    var user = await db.Users.FirstOrDefaultAsync(
+                        u => u.Username == username,
+                        cancellationToken
+                    );
                     if (user == null)
                     {
                         return Results.NotFound("User not found.");
                     }
-                    
+
                     // Define a cache key that includes the username and limit.
                     var cacheKey = $"userTimeline:{username}:{no}";
 
@@ -33,15 +39,20 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                         async ct =>
                         {
                             // Retrieve the user's messages where flagged == 0.
-                            var messages = await db.Messages
-                                .Where(m => m.AuthorId == user.UserId && m.Flagged == 0)
+                            var messages = await db
+                                .Messages.Where(m => m.AuthorId == user.UserId && m.Flagged == 0)
                                 .OrderByDescending(m => m.PubDate)
                                 .Take(no)
                                 .ToListAsync(ct);
 
                             // Map each message to the DTO.
                             var dto = messages
-                                .Select(m => new GetMessageResponse(m.MessageId, m.PubDate, user.Username, m.Text))
+                                .Select(m => new GetMessageResponse(
+                                    m.MessageId,
+                                    m.PubDate,
+                                    user.Username,
+                                    m.Text
+                                ))
                                 .ToList();
 
                             return dto;

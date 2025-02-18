@@ -34,20 +34,25 @@ if (!builder.Environment.IsEnvironment("Testing"))
 var clientBaseUrl = builder.Configuration["ClientBaseUrl"];
 if (string.IsNullOrEmpty(clientBaseUrl))
 {
-    throw new Exception("API base URL is not configured. Please set ApiBaseUrl in appsettings.json.");
+    throw new Exception(
+        "API base URL is not configured. Please set ApiBaseUrl in appsettings.json."
+    );
 }
+
 //allow client to use api
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowBlazorClient", policy =>
-    {
-        policy.WithOrigins(clientBaseUrl)  // Replace with your client URL.
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
+    options.AddPolicy(
+        "AllowBlazorClient",
+        policy =>
+        {
+            policy
+                .WithOrigins(clientBaseUrl) // Replace with your client URL.
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    );
 });
-
-
 
 // Register basic caching services
 builder.Services.AddMemoryCache();
@@ -76,6 +81,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowBlazorClient");
+
 //Message endpoints
 app.MapPostMessageEndpoints(); // registers POST "/msgs/{username}" endpoint.
 app.MapGetMessagesEndpoints(); // registers GET "/msgs" endpoint.

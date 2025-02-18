@@ -15,9 +15,7 @@ using MiniTwit.Test;
 using Xunit;
 
 [CollectionDefinition("MiniTwitCollection")]
-public class MiniTwitCollection : ICollectionFixture<MiniTwitApiWebAppFactory>
-{
-}
+public class MiniTwitCollection : ICollectionFixture<MiniTwitApiWebAppFactory> { }
 
 [Collection("MiniTwitCollection")]
 public class MiniTwitTests : IAsyncLifetime
@@ -29,7 +27,9 @@ public class MiniTwitTests : IAsyncLifetime
     private readonly MiniTwitDbContext _dbContext;
 
     private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
-        { PropertyNameCaseInsensitive = true };
+    {
+        PropertyNameCaseInsensitive = true,
+    };
 
     public MiniTwitTests(MiniTwitApiWebAppFactory factory)
     {
@@ -50,8 +50,20 @@ public class MiniTwitTests : IAsyncLifetime
     public async Task GetPublicTimelineWorksAsExpected()
     {
         // Arrange: Create two users.
-        var user1 = new User { UserId = 1, Username = "user1", Email = "user1@example.com", PwHash = "hash1" };
-        var user2 = new User { UserId = 2, Username = "user2", Email = "user2@example.com", PwHash = "hash2" };
+        var user1 = new User
+        {
+            UserId = 1,
+            Username = "user1",
+            Email = "user1@example.com",
+            PwHash = "hash1",
+        };
+        var user2 = new User
+        {
+            UserId = 2,
+            Username = "user2",
+            Email = "user2@example.com",
+            PwHash = "hash2",
+        };
         _dbContext.Users.AddRange(user1, user2);
         await _dbContext.SaveChangesAsync();
 
@@ -65,7 +77,7 @@ public class MiniTwitTests : IAsyncLifetime
             PubDate = currentTime,
             Flagged = 0,
             // Set navigation property so that m.Author is not null.
-            Author = user1
+            Author = user1,
         };
         var message2 = new Message
         {
@@ -74,7 +86,7 @@ public class MiniTwitTests : IAsyncLifetime
             Text = "Hello from user2",
             PubDate = currentTime,
             Flagged = 0,
-            Author = user2
+            Author = user2,
         };
         _dbContext.Messages.AddRange(message1, message2);
         await _dbContext.SaveChangesAsync();
@@ -91,8 +103,20 @@ public class MiniTwitTests : IAsyncLifetime
     public async Task GetUserTimelineWorksAsExpected()
     {
         // Arrange: Create two users.
-        var user1 = new User { UserId = 1, Username = "user1", Email = "user1@example.com", PwHash = "hash1" };
-        var user2 = new User { UserId = 2, Username = "user2", Email = "user2@example.com", PwHash = "hash2" };
+        var user1 = new User
+        {
+            UserId = 1,
+            Username = "user1",
+            Email = "user1@example.com",
+            PwHash = "hash1",
+        };
+        var user2 = new User
+        {
+            UserId = 2,
+            Username = "user2",
+            Email = "user2@example.com",
+            PwHash = "hash2",
+        };
         _dbContext.Users.AddRange(user1, user2);
         await _dbContext.SaveChangesAsync();
 
@@ -105,7 +129,7 @@ public class MiniTwitTests : IAsyncLifetime
             Text = "Hello from user1",
             PubDate = currentTime,
             Flagged = 0,
-            Author = user1
+            Author = user1,
         };
         var message2 = new Message
         {
@@ -114,13 +138,16 @@ public class MiniTwitTests : IAsyncLifetime
             Text = "Hello from user2",
             PubDate = currentTime,
             Flagged = 0,
-            Author = user2
+            Author = user2,
         };
         _dbContext.Messages.AddRange(message1, message2);
         await _dbContext.SaveChangesAsync();
 
         // Act: Get the timeline for user "user1" via the typed client.
-        IList<GetMessageResponse> userMessages = await _typedClient.GetMessagesForUserAsync("user1", 100);
+        IList<GetMessageResponse> userMessages = await _typedClient.GetMessagesForUserAsync(
+            "user1",
+            100
+        );
 
         // Assert: Only one message should belong to user1.
         Assert.NotNull(userMessages);
@@ -132,13 +159,28 @@ public class MiniTwitTests : IAsyncLifetime
     public async Task FollowUserEndpoint_WorksAsExpected()
     {
         // Arrange: Create two users.
-        var user1 = new User { UserId = 1, Username = "user1", Email = "user1@example.com", PwHash = "hash1" };
-        var user2 = new User { UserId = 2, Username = "user2", Email = "user2@example.com", PwHash = "hash2" };
+        var user1 = new User
+        {
+            UserId = 1,
+            Username = "user1",
+            Email = "user1@example.com",
+            PwHash = "hash1",
+        };
+        var user2 = new User
+        {
+            UserId = 2,
+            Username = "user2",
+            Email = "user2@example.com",
+            PwHash = "hash2",
+        };
         _dbContext.Users.AddRange(user1, user2);
         await _dbContext.SaveChangesAsync();
 
         // Act: user1 follows user2 using the typed client.
-        HttpResponseMessage response = await _typedClient.FollowUserAsync("user1", new FollowRequest("user2"));
+        HttpResponseMessage response = await _typedClient.FollowUserAsync(
+            "user1",
+            new FollowRequest("user2")
+        );
 
         // Assert: Expect HTTP 204 NoContent.
         response.EnsureSuccessStatusCode();
@@ -153,8 +195,20 @@ public class MiniTwitTests : IAsyncLifetime
     public async Task UnfollowUserEndpoint_WorksAsExpected()
     {
         // Arrange: Create two users and add a follower relationship.
-        var user1 = new User { UserId = 1, Username = "user1", Email = "user1@example.com", PwHash = "hash1" };
-        var user2 = new User { UserId = 2, Username = "user2", Email = "user2@example.com", PwHash = "hash2" };
+        var user1 = new User
+        {
+            UserId = 1,
+            Username = "user1",
+            Email = "user1@example.com",
+            PwHash = "hash1",
+        };
+        var user2 = new User
+        {
+            UserId = 2,
+            Username = "user2",
+            Email = "user2@example.com",
+            PwHash = "hash2",
+        };
         _dbContext.Users.AddRange(user1, user2);
         await _dbContext.SaveChangesAsync();
 
@@ -167,7 +221,10 @@ public class MiniTwitTests : IAsyncLifetime
         // Act: user1 unfollows user2 using the typed client.
         // The typed client now uses custom serializer options (PascalCase) so that the JSON payload is:
         // { "Unfollow": "user2" }
-        HttpResponseMessage response = await _typedClient.UnfollowUserAsync("user1", new UnfollowRequest("user2"));
+        HttpResponseMessage response = await _typedClient.UnfollowUserAsync(
+            "user1",
+            new UnfollowRequest("user2")
+        );
 
         // Assert: Expect HTTP 204 NoContent.
         response.EnsureSuccessStatusCode();
@@ -176,7 +233,6 @@ public class MiniTwitTests : IAsyncLifetime
         bool existsAfter = await _dbContext.Followers.AnyAsync(f => f.WhoId == 1 && f.WhomId == 2);
         Assert.False(existsAfter);
     }
-
 
     [Fact]
     public async Task RegisterUserEndpoint_WorksAsExpected()
@@ -200,17 +256,25 @@ public class MiniTwitTests : IAsyncLifetime
     {
         // Arrange: Create a user for login.
         var user = new User
-            { UserId = 1, Username = "loginuser", Email = "loginuser@example.com", PwHash = "mypassword" };
+        {
+            UserId = 1,
+            Username = "loginuser",
+            Email = "loginuser@example.com",
+            PwHash = "mypassword",
+        };
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();
 
         // Act: Successful login using the typed client.
-        HttpResponseMessage response =
-            await _typedClient.LoginUserAsync(new LoginUserRequest("loginuser@example.com", "mypassword"));
+        HttpResponseMessage response = await _typedClient.LoginUserAsync(
+            new LoginUserRequest("loginuser@example.com", "mypassword")
+        );
         response.EnsureSuccessStatusCode();
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginUserResponse>(_jsonOptions);
+        var loginResponse = await response.Content.ReadFromJsonAsync<LoginUserResponse>(
+            _jsonOptions
+        );
         Assert.NotNull(loginResponse);
         Assert.Equal(user.UserId, loginResponse!.UserId);
         Assert.Equal("loginuser", loginResponse.Username);
@@ -218,8 +282,9 @@ public class MiniTwitTests : IAsyncLifetime
         Assert.Equal("fake-token", loginResponse.Token);
 
         // Act: Failed login (wrong password).
-        HttpResponseMessage responseWrong =
-            await _typedClient.LoginUserAsync(new LoginUserRequest("loginuser@example.com", "wrongpassword"));
+        HttpResponseMessage responseWrong = await _typedClient.LoginUserAsync(
+            new LoginUserRequest("loginuser@example.com", "wrongpassword")
+        );
         Assert.Equal(HttpStatusCode.Unauthorized, responseWrong.StatusCode);
     }
 
@@ -231,10 +296,11 @@ public class MiniTwitTests : IAsyncLifetime
         response.EnsureSuccessStatusCode();
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var logoutResponse = await response.Content.ReadFromJsonAsync<LogoutUserResponse>(_jsonOptions);
+        var logoutResponse = await response.Content.ReadFromJsonAsync<LogoutUserResponse>(
+            _jsonOptions
+        );
         Assert.NotNull(logoutResponse);
         Assert.True(logoutResponse!.Success);
         Assert.Equal("Logged out successfully.", logoutResponse.Message);
     }
-
 }

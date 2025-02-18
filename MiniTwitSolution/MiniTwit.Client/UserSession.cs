@@ -6,7 +6,7 @@ public class UserSession
 {
     public bool IsLoggedIn { get; set; }
     public string Username { get; set; } = string.Empty;
-    
+
     public async Task SaveAsync(ILocalStorageService localStorage)
     {
         await localStorage.SetItemAsync("UserSession", this);

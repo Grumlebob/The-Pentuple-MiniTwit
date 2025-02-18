@@ -18,17 +18,26 @@ public class MiniTwitClient : IFollowerService, IUserServices, IMessageService
         _httpClient = httpClient;
     }
 
-    public async Task<HttpResponseMessage> FollowUserAsync(string currentUsername, FollowRequest followRequest)
+    public async Task<HttpResponseMessage> FollowUserAsync(
+        string currentUsername,
+        FollowRequest followRequest
+    )
     {
         return await _httpClient.PostAsJsonAsync($"/fllws/{currentUsername}", followRequest);
     }
 
-    public async Task<HttpResponseMessage> UnfollowUserAsync(string currentUsername, UnfollowRequest unfollowRequest)
+    public async Task<HttpResponseMessage> UnfollowUserAsync(
+        string currentUsername,
+        UnfollowRequest unfollowRequest
+    )
     {
         return await _httpClient.PostAsJsonAsync($"/fllws/{currentUsername}", unfollowRequest);
     }
 
-    public async Task<GetFollowersResponse> GetFollowersAsync(string currentUsername, int limit = 100)
+    public async Task<GetFollowersResponse> GetFollowersAsync(
+        string currentUsername,
+        int limit = 100
+    )
     {
         var response = await _httpClient.GetAsync($"/fllws/{currentUsername}?no={limit}");
         if (response.IsSuccessStatusCode)
@@ -55,7 +64,6 @@ public class MiniTwitClient : IFollowerService, IUserServices, IMessageService
         return await _httpClient.PostAsync("/logout", null);
     }
 
-
     public async Task<IList<GetMessageResponse>> GetMessagesAsync(int limit = 100)
     {
         var response = await _httpClient.GetAsync($"/msgs?no={limit}");
@@ -67,7 +75,10 @@ public class MiniTwitClient : IFollowerService, IUserServices, IMessageService
         return [];
     }
 
-    public async Task<IList<GetMessageResponse>> GetMessagesForUserAsync(string username, int limit = 100)
+    public async Task<IList<GetMessageResponse>> GetMessagesForUserAsync(
+        string username,
+        int limit = 100
+    )
     {
         var response = await _httpClient.GetAsync($"/msgs/{username}?no={limit}");
         if (response.IsSuccessStatusCode)
@@ -78,7 +89,10 @@ public class MiniTwitClient : IFollowerService, IUserServices, IMessageService
         return [];
     }
 
-    public async Task<HttpResponseMessage> PostMessageAsync(string currentUsername, PostMessageRequest messageRequest)
+    public async Task<HttpResponseMessage> PostMessageAsync(
+        string currentUsername,
+        PostMessageRequest messageRequest
+    )
     {
         return await _httpClient.PostAsJsonAsync($"/msgs/{currentUsername}", messageRequest);
     }
