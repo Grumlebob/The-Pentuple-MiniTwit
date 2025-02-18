@@ -13,15 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Documentation", "Documentat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniTwit.Test", "MiniTwit.Test\MiniTwit.Test.csproj", "{6C201F2D-2A68-4B89-B333-8C2ED9BA1538}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulator", "Simulator", "{B2647147-7C6E-451F-A4C3-695EE3C35B31}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\..\..\Users\jgrum\Desktop\Python\latest_processed_sim_action_id.txt = ..\..\..\..\Users\jgrum\Desktop\Python\latest_processed_sim_action_id.txt
-		..\..\..\..\Users\jgrum\Desktop\Python\minitwit_scenario.csv = ..\..\..\..\Users\jgrum\Desktop\Python\minitwit_scenario.csv
-		..\..\..\..\Users\jgrum\Desktop\Python\minitwit_simulator.py = ..\..\..\..\Users\jgrum\Desktop\Python\minitwit_simulator.py
-		..\..\..\..\Users\jgrum\Desktop\Python\requirements.txt = ..\..\..\..\Users\jgrum\Desktop\Python\requirements.txt
-		..\..\..\..\Users\jgrum\Desktop\Python\Dockerfile = ..\..\..\..\Users\jgrum\Desktop\Python\Dockerfile
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
