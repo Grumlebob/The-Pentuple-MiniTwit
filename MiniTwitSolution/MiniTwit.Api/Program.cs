@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Caching.Hybrid;
-using MiniTwit.Api.Features.Followers.FollowUser;
+using MiniTwit.Api.Features.Followers.GetFollowers;
+using MiniTwit.Api.Features.Followers.PostFollowUser;
 using MiniTwit.Api.Features.Messages.GetMessages;
 using MiniTwit.Api.Features.Messages.GetUserMessages;
 using MiniTwit.Api.Features.Messages.PostMessage;
@@ -82,6 +83,7 @@ app.MapGetUserMessagesEndpoints(); // registers GET "/msgs/{username}" endpoint.
 
 // Map follow/unfollow endpoints.
 app.MapFollowUserEndpoints(); // registers POST "/fllws/{username}"
+app.MapGetFollowersEndpoints(); // registers GET "/fllws/{username}"
 
 // Map user endpoints.
 app.MapRegisterUserEndpoints(); // registers POST "/register"

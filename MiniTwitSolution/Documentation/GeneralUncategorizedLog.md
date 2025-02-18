@@ -153,3 +153,10 @@ http://localhost:5001/
 
 Added github security scanning to pipeline called CodeQL Advanced.
 Ensures we don't try to leak sensitive information, such as keys.
+
+# 18.02.2025
+
+## Authentication
+
+We are currently not supporting proper authentication so we can focus on deploying. 
+We handle current user with a singleton service that relies on localStorage.

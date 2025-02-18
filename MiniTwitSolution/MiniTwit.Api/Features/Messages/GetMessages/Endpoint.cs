@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Shared.DTO.Messages;
 
@@ -16,10 +17,10 @@ namespace MiniTwit.Api.Features.Messages.GetMessages
                     CancellationToken cancellationToken,
                     [FromQuery] int no = 100) =>
                 {
-                    // used by the hybrid cache 
+                    // Cache key includes the limit
                     var cacheKey = $"publicTimeline:{no}";
 
-                    // Try to get the cached response; if not present, load from the database.
+                    // Retrieve or create the cached response.
                     var response = await hybridCache.GetOrCreateAsync<List<GetMessageResponse>>(
                         cacheKey,
                         async ct =>
@@ -30,7 +31,6 @@ namespace MiniTwit.Api.Features.Messages.GetMessages
                                 .OrderByDescending(m => m.PubDate)
                                 .Take(no)
                                 .ToListAsync(ct);
-
                             
                             var dto = messages
                                 .Select(m => new GetMessageResponse(m.MessageId, m.PubDate, m.Author!.Username, m.Text))
@@ -38,7 +38,8 @@ namespace MiniTwit.Api.Features.Messages.GetMessages
 
                             return dto;
                         },
-                        cancellationToken: cancellationToken
+                        cancellationToken: cancellationToken,
+                        tags: new[] { "publicTimeline" }
                     );
 
                     return Results.Json(response);

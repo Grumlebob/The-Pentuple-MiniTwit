@@ -39,14 +39,15 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                                 .Take(no)
                                 .ToListAsync(ct);
 
-                            // Map each message to the GetMessageResponse DTO.
+                            // Map each message to the DTO.
                             var dto = messages
                                 .Select(m => new GetMessageResponse(m.MessageId, m.PubDate, user.Username, m.Text))
                                 .ToList();
 
                             return dto;
                         },
-                        cancellationToken: cancellationToken
+                        cancellationToken: cancellationToken,
+                        tags: new[] { $"userTimeline:{username}" }
                     );
 
                     return Results.Json(response);

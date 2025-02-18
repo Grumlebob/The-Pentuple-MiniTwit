@@ -8,13 +8,10 @@
 
 <h3>@PageTitle</h3>
 
-<!-- For debugging: show current session username -->
-<div>
-    <p>User logged in: @Session.Username</p>
-</div>
-
-<!-- Display the posting form when logged in and not in a user timeline (or when viewing your own timeline) -->
-@if (Session.IsLoggedIn && (Mode != TimelineMode.User || string.Equals(Session.Username, username, StringComparison.OrdinalIgnoreCase)))
+<!-- Display the posting form when logged in and either:
+     - in Private mode, or
+     - in User mode and viewing your own timeline -->
+@if (Session.IsLoggedIn && (Mode != TimelineMode.User || string.Equals(Session.Username, username)))
 {
     <div class="twitbox">
         <h3>What's on your mind, @Session.Username?</h3>
@@ -52,13 +49,13 @@ else
 
 @code {
 
-    // Receive the session as a cascading parameter.
+// Cascading session parameter.
     [CascadingParameter] public UserSession Session { get; set; }
 
-    // Optional route parameter: if present, we're showing a user timeline.
+// Optional route parameter: if present, we're in a user timeline.
     [Parameter] public string username { get; set; }
 
-    // Enum to track timeline modes.
+// Timeline modes.
     private enum TimelineMode
     {
         Private,
@@ -68,16 +65,16 @@ else
 
     private TimelineMode Mode;
 
-    // Holds the loaded messages.
+// Loaded messages.
     private IList<GetMessageResponse>? _messages;
 
-    // Model for the new message posting form.
+// Model for posting a new message.
     private NewMessageModel newMessageModel = new();
 
-    // Follow state for user timelines.
+// Follow state for user timelines.
     private bool IsFollowing = false;
 
-    // Dynamic page title based on mode.
+// Dynamic title.
     private string PageTitle => Mode switch
     {
         TimelineMode.Private => "My Timeline",
@@ -88,9 +85,30 @@ else
 
     private string FollowButtonText => IsFollowing ? "Unfollow" : "Follow";
 
+// Called when the route parameters change.
     protected override async Task OnParametersSetAsync()
     {
-        // Determine timeline mode based on the route parameter and URL.
+        await UpdateModeAndMessages();
+    }
+
+// Subscribe to location changes so we update even if no parameters change.
+    protected override void OnInitialized()
+    {
+        NavManager.LocationChanged += HandleLocationChanged;
+    }
+
+    private async void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        // When the URL changes, update mode and reload messages.
+        await UpdateModeAndMessages();
+    }
+
+    /// <summary>
+    /// Determines the timeline mode based on the URL and reloads messages.
+    /// </summary>
+    private async Task UpdateModeAndMessages()
+    {
+// Set the mode.
         if (!string.IsNullOrEmpty(username))
         {
             Mode = TimelineMode.User;
@@ -101,48 +119,43 @@ else
             Mode = string.IsNullOrEmpty(relativePath) ? TimelineMode.Private : TimelineMode.Public;
         }
 
-        // If in private mode and not logged in, redirect to the public timeline.
+// If in private mode but not logged in, redirect to public timeline.
         if (Mode == TimelineMode.Private && !Session.IsLoggedIn)
         {
             NavManager.NavigateTo("/timeline", true);
             return;
         }
 
-        // Load the appropriate messages.
+// Load messages based on the mode.
         await LoadMessagesAsync();
+
+        StateHasChanged();
     }
 
     private async Task LoadMessagesAsync()
     {
-        switch (Mode)
+        if (Mode == TimelineMode.User)
         {
-            case TimelineMode.User:
+            _messages = await MiniTwitClient.GetMessagesForUserAsync(username);
+// If logged in and viewing someone else's timeline, check follow status.
+            if (Session.IsLoggedIn && !string.Equals(Session.Username, username, StringComparison.OrdinalIgnoreCase))
             {
-                _messages = await MiniTwitClient.GetMessagesForUserAsync(username);
-                // When viewing someone else's timeline, check follow status.
-                if (Session.IsLoggedIn && !string.Equals(Session.Username, username, StringComparison.OrdinalIgnoreCase))
-                {
-                    var followersResponse = await MiniTwitClient.GetFollowersAsync(Session.Username);
-                    IsFollowing = followersResponse.Followers.Any(f =>
-                        string.Equals(f, username, StringComparison.OrdinalIgnoreCase));
-                }
-
-                break;
-            }
-            case TimelineMode.Private:
-            {
-                var publicMessages = await MiniTwitClient.GetMessagesAsync();
                 var followersResponse = await MiniTwitClient.GetFollowersAsync(Session.Username);
-                var followedUsernames = followersResponse.Followers.ToHashSet(StringComparer.OrdinalIgnoreCase);
-                _messages = publicMessages.Where(m => followedUsernames.Contains(m.AuthorUsername)).ToList();
-                break;
+                IsFollowing = followersResponse.Followers.Any(f =>
+                    string.Equals(f, username, StringComparison.OrdinalIgnoreCase));
             }
-            // Public timeline
-            case TimelineMode.Public:
-                _messages = await MiniTwitClient.GetMessagesAsync();
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
+        }
+        else if (Mode == TimelineMode.Private)
+        {
+            var publicMessages = await MiniTwitClient.GetMessagesAsync();
+            var followersResponse = await MiniTwitClient.GetFollowersAsync(Session.Username);
+            var followedUsernames = followersResponse.Followers.ToHashSet(StringComparer.OrdinalIgnoreCase);
+            followedUsernames.Add(Session.Username); // Include own messages in the private timeline.
+            _messages = publicMessages.Where(m => followedUsernames.Contains(m.AuthorUsername)).ToList();
+        }
+        else // Public timeline
+        {
+            _messages = await MiniTwitClient.GetMessagesAsync();
         }
     }
 
@@ -152,13 +165,13 @@ else
         var response = await MiniTwitClient.PostMessageAsync(Session.Username, request);
         if (response.IsSuccessStatusCode)
         {
-            await LoadMessagesAsync();
+            await UpdateModeAndMessages();
             newMessageModel.TextContent = string.Empty;
             StateHasChanged();
         }
         else
         {
-            // Optionally handle the error.
+// Optionally handle errors.
         }
     }
 
@@ -183,11 +196,15 @@ else
 
         StateHasChanged();
     }
-
+    
     private class NewMessageModel
     {
         [Required(ErrorMessage = "Message cannot be empty")]
         public string TextContent { get; set; } = "";
     }
 
+    public void Dispose()
+    {
+        NavManager.LocationChanged -= HandleLocationChanged;
+    }
 }

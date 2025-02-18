@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using MiniTwit.Shared.DTO.Followers.FollowUser;
+using Microsoft.Extensions.Caching.Hybrid;
 
-namespace MiniTwit.Api.Features.Followers.FollowUser
+namespace MiniTwit.Api.Features.Followers.PostFollowUser
 {
     public static class FollowUserEndpoints
     {
@@ -18,6 +18,7 @@ namespace MiniTwit.Api.Features.Followers.FollowUser
                     string username,
                     HttpRequest request,
                     MiniTwitDbContext db,
+                    HybridCache hybridCache,
                     CancellationToken cancellationToken
                 ) =>
                 {
@@ -43,47 +44,40 @@ namespace MiniTwit.Api.Features.Followers.FollowUser
                         return Results.BadRequest("Invalid request body.");
                     }
 
-                    var currentUser = await db.Users.Where(u => u.Username == username)
-                        .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-                    var targetUser = await db.Users.Where(u => u.Username == targetUsername)
-                        .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+                    var currentUser = await db.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+                    var targetUser = await db.Users.FirstOrDefaultAsync(u => u.Username == targetUsername, cancellationToken);
 
                     if (currentUser == null || targetUser == null)
                     {
                         return Results.BadRequest("Invalid usernames.");
                     }
-
-                    if (followAction == FollowAction.Unfollow)
-                    {
-                        db.Followers.Remove(new Follower
-                        {
-                            WhoId = currentUser.UserId,
-                            WhomId = targetUser.UserId
-                        });
-                        await db.SaveChangesAsync(cancellationToken);
-                        return Results.NoContent();
-                    }
-
+                    
+                    // Build the follow relationship.
+                    var followRelation = new Follower { WhoId = currentUser.UserId, WhomId = targetUser.UserId };
                     // Check if the follow relationship already exists.
                     var alreadyFollowing = await db.Followers.AnyAsync(
                         f => f.WhoId == currentUser.UserId && f.WhomId == targetUser.UserId,
                         cancellationToken
                     );
-                    if (alreadyFollowing)
+
+                    if (followAction == FollowAction.Unfollow && alreadyFollowing)
+                    {
+                        db.Followers.Remove(followRelation);
+                        await db.SaveChangesAsync(cancellationToken);
+                        // Invalidate all cache entries for the current user's follows.
+                        await hybridCache.RemoveByTagAsync($"followers:{username}", cancellationToken);
+                        return Results.NoContent();
+                    }
+                    
+                    if (followAction == FollowAction.Follow && alreadyFollowing)
                     {
                         return Results.Conflict("Already following this user.");
                     }
 
-                    // Create the follow relationship.
-                    var newFollower = new Follower
-                    {
-                        WhoId = currentUser.UserId,
-                        WhomId = targetUser.UserId
-                    };
-
-                    db.Followers.Add(newFollower);
+                    db.Followers.Add(followRelation);
                     await db.SaveChangesAsync(cancellationToken);
-
+                    // Invalidate all cache entries for the current user's follows.
+                    await hybridCache.RemoveByTagAsync($"followers:{username}", cancellationToken);
                     return Results.NoContent();
                 }
             );
@@ -92,10 +86,9 @@ namespace MiniTwit.Api.Features.Followers.FollowUser
         }
     }
     
-}
-
-internal enum FollowAction
-{
-    Follow,
-    Unfollow
+    internal enum FollowAction
+    {
+        Follow,
+        Unfollow
+    }
 }

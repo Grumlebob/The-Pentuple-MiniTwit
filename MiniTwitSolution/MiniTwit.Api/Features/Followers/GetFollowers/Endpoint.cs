@@ -1,8 +1,7 @@
-﻿//Co-authored by: ChatGPT (https://chat.openai.com/)
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Shared.DTO.Followers.FollowUser;
-
 
 namespace MiniTwit.Api.Features.Followers.GetFollowers
 {
@@ -29,6 +28,13 @@ namespace MiniTwit.Api.Features.Followers.GetFollowers
                     // Define a cache key that uniquely identifies this query.
                     var cacheKey = $"followers:{username}:{no}";
 
+                    // Create cache entry options with a tag.
+                    var cacheEntryOptions = new HybridCacheEntryOptions
+                    {
+                        LocalCacheExpiration = TimeSpan.FromMinutes(5),
+                        Expiration = TimeSpan.FromMinutes(5),
+                    };
+
                     // Retrieve or create the cached response.
                     var response = await hybridCache.GetOrCreateAsync<GetFollowersResponse>(
                         cacheKey,
@@ -44,7 +50,9 @@ namespace MiniTwit.Api.Features.Followers.GetFollowers
 
                             return new GetFollowersResponse(followUsernames);
                         },
-                        cancellationToken: cancellationToken
+                        cacheEntryOptions,
+                        cancellationToken: cancellationToken,
+                        tags: new[] { $"followers:{username}" }
                     );
 
                     return Results.Json(response);
