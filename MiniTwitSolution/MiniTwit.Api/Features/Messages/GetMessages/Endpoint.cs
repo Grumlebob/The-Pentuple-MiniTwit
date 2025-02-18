@@ -26,9 +26,11 @@ namespace MiniTwit.Api.Features.Messages.GetMessages
                         {
                             var messages = await db.Messages
                                 .Where(m => m.Flagged == 0)
+                                .Include(m => m.Author)
                                 .OrderByDescending(m => m.PubDate)
                                 .Take(no)
                                 .ToListAsync(ct);
+
                             
                             var dto = messages
                                 .Select(m => new GetMessageResponse(m.MessageId, m.PubDate, m.Author!.Username, m.Text))

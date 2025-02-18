@@ -1,0 +1,98 @@
+﻿@page "/"
+@page "/timeline"
+@inject MiniTwitClient MiniTwitClient
+
+<h3>My Timeline</h3>
+
+@if (messages == null)
+{
+    <p><em>Loading messages...</em></p>
+}
+else if (!messages.Any())
+{
+    <p><em>There are no messages so far.</em></p>
+}
+else
+{
+    <ul class="messages">
+        @foreach (var message in messages)
+        {
+            <li>
+                <p>
+                    <strong>@message.AuthorUsername</strong>: @message.Text
+                    <br />
+                    <small>
+                        @if (message.PubDate.HasValue)
+                        {
+                            @UnixTimeStampToDateTime(message.PubDate.Value).ToString("g")
+                        }
+                        else
+                        {
+                            <span>N/A</span>
+                        }
+                    </small>
+                </p>
+            </li>
+        }
+    </ul>
+}
+
+@if (IsLoggedIn)
+{
+    <div class="twitbox">
+        <h3>What's on your mind, @CurrentUsername?</h3>
+        <EditForm Model="newMessageModel" OnValidSubmit="PostMessage">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <InputText @bind-Value="newMessageModel.TextContent" placeholder="Share something..." size="60" />
+            <button type="submit">Share</button>
+        </EditForm>
+    </div>
+}
+
+@code {
+    private IList<GetMessageResponse> messages;
+    private NewMessageModel newMessageModel = new();
+
+    // In a real application, these values would come from an authentication service.
+    private bool IsLoggedIn { get; set; } = true;
+    private string CurrentUsername { get; set; } = "demoUser";
+
+    protected override async Task OnInitializedAsync()
+    {
+        messages = await MiniTwitClient.GetMessagesAsync();
+        Console.WriteLine("messages: " + messages);
+        StateHasChanged();
+    }
+
+    private async Task PostMessage()
+    {
+        var request = new PostMessageRequest(newMessageModel.TextContent);
+        var response = await MiniTwitClient.PostMessageAsync(CurrentUsername, request);
+        if (response.IsSuccessStatusCode)
+        {
+            // Refresh the timeline after successfully posting a new message.
+            messages = await MiniTwitClient.GetMessagesAsync();
+            newMessageModel.TextContent = string.Empty;
+        }
+        else
+        {
+            //...
+        }
+    }
+
+    /// <summary>
+    /// Converts a Unix timestamp (in seconds) to a local DateTime.
+    /// </summary>
+    private DateTime UnixTimeStampToDateTime(int unixTimeStamp)
+    {
+        return DateTimeOffset.FromUnixTimeSeconds(unixTimeStamp).LocalDateTime;
+    }
+
+    private class NewMessageModel
+    {
+        [Required(ErrorMessage = "Message cannot be empty")]
+        public string TextContent { get; set; } = "";
+    }
+}

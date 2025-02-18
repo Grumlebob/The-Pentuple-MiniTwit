@@ -21,28 +21,26 @@ namespace MiniTwit.Api.Features.Followers.FollowUser
                     CancellationToken cancellationToken
                 ) =>
                 {
-                    using var doc = await JsonDocument.ParseAsync(request.Body, cancellationToken: cancellationToken);
-                    var json = doc.RootElement.GetRawText();
+                    string requestBody;
+                    using (var reader = new StreamReader(request.Body))
+                    {
+                        requestBody = await reader.ReadToEndAsync(cancellationToken);
+                    }
+                    using var document = JsonDocument.Parse(requestBody);
                     var targetUsername = "";
                     var followAction = FollowAction.Follow;
-                    try
+                    if (document.RootElement.TryGetProperty("follow", out var followElement))
                     {
-                        var followRequest = JsonSerializer.Deserialize<FollowRequest>(json);
-                        targetUsername = followRequest!.Follow;
+                        targetUsername = followElement.GetString();
                     }
-                    catch (JsonException)
+                    else if (document.RootElement.TryGetProperty("unfollow", out var unfollowElement))
                     {
-                        try
-                        {
-                            var unfollowRequest = JsonSerializer.Deserialize<UnfollowRequest>(json);
-                            targetUsername = unfollowRequest!.Unfollow;
-                            followAction = FollowAction.Unfollow;
-                        }
-                        catch (JsonException)
-                        {
-                            return Results.BadRequest("Invalid request body.");
-                        }
-                        
+                        targetUsername = unfollowElement.GetString();
+                        followAction = FollowAction.Unfollow;
+                    }
+                    else
+                    {
+                        return Results.BadRequest("Invalid request body.");
                     }
 
                     var currentUser = await db.Users.Where(u => u.Username == username)

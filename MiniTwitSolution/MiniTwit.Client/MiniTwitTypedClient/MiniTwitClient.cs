@@ -35,6 +35,7 @@ public class MiniTwitClient : IFollowerService, IUserServices, IMessageService
         {
             return (await response.Content.ReadFromJsonAsync<GetFollowersResponse>())!;
         }
+
         return new GetFollowersResponse([]);
     }
 
@@ -50,8 +51,10 @@ public class MiniTwitClient : IFollowerService, IUserServices, IMessageService
 
     public async Task<HttpResponseMessage> LogoutUserAsync()
     {
-        return await _httpClient.GetAsync("/logout");
+        // Use POST to match the endpoint configuration.
+        return await _httpClient.PostAsync("/logout", null);
     }
+
 
     public async Task<IList<GetMessageResponse>> GetMessagesAsync(int limit = 100)
     {
@@ -60,6 +63,7 @@ public class MiniTwitClient : IFollowerService, IUserServices, IMessageService
         {
             return (await response.Content.ReadFromJsonAsync<IList<GetMessageResponse>>())!;
         }
+
         return [];
     }
 
@@ -70,6 +74,7 @@ public class MiniTwitClient : IFollowerService, IUserServices, IMessageService
         {
             return (await response.Content.ReadFromJsonAsync<IList<GetMessageResponse>>())!;
         }
+
         return [];
     }
 

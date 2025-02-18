@@ -1,3 +1,5 @@
-﻿namespace MiniTwit.Shared.DTO.Followers.FollowUser;
+﻿using System.Text.Json.Serialization;
 
-public record UnfollowRequest(string Unfollow);
+namespace MiniTwit.Shared.DTO.Followers.FollowUser;
+
+public record UnfollowRequest([property: JsonPropertyName("unfollow")] string Unfollow);
