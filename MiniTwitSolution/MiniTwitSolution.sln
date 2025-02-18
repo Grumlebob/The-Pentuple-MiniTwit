@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniTwit.Client", "MiniTwit.Client\MiniTwit.Client.csproj", "{4D7FFD8A-75BA-46A8-A7FD-7B7FD6E71674}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniTwit.Api", "MiniTwit.Api\MiniTwit.Api.csproj", "{7C2D84E2-B67E-4162-89CA-D9E70255E838}"
@@ -9,6 +12,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Documentation", "Documentation\Documentation.csproj", "{885557C3-C311-45DA-ABB8-AC17CB9BB797}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniTwit.Test", "MiniTwit.Test\MiniTwit.Test.csproj", "{6C201F2D-2A68-4B89-B333-8C2ED9BA1538}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulator", "Simulator", "{B2647147-7C6E-451F-A4C3-695EE3C35B31}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\Users\jgrum\Desktop\Python\latest_processed_sim_action_id.txt = ..\..\..\..\Users\jgrum\Desktop\Python\latest_processed_sim_action_id.txt
+		..\..\..\..\Users\jgrum\Desktop\Python\minitwit_scenario.csv = ..\..\..\..\Users\jgrum\Desktop\Python\minitwit_scenario.csv
+		..\..\..\..\Users\jgrum\Desktop\Python\minitwit_simulator.py = ..\..\..\..\Users\jgrum\Desktop\Python\minitwit_simulator.py
+		..\..\..\..\Users\jgrum\Desktop\Python\requirements.txt = ..\..\..\..\Users\jgrum\Desktop\Python\requirements.txt
+		..\..\..\..\Users\jgrum\Desktop\Python\Dockerfile = ..\..\..\..\Users\jgrum\Desktop\Python\Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +48,8 @@ Global
 		{6C201F2D-2A68-4B89-B333-8C2ED9BA1538}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C201F2D-2A68-4B89-B333-8C2ED9BA1538}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C201F2D-2A68-4B89-B333-8C2ED9BA1538}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
