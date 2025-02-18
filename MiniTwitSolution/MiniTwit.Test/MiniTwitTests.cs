@@ -1,23 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using MiniTwit.Api.Domain;
-using MiniTwit.Api.Infrastructure;
-using MiniTwit.Client.MiniTwitTypedClient;
-using MiniTwit.Shared.DTO.Followers.FollowUser;
-using MiniTwit.Shared.DTO.Messages;
-using MiniTwit.Shared.DTO.Users.Authentication.LoginUser;
-using MiniTwit.Shared.DTO.Users.Authentication.LogoutUser;
-using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
-using MiniTwit.Test;
-using Xunit;
-
-[CollectionDefinition("MiniTwitCollection")]
-public class MiniTwitCollection : ICollectionFixture<MiniTwitApiWebAppFactory> { }
-
-[Collection("MiniTwitCollection")]
+﻿[Collection("MiniTwitCollection")]
 public class MiniTwitTests : IAsyncLifetime
 {
     private readonly MiniTwitApiWebAppFactory _factory;
