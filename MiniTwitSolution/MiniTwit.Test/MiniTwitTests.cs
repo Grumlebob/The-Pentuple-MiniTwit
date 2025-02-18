@@ -248,7 +248,7 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Act: Successful login using the typed client.
         HttpResponseMessage response = await _typedClient.LoginUserAsync(
-            new LoginUserRequest("loginuser@example.com", "mypassword")
+            new LoginUserRequest("loginuser", "mypassword")
         );
         response.EnsureSuccessStatusCode();
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -264,7 +264,7 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Act: Failed login (wrong password).
         HttpResponseMessage responseWrong = await _typedClient.LoginUserAsync(
-            new LoginUserRequest("loginuser@example.com", "wrongpassword")
+            new LoginUserRequest("loginuser", "wrongpassword")
         );
         Assert.Equal(HttpStatusCode.Unauthorized, responseWrong.StatusCode);
     }
