@@ -5,10 +5,8 @@ services:
       context: .
       dockerfile: MiniTwit.Api/Dockerfile
     ports:
-      - "5000:80"
+      - "5000:80"         # Host port 5000 → container port 80 (HTTP)
     volumes:
-      # Map the local Infrastructure folder (which contains minitwit.db and migrations)
-      # to the container's /app/Infrastructure folder.
       - ./MiniTwit.Api/Infrastructure:/app/Infrastructure
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -19,4 +17,11 @@ services:
       context: .
       dockerfile: MiniTwit.Client/Dockerfile
     ports:
-      - "5001:80"
+      - "5001:80"         # Host port 5001 → container port 80 (Nginx serving the Blazor client)
+
+  simulator:
+    build:
+      context: ./Simulator
+      dockerfile: Dockerfile
+    environment:
+      - SIMULATOR_HOST=http://api:80   # Use the service name 'api' to reach the API container on port 80
