@@ -160,3 +160,12 @@ Ensures we don't try to leak sensitive information, such as keys.
 
 We are currently not supporting proper authentication so we can focus on deploying. 
 We handle current user with a singleton service that relies on Blazored library localStorage.
+
+## Ef core migrations
+
+To make a migration, go to root (where .sln is) and run the following commands:
+dotnet ef migrations add InitialPostgres --project MiniTwit.Api/MiniTwit.Api.csproj --startup-project MiniTwit.Api/MiniTwit.Api.csproj
+
+To update the database, run the following command:
+dotnet ef database update -p MiniTwit.Api/MiniTwit.Api.csproj -s MiniTwit.Api/MiniTwit.Api.csproj
+

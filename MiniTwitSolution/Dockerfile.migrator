@@ -1,0 +1,20 @@
+# Use the .NET SDK so we have access to the EF tools
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS migrator
+
+WORKDIR /src
+
+# 1) Copy just the csproj so we can restore early
+COPY ["MiniTwit.Api/MiniTwit.Api.csproj", "MiniTwit.Api/"]
+RUN dotnet restore "MiniTwit.Api/MiniTwit.Api.csproj"
+
+# 2) Copy the rest of the source code
+COPY . .
+WORKDIR "/src/MiniTwit.Api"
+
+# 3) Build the API project (which includes EF migrations)
+RUN dotnet build "MiniTwit.Api.csproj" -c Release
+
+# 4) The entrypoint runs the EF migrations
+#    -p (project) points to the EF-containing project
+#    -s (startup) points to the same project (since it's minimal API)
+ENTRYPOINT ["dotnet", "ef", "database", "update", "-p", "MiniTwit.Api.csproj", "-s", "MiniTwit.Api.csproj"]

@@ -1,21 +1,54 @@
 version: "3.8"
 
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: minitwit_db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=MiniTwitDb
+    # (Optional) Healthcheck so other containers only start once DB is ready
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  # The migrator container uses Dockerfile.migrator to run `dotnet ef database update`.
+  migrator:
+    build:
+      context: . # the solution root
+      dockerfile: Dockerfile.migrator
+    depends_on:
+      db:
+        condition: service_healthy # wait until Postgres is up & healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
+    # You might want this container to exit once migrations are applied.
+    # Typically, you'd let the container run the EF command and then stop.
+
   api:
     build:
       context: .
       dockerfile: MiniTwit.Api/Dockerfile
-    ports:
-      - "5000:80"
-    volumes:
-      - ./MiniTwit.Api/Infrastructure:/app/Infrastructure
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
+    depends_on:
+      db:
+        condition: service_healthy
+      migrator:
+        condition: service_started
+    ports:
+      - "5000:80"
 
   client:
     build:
-      context: .                 # <--- The entire solution is the build context
+      context: .
       dockerfile: MiniTwit.Client/Dockerfile
     ports:
       - "5001:80"
@@ -26,3 +59,5 @@ services:
       dockerfile: Dockerfile
     environment:
       - SIMULATOR_HOST=http://api:80
+    depends_on:
+      - api

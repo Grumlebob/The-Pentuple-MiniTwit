@@ -18,21 +18,17 @@ builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
 
 //TESTING MODE
-//If outcommented, we use SQLite in-memory database
-//Otherwise it uses Postgres
-//builder.Environment.EnvironmentName = "Testing";
 
 // Only configure database if we're not in test mode
-if (!builder.Environment.IsEnvironment("Testing"))
-{
-    builder.Services.AddDbContext<MiniTwitDbContext>(options =>
-        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
-    );
 
-    builder.Services.AddScoped<IMiniTwitDbContext>(provider =>
-        provider.GetRequiredService<MiniTwitDbContext>()
-    );
-}
+builder.Services.AddDbContext<MiniTwitDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
+builder.Services.AddScoped<IMiniTwitDbContext>(provider =>
+    provider.GetRequiredService<MiniTwitDbContext>()
+);
+
 
 var clientBaseUrl = builder.Configuration["ClientBaseUrl"];
 if (string.IsNullOrEmpty(clientBaseUrl))
@@ -81,6 +77,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MiniTwitDbContext>();
+    db.Database.Migrate();
+}
+
 //app.UseHttpsRedirection();
 
 app.UseCors("AllowBlazorClient");
@@ -99,6 +101,9 @@ app.MapRegisterUserEndpoints(); // registers POST "/register"
 app.MapLoginUserEndpoints(); // registers POST "/login"
 app.MapLogoutUserEndpoints(); // registers POST "/logout"
 
+
 app.Run();
 
-public partial class Program { }
+public partial class Program
+{
+}

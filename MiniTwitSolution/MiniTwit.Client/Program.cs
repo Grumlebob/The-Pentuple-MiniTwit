@@ -37,4 +37,5 @@ builder.Services.AddScoped<IMessageService>(sp => sp.GetRequiredService<MiniTwit
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddSingleton<UserSession>();
 
+
 await builder.Build().RunAsync();
