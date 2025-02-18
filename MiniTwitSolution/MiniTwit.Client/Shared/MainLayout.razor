@@ -1,16 +1,19 @@
-﻿@inherits LayoutComponentBase
+﻿@using Blazored.LocalStorage
+@inherits LayoutComponentBase
 @inject NavigationManager NavManager
+@inject ILocalStorageService LocalStorage
+@inject UserSession Session
 
 <div class="page">
     <h1>MiniTwit</h1>
     <nav class="navigation">
-        @if (User != null)
+        @if (Session.IsLoggedIn)
         {
             <NavLink href="/">My Timeline</NavLink>
             <span>&#124;</span>
             <NavLink href="/timeline">Public Timeline</NavLink>
             <span>&#124;</span>
-            <NavLink href="/logout">Sign Out (@User.Username)</NavLink>
+            <button class="nav-link" @onclick="Logout">Sign Out (@Session.Username)</button>
         }
         else
         {
@@ -25,22 +28,33 @@
         @Body
     </div>
     <footer class="footer">
-        MiniTwit &mdash; A Blazor WebAssembly Application
     </footer>
 </div>
 
 @code {
-    // In a full application, this would be replaced with an authentication service.
-    private UserModel User { get; set; } = null;
-
-    protected override void OnInitialized()
+    [Inject] MiniTwitClient MiniTwitClient { get; set; } = default!;
+ 
+    protected override async Task OnInitializedAsync()
     {
-        // For demonstration, User remains null.
-        // In production, retrieve the authenticated user from a proper service.
+        var loadedSession = await UserSession.LoadAsync(LocalStorage);
+        Session.IsLoggedIn = loadedSession.IsLoggedIn;
+        Session.Username = loadedSession.Username;
     }
 
-    public class UserModel
+    private async Task Logout()
     {
-        public string Username { get; set; }
+        
+        var response = await MiniTwitClient.LogoutUserAsync();
+        if (response.IsSuccessStatusCode)
+        {
+            Session.IsLoggedIn = false;
+            Session.Username = "";
+            await Session.SaveAsync(LocalStorage);
+            NavManager.NavigateTo("/timeline");
+        }
+        else
+        {
+            // Optionally, handle error cases (show a message, etc.)
+        }
     }
 }

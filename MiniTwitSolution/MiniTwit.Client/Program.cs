@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MiniTwit.Client;
@@ -31,6 +32,8 @@ builder.Services.AddScoped<IFollowerService>(sp => sp.GetRequiredService<MiniTwi
 builder.Services.AddScoped<IUserServices>(sp => sp.GetRequiredService<MiniTwitClient>());
 builder.Services.AddScoped<IMessageService>(sp => sp.GetRequiredService<MiniTwitClient>());
 
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddSingleton<UserSession>();
 
 
 await builder.Build().RunAsync();
