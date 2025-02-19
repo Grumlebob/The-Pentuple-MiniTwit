@@ -29,7 +29,6 @@ builder.Services.AddScoped<IMiniTwitDbContext>(provider =>
     provider.GetRequiredService<MiniTwitDbContext>()
 );
 
-
 var clientBaseUrl = builder.Configuration["ClientBaseUrl"];
 if (string.IsNullOrEmpty(clientBaseUrl))
 {
@@ -45,10 +44,7 @@ builder.Services.AddCors(options =>
         "AllowBlazorClient",
         policy =>
         {
-            policy
-                .WithOrigins(clientBaseUrl)
-                .AllowAnyHeader()
-                .AllowAnyMethod();
+            policy.WithOrigins(clientBaseUrl).AllowAnyHeader().AllowAnyMethod();
         }
     );
 });
@@ -101,9 +97,6 @@ app.MapRegisterUserEndpoints(); // registers POST "/register"
 app.MapLoginUserEndpoints(); // registers POST "/login"
 app.MapLogoutUserEndpoints(); // registers POST "/logout"
 
-
 app.Run();
 
-public partial class Program
-{
-}
+public partial class Program { }
