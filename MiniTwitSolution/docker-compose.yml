@@ -9,7 +9,6 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=MiniTwitDb
-    # (Optional) Healthcheck so other containers only start once DB is ready
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 5s
@@ -22,11 +21,20 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.migrator
-    environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
+    # Wait for the database to be healthy
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
+      - ClientBaseUrl=https://whatever-url-or-placeholder
+    # Mark migrator healthy only after /tmp/migrations_done is created
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/migrations_done"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
 
   api:
     build:
@@ -35,18 +43,20 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
+    # IMPORTANT: Wait for db (healthy) and migrator (healthy)
     depends_on:
       db:
         condition: service_healthy
       migrator:
-        condition: service_started
+        condition: service_healthy
     ports:
-      - "5000:80"
+      - "5000:8080"
 
   client:
     build:
       context: .
       dockerfile: MiniTwit.Client/Dockerfile
+    # Wait for the API container to start (which itself waits for migrator)
     ports:
       - "5001:80"
 
@@ -54,7 +64,9 @@ services:
     build:
       context: ./Simulator
       dockerfile: Dockerfile
-    environment:
-      - SIMULATOR_HOST=http://api:80
+     # Also wait for the API container to start
     depends_on:
-      - api
+      api:
+        condition: service_started
+    environment:
+      - SIMULATOR_HOST=http://api:8080
