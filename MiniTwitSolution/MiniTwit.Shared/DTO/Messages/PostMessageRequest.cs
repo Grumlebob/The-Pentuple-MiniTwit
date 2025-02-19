@@ -1,3 +1,3 @@
 namespace MiniTwit.Shared.DTO.Messages;
 
-public record PostMessageRequest(string TextContent);
+public record PostMessageRequest(string Content);

@@ -16,4 +16,4 @@ COPY . .
 ENV SIMULATOR_HOST="http://localhost:5000"
 
 # Run the simulator, passing the API host URL as an argument.
-CMD ["python", "minitwit_simulator.py", "${SIMULATOR_HOST}"]
+CMD python minitwit_simulator.py "$SIMULATOR_HOST"

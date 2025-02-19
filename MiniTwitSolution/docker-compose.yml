@@ -1,27 +1,72 @@
 version: "3.8"
+
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: minitwit_db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=MiniTwitDb
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  migrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrator
+    # Wait for the database to be healthy
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
+      - ClientBaseUrl=https://whatever-url-or-placeholder
+    # Mark migrator healthy only after /tmp/migrations_done is created
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/migrations_done"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
+
   api:
     build:
       context: .
       dockerfile: MiniTwit.Api/Dockerfile
-    ports:
-      - "5000:80"         # Host port 5000 → container port 80 (HTTP)
-    volumes:
-      - ./MiniTwit.Api/Infrastructure:/app/Infrastructure
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
+    # IMPORTANT: Wait for db (healthy) and migrator (healthy)
+    depends_on:
+      db:
+        condition: service_healthy
+      migrator:
+        condition: service_healthy
+    ports:
+      - "5000:8080"
 
   client:
     build:
       context: .
       dockerfile: MiniTwit.Client/Dockerfile
+    # Wait for the API container to start (which itself waits for migrator)
     ports:
-      - "5001:80"         # Host port 5001 → container port 80 (Nginx serving the Blazor client)
+      - "5001:80"
 
   simulator:
     build:
       context: ./Simulator
       dockerfile: Dockerfile
+     # Also wait for the API container to start
+    depends_on:
+      api:
+        condition: service_started
     environment:
-      - SIMULATOR_HOST=http://api:80   # Use the service name 'api' to reach the API container on port 80
+      - SIMULATOR_HOST=http://api:8080

@@ -160,3 +160,46 @@ Ensures we don't try to leak sensitive information, such as keys.
 
 We are currently not supporting proper authentication so we can focus on deploying. 
 We handle current user with a singleton service that relies on Blazored library localStorage.
+
+## Ef core migrations
+
+To make a migration, go to root (where .sln is) and run the following commands:
+dotnet ef migrations add InitialPostgres --project MiniTwit.Api/MiniTwit.Api.csproj --startup-project MiniTwit.Api/MiniTwit.Api.csproj
+
+To update the database, run the following command:
+dotnet ef database update -p MiniTwit.Api/MiniTwit.Api.csproj -s MiniTwit.Api/MiniTwit.Api.csproj
+
+
+
+# 19.02
+
+## Struggling with migrations
+
+Turns out the answer was: Ef Core Migration Bundles.
+https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying
+
+This was the correct command to run from root:
+dotnet ef migrations bundle --project MiniTwit.Api/MiniTwit.Api.csproj --startup-project MiniTwit.Api/MiniTwit.Api.csproj --self-contained -r linux-x64 -o ef-migrations-bundle
+
+
+## What a docker day
+
+docker-compose up --build now works with migration. 
+
+In docker-compose file:
+Api has ports 5000:8080, where client has port 5001:80. 80 instead of 8080 might be some nginx thing.
+
+In Api program.cs:
+There are cors policies which allow client to connect to api.
+It is currently hardcoded in appsettings.json as http//localhost:5001 (notice not https)
+
+In Client program.cs:
+It sets up the typed client again with a hardcoded baseurl to the api in appsettings.json http//:localhost:5000.
+
+The migration happens in Dockerfile.migrator where it copies run.sh into the container and runs it.
+The run.sh is a script that runs the migration. Perhaps this could be done directly.
+We kept changing a "bug" where it said something like "could not find Migrations__History". 
+But there is a chance that this was not a bug and would have worked regardless.
+
+The simulator was activated afterwards and we tried again. ConnectionErrors...
+But the solution was just to use port 8080 instead of 80 in compose.

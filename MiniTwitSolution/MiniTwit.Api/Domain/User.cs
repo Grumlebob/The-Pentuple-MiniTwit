@@ -14,7 +14,7 @@ public partial class User
     public string Email { get; set; } = null!;
 
     [Column("pw_hash", TypeName = "TEXT")]
-    public string PwHash { get; set; } = null!;
+    public string? PwHash { get; set; } = null!;
 
     // Navigation property: All follower records where this user is being followed.
     [InverseProperty(nameof(Follower.FollowedUser))]

@@ -34,7 +34,7 @@ namespace MiniTwit.Api.Features.Messages.PostMessage
                     var message = new Message
                     {
                         AuthorId = author.UserId,
-                        Text = request.TextContent,
+                        Text = request.Content,
                         PubDate = pubDate,
                         Flagged = 0,
                     };

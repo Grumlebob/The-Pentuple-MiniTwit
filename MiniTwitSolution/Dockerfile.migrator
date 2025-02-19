@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/runtime-deps:9.0
+WORKDIR /app
+
+# 1) Install Bash and dos2unix so we can convert CRLF -> LF if needed
+RUN apt-get update && apt-get install -y bash dos2unix
+
+# 2) Copy in your self-contained EF migrations bundle and the script
+COPY ef-migrations-bundle .
+COPY run.sh .
+
+# 3) Convert line endings from CRLF to LF (in case you're on Windows)
+RUN dos2unix run.sh
+
+# 4) Make the files executable
+RUN chmod +x ef-migrations-bundle run.sh
+
+# 5) Use Bash explicitly as the entrypoint
+ENTRYPOINT ["bash", "./run.sh"]
