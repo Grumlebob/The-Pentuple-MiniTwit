@@ -1,20 +1,11 @@
-# Use the .NET SDK so we have access to the EF tools
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS migrator
+# Use a minimal base image (your bundle is self-contained)
+FROM alpine:3.18
+WORKDIR /app
 
-WORKDIR /src
+COPY ef-migrations-bundle /app/ef-migrations-bundle
 
-# 1) Copy just the csproj so we can restore early
-COPY ["MiniTwit.Api/MiniTwit.Api.csproj", "MiniTwit.Api/"]
-RUN dotnet restore "MiniTwit.Api/MiniTwit.Api.csproj"
+COPY appsettings.json /app/MiniTwit.Api/appsettings.json
 
-# 2) Copy the rest of the source code
-COPY . .
-WORKDIR "/src/MiniTwit.Api"
+RUN chmod +x /app/ef-migrations-bundle
 
-# 3) Build the API project (which includes EF migrations)
-RUN dotnet build "MiniTwit.Api.csproj" -c Release
-
-# 4) The entrypoint runs the EF migrations
-#    -p (project) points to the EF-containing project
-#    -s (startup) points to the same project (since it's minimal API)
-ENTRYPOINT ["dotnet", "ef", "database", "update", "-p", "MiniTwit.Api.csproj", "-s", "MiniTwit.Api.csproj"]
+ENTRYPOINT ["/app/ef-migrations-bundle"]

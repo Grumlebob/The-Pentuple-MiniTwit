@@ -18,18 +18,15 @@ services:
     ports:
       - "5432:5432"
 
-  # The migrator container uses Dockerfile.migrator to run `dotnet ef database update`.
   migrator:
     build:
-      context: . # the solution root
+      context: .
       dockerfile: Dockerfile.migrator
-    depends_on:
-      db:
-        condition: service_healthy # wait until Postgres is up & healthy
     environment:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
-    # You might want this container to exit once migrations are applied.
-    # Typically, you'd let the container run the EF command and then stop.
+    depends_on:
+      db:
+        condition: service_healthy
 
   api:
     build:
