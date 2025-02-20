@@ -137,10 +137,13 @@ such as the common tricky many-to-many cases, where we need to avoid cyclic depe
 ## Docker
 To run:
 Go to root of director
+```bash
 docker-compose up --build
-
+```
 To stop:
+```bash
 docker-compose down
+```
 
 To open API:
 http://localhost:5000/
@@ -164,11 +167,14 @@ We handle current user with a singleton service that relies on Blazored library 
 ## Ef core migrations
 
 To make a migration, go to root (where .sln is) and run the following commands:
+```bash
 dotnet ef migrations add InitialPostgres --project MiniTwit.Api/MiniTwit.Api.csproj --startup-project MiniTwit.Api/MiniTwit.Api.csproj
+```
 
 To update the database, run the following command:
+```bash
 dotnet ef database update -p MiniTwit.Api/MiniTwit.Api.csproj -s MiniTwit.Api/MiniTwit.Api.csproj
-
+```
 
 
 # 19.02
@@ -179,12 +185,18 @@ Turns out the answer was: Ef Core Migration Bundles.
 https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying
 
 This was the correct command to run from root:
+```bash
 dotnet ef migrations bundle --project MiniTwit.Api/MiniTwit.Api.csproj --startup-project MiniTwit.Api/MiniTwit.Api.csproj --self-contained -r linux-x64 -o ef-migrations-bundle
+```
 
 
 ## What a docker day
 
-docker-compose up --build now works with migration. 
+Docker compose up now works with migration. 
+```bash
+docker-compose up --build 
+```
+
 
 In docker-compose file:
 Api has ports 5000:8080, where client has port 5001:80. 80 instead of 8080 might be some nginx thing.
@@ -203,3 +215,111 @@ But there is a chance that this was not a bug and would have worked regardless.
 
 The simulator was activated afterwards and we tried again. ConnectionErrors...
 But the solution was just to use port 8080 instead of 80 in compose.
+
+# 20.02
+
+## Running docker compose
+On macOs the docker compose up does not use "-" command is
+```bash
+docker compose up --build
+```
+and docker compose down is
+```bash
+docker compose down
+```
+
+## Problems with migrations
+We had problems with outdated global tools for running the dotnet command for ef, therefore we needed to run the following command.
+```bash
+dotnet tool install --global dotnet-ef
+```
+We might need to add this to the Vagrant file...
+
+We needed to delete the existing migrations file, as it was deprecated/uncompatable with our version of dotnet. 
+
+After deleting the file, we ran the following command:
+```bash
+dotnet ef migrations bundle --project MiniTwit.Api/MiniTwit.Api.csproj --startup-project MiniTwit.Api/MiniTwit.Api.csproj --self-contained -r linux-x64 -o ef-migrations-bundle
+```
+Which fixed the migratin issues.
+
+## Problems with Ports/Docker
+On Linux (fedoraOS):
+There were several issues when docker compose. We had an error where port 5432 was used by Postgres and as such could not be used when building the project. And was subsequently changed to 5433. 
+
+On Mac:
+Another was that specifically on MacOS, the port 5000 is occupied by the control center, which is a process that should not be killed.
+For the client to work, we had to change its port from 8080 to 80.
+Port 5432 was already occupied by postgress, this seems to be the port that postgress occupies on machines.
+These we changes to (docker-compose.yml):
+```yml 
+...
+api: 
+    ...
+    ports:
+      - "5002:8080"
+
+...
+
+client:
+    ...
+    ports:
+      - "5001:80"
+...
+db:
+    ports:
+      - "5433:5432"
+```
+
+## Problems with Vagrant
+
+There is a problem when running vagrant up. That it get stuck 
+
+There is a syntax error in one of the files when running vagrant up.
+
+/.vagrant.d/gems/3.3.6/gems/vagrant-vbguest-0.32.0/lib/vagrant-vbguest/hosts/virtualbox.rb
+
+To fix this we had to manually fix this file by removing an "s" from "exists" to "exist".
+
+For some reason specifying the VM provider in the vagrant file does not seem to work. Instead by explicitly specifiying the provider when calling
+```bash
+vagrant up --provider=virtualbox
+```
+seems to work. We are not sure why.
+
+We have a theory that the plugin that virtualBox uses aka. "vagrant-vbguest" when being freshly installed/or updated does not auto-update when vagrant up is being run afterwards. Which is what we think is what vagrant keeps getting stuck on for some reason. 
+
+This has been fixed by adding the following line to the vagrantFile: 
+```ruby
+if Vagrant.has_plugin?("vagrant-vbguest")
+    config.vbguest.auto_update = false
+end
+```
+(edit: this has solved the issue of running "vagrant up --provider=virtualbox")
+
+Now running
+```bash
+vagrant up
+```
+works as it should.
+
+
+There were also issues with syncing the project folders into the VM. As such the VM does not have the correct files for running the system. By adding the last parameter to the following command, seems to have fixed it:
+```ruby 
+config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+```
+(ie. adding - type: "virtualbox").
+
+Running with digital ocean
+```bash
+vagrant up --provider=digital_ocean
+```
+
+## Problems with Digital Ocean
+There are issues with getting the configuration in our VagrantFile to work with digital ocean. As it cannot find the private ssh key. We are getting the following error:
+´´´
+DigitalOcean Provider:
+* SSH private key path is required
+```
+
+We have tried several "fixes", none of them work.

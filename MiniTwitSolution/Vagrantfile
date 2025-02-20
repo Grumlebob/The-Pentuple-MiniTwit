@@ -1,0 +1,125 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = 'digital_ocean'
+    config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+
+    # Sync project folder to VM
+    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+
+    # DigitalOcean Provider Configuration
+    config.vm.provider :digital_ocean do |provider|
+        # DigitalOcean-specific settings
+        provider.token = ENV['DIGITAL_OCEAN_TOKEN']  # Ensure your token is set in your environment
+        provider.image = "ubuntu-22-04-x64"
+        provider.region = "fra1"  # Frankfurt region
+        provider.size = "s-2vcpu-2gb"  # Droplet size
+        provider.droplet_name = "ubuntu-s-2vcpu-2gb-fra1-01"  # Name for your DigitalOcean droplet
+        provider.private_networking = true  # Enable private networking if needed
+        provider.ssh_key_name = ENV["SSH_KEY_ID"]  # Ensure this matches the key ID you set in DigitalOcean
+        provider.private_key_path = "~/.ssh/id_rsa" # Path to your SSH private key
+        provider.create = true  # Control whether Vagrant creates the droplet when `vagrant up` is run
+    end
+  
+    # Check if the vagrant-vbguest plugin is installed and disable auto-update
+    if Vagrant.has_plugin?("vagrant-vbguest")
+      config.vbguest.auto_update = false
+    end
+  
+    # Forward ports for external access
+    config.vm.network "forwarded_port", guest: 80, host: 8080
+    config.vm.network "forwarded_port", guest: 5001, host: 5001
+    config.vm.network "forwarded_port", guest: 5002, host: 5002
+    config.vm.network "forwarded_port", guest: 5432, host: 5433
+  
+    
+  
+    # Shell provisioning for your setup
+    config.vm.provision "shell", inline: <<-SHELL
+      echo "Waiting for synced folder to be ready"
+  
+      while [ ! -d "/vagrant/MiniTwit.Api" ]; do
+        sleep 1
+      done
+  
+      echo "Synced folder ready!"
+  
+      echo "Running shell provisioner"
+  
+      # Update and install prerequisites
+      apt-get update
+      apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+  
+      echo "Finished installing prerequisites"
+  
+      # Install Docker
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+      add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable"
+      apt-get update
+      apt-get install -y docker-ce docker-ce-cli containerd.io
+      usermod -aG docker vagrant
+  
+      echo "Finished installing Docker"
+  
+      # Install Docker Compose
+      curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      chmod +x /usr/local/bin/docker-compose
+  
+      echo "Finished installing Docker Compose"
+  
+      # Install .NET 9.0 SDK
+      wget https://builds.dotnet.microsoft.com/dotnet/Sdk/9.0.200/dotnet-sdk-9.0.200-linux-x64.tar.gz -O dotnet-sdk.tar.gz
+      mkdir -p /usr/share/dotnet
+      tar -xzf dotnet-sdk.tar.gz -C /usr/share/dotnet
+      ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+  
+      echo "Finished installing .NET 9.0 SDK"
+  
+      # Verify .NET installation
+      if ! dotnet --version; then
+        echo "Dotnet SDK installation failed!"
+        exit 1
+      fi
+  
+      # Install EF Core tool
+      dotnet tool install --global dotnet-ef
+      echo 'export PATH="$PATH:$HOME/.dotnet/tools"' >> ~/.bashrc
+      export PATH="$PATH:$HOME/.dotnet/tools"
+  
+      # Set up PostgreSQL connection strings
+      echo 'export ConnectionStrings__DefaultConnection="Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres"' >> ~/.bashrc
+      echo 'export ConnectionStrings__ExternalConnection="Host=localhost;Port=5433;Database=MiniTwitDb;Username=postgres;Password=postgres"' >> ~/.bashrc
+      source ~/.bashrc
+  
+      # Move into the correct project directory
+      cd /vagrant/
+  
+      # Build EF migrations bundle
+      dotnet ef migrations bundle --project MiniTwit.Api/MiniTwit.Api.csproj \\
+        --startup-project MiniTwit.Api/MiniTwit.Api.csproj --self-contained -r linux-x64 -o ef-migrations-bundle
+  
+      # Verify if migration bundle exists
+      if [ -f ef-migrations-bundle ]; then
+        chmod +x ef-migrations-bundle
+      else
+        echo "Error: EF migrations bundle not found!"
+        exit 1
+      fi
+  
+      # Apply group changes immediately to use Docker without restarting
+      newgrp docker
+  
+      echo "Running docker-compose up --build"
+      # Start Docker Compose
+      docker-compose up --build -d
+  
+      # Wait for DB container to be healthy
+      sleep 20
+  
+      # Apply EF Core migrations
+      dotnet ef database update -p MiniTwit.Api/MiniTwit.Api.csproj -s MiniTwit.Api/MiniTwit.Api.csproj --connection "Host=localhost;Port=5433;Database=MiniTwitDb;Username=postgres;Password=postgres"
+  
+    SHELL
+  end
+  
