@@ -9,7 +9,11 @@ A: The only reason is because we can use free credits via. the Github Education 
 
 ### Step 1
 
-Create a ssh key pair with a private and public key inside the directory ~/.ssh/.
+(If windows open git bash) and type command:
+```cat ~/.ssh/id_rsa.pub``` to get your public key.
+
+If key doesn't exist create a ssh key pair with a private and public key inside the directory ~/.ssh/. https://git-scm.com/book/be/v2/Git-on-the-Server-Generating-Your-SSH-Public-Key
+
 Make sure that the name of the file containing the private key has the name **id_rsa**
 
 Summary: Make sure that the private key is located at:
@@ -19,13 +23,30 @@ Summary: Make sure that the private key is located at:
 
 ### Step 2
 
-Send the public key to @ChrBank.
+If you have access to our digital ocean add the key value pair: \<your first name>, \<your public key>
+
+Otherwise send the public key to @ChrBank.
 
 @ChrBank will register your public key and assign you a with a SSH_KEY_NAME.
 
-#### Local setup (Windows):
+#### Local setup (Windows)
 
-#### Local setup (macOS):
+Create the following two environment variables:
+
+First:
+
+Name: DIGITAL_OCEAN_TOKEN
+
+Value: \<our digital ocean token> (found on discord under resources)
+
+Second:
+
+Name: SHH_KEY_NAME
+
+Value: \<your first name>
+
+
+#### Local setup (macOS)
 
 Depending on which shell you are using. Go to the file .bashrc or .zshrc.
 
@@ -33,7 +54,7 @@ Inside that file:
 Add the following lines:
 
 ```bash
-export DIGITAL_OCEAN_TOKEN="<your digital ocean token>"
+export DIGITAL_OCEAN_TOKEN="<our digital ocean token>" # found on discord under resources
 export SSH_KEY_NAME="<your first name>"
 
 #Example
