@@ -1,0 +1,116 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-22.04"
+
+  # Check if the vagrant-vbguest plugin is installed and disable auto-update
+  if Vagrant.has_plugin?("vagrant-vbguest")
+    config.vbguest.auto_update = false
+  end
+
+  # Forward ports for external access
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network "forwarded_port", guest: 5001, host: 5001
+  config.vm.network "forwarded_port", guest: 5002, host: 5002
+  config.vm.network "forwarded_port", guest: 5432, host: 5433
+
+  # Sync project folder to VM
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox", owner: "vagrant", group: "vagrant"
+
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = false
+    vb.memory = "2048"
+    vb.cpus = 2
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "Waiting for synced folder to be ready"
+
+    while [ ! -d "/vagrant/MiniTwit.Api" ]; do
+      sleep 1
+    done
+
+    echo "Synced folder ready!"
+
+    echo "running shell provisioner"
+
+    apt-get update
+    apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+
+    echo "finished installing prerequisites"
+
+    # Install Docker
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable"
+    apt-get update
+    apt-get install -y docker-ce docker-ce-cli containerd.io
+    usermod -aG docker vagrant
+
+    echo "finished installing docker"
+
+    # Install Docker Compose
+    curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+
+    echo "finished installing docker-compose"
+
+    # Install .NET 9.0 SDK
+    wget https://builds.dotnet.microsoft.com/dotnet/Sdk/9.0.200/dotnet-sdk-9.0.200-linux-x64.tar.gz -O dotnet-sdk.tar.gz
+    mkdir -p /usr/share/dotnet
+    tar -xzf dotnet-sdk.tar.gz -C /usr/share/dotnet
+    ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+
+    echo "finished installing dotnet"
+
+    # Verify dotnet installation
+    if ! dotnet --version; then
+      echo "Dotnet SDK installation failed!"
+      exit 1
+    fi
+
+    # Install dotnet-ef tool (this installs to /root/.dotnet/tools if running as root)
+    dotnet tool install --global dotnet-ef
+
+    # Ensure the dotnet tools path is available
+    echo 'export PATH="$PATH:$HOME/.dotnet/tools"' >> ~/.bashrc
+    export PATH="$PATH:$HOME/.dotnet/tools"
+
+    # Persist connection string for PostgreSQL (5433)
+    echo 'export ConnectionStrings__DefaultConnection="Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres"' >> ~/.bashrc
+    echo 'export ConnectionStrings__ExternalConnection="Host=localhost;Port=5433;Database=MiniTwitDb;Username=postgres;Password=postgres"' >> ~/.bashrc
+    source ~/.bashrc
+
+
+    # Move into the correct project directory (ensure it's under /vagrant)
+    cd /vagrant/
+
+    # Build the EF migrations bundle
+    dotnet ef migrations bundle --project MiniTwit.Api/MiniTwit.Api.csproj \\
+      --startup-project MiniTwit.Api/MiniTwit.Api.csproj --self-contained -r linux-x64 -o ef-migrations-bundle
+
+    # Check if the bundle was generated and apply chmod only if it exists
+    if [ -f ef-migrations-bundle ]; then
+      chmod +x ef-migrations-bundle
+    else
+      echo "Error: ef-migrations-bundle not found!"
+      exit 1
+    fi
+
+    # Apply group changes immediately to use Docker without restarting
+    newgrp docker
+    
+    echo "running docker-compose up --build"
+    # Start the application with Docker Compose
+    docker-compose up --build -d
+
+    # Wait for the database container to be healthy (adjust sleep if necessary)
+    sleep 20
+
+    # Apply the EF Core migrations to update the database schema
+    # dotnet ef database update -p MiniTwit.Api/MiniTwit.Api.csproj -s MiniTwit.Api/MiniTwit.Api.csproj
+    dotnet ef database update -p MiniTwit.Api/MiniTwit.Api.csproj -s MiniTwit.Api/MiniTwit.Api.csproj --connection "Host=localhost;Port=5433;Database=MiniTwitDb;Username=postgres;Password=postgres"
+
+  SHELL
+end
