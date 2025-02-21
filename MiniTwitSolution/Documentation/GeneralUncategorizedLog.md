@@ -357,3 +357,16 @@ dotnet ef migrations bundle --project MiniTwit.Api/MiniTwit.Api.csproj \\
         --startup-project MiniTwit.Api/MiniTwit.Api.csproj --self-contained -r linux-x64 -o ef-migrations-bundle
 ```
 Instead of having to run this command inside the Vagrantfile, we want this command to be executed in another Dockercontainer (either using the API or migrations dockercontainer, using API makes sense since it contains the Migrations folder).
+
+## Problem with droplets in digital ocean
+Each time running the following command:
+```bash
+vagrant up --provider=digital_ocean
+```
+A new droplet is created
+
+Using the command:
+```bash
+vagrant destroy -f
+```
+Does not destroy the droplet in digital ocean.
