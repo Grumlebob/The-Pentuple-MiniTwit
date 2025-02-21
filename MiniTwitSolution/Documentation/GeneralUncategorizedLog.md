@@ -348,3 +348,12 @@ export SSH_KEY_NAME="45641584"
 #updated
 export SSH_KEY_NAME="Christian Lauridsen"
 ```
+
+## Considerations with ef migrations bundle
+
+To generate the ef migrations bundle the following command needs to run inside shell provisioning setup in MiniTwitSolution/Vagrantfile:
+```bash
+dotnet ef migrations bundle --project MiniTwit.Api/MiniTwit.Api.csproj \\
+        --startup-project MiniTwit.Api/MiniTwit.Api.csproj --self-contained -r linux-x64 -o ef-migrations-bundle
+```
+Instead of having to run this command inside the Vagrantfile, we want this command to be executed in another Dockercontainer (either using the API or migrations dockercontainer, using API makes sense since it contains the Migrations folder).
