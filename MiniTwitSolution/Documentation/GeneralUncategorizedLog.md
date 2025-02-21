@@ -317,9 +317,34 @@ vagrant up --provider=digital_ocean
 
 ## Problems with Digital Ocean
 There are issues with getting the configuration in our VagrantFile to work with digital ocean. As it cannot find the private ssh key. We are getting the following error:
-´´´
+```
 DigitalOcean Provider:
 * SSH private key path is required
 ```
 
 We have tried several "fixes", none of them work.
+
+# 21.02
+
+## Problem with ssh keys with Digital ocean when running vagrant up
+
+There is a problem that the SSH_KEY_NAME from the vagrant file cannot recognize the ID of the ssh key owner inside the ~/.zshrc file.
+For other developers this might be in the ~/.bashrc file, depending on which shell you are using.
+
+We are currently getting the ID of the users ssh key by running this command.
+```bash
+curl -X GET "https://api.digitalocean.com/v2/account/keys" -H "Authorization: Bearer $DIGITAL_OCEAN_TOKEN"
+
+{"ssh_keys":[{"id":45641586,"public_key":"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN/CFG4HkRiyZqtCv6/cQldFE6Tavt6SoFL +ScBnUE9A adamhadoutemsamani@fedora","name":"Adam","fingerprint":"77:0e:e3:50:b2:d2:cb:81:f7:46:f3:04:c6:69:d8:70"},{"id":45641584,"public_key":"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCzgvxcDmnyYFhoZTcO7uvYGWaGpadYJ+1rdmSkhpTKMvqSck7gCIak5a1qh7/PPbm3GU2RqpSRaSQzKQJauiLr9zM+bGukIm9d9yHIcx+vMlrJ5Z0lddHuPb4m8BVoMN0JQLFceSooLsQ9RHhTiCxVvlybKAs0WpzKk7TfOh230fPx+yZasnnTp0rVVM0kWRfDTf+lTHX9W6339t11N3hZB2C85B6FAGNe/GwMnCx0frh47h7uhw8lcxycqWqUEfqH6geGTHWSL1iQ1G3HtIEY/BfcUWebDrOeyLSR455+vYLXvWBGU8ucQWGFttEeN/XTcra8lUbqXENDcFenM1VxuJ1vQWQRMOAzixg7mXzYtrYBgWqDSvNHqXd+e53GSiAr4g6hsafTVq7irqfa9A2WnhoIh8UihItpKOnz9ruMg5TK/GIOEH2Lqd7/xcCNGcTUXn3ldNINZxlWvG5XdtaRuvKX9yWqbhrIeJFuuW07+EsDoGrz3ZjbF2FmBaPMbRaewpFarQlZARpNszAzLiVykMJgyCXEN7OI0E3iigRwUrpNAV0Lbf9Z9ambTZOD9yWU3jk7+kZUn5eZBJNdGCWPrNYoGG7ZPrTXtF34qykiMil6tnPGUYuv7RDcA0xBYZNSjJ7pv2j2Q+dxjXGUkuxIC+tKJ5Sp80bYTIxViHEqsQ== chbl@itu.dk\n","name":"Christian Lauridsen","fingerprint":"91:cd:2f:4d:f6:8f:e6:95:b1:a1:d2:05:be:ad:0b:c5"}],"links":{"pages":{}},"meta":{"total":2}}
+```
+
+**FIX**: Instead of writing the ID of the ssh key owner, give it the assigned name of the ssh key from Digital ocean in the ~/.zshrc file.
+
+Changes made in local file ~/.zshrc
+```bash
+#old
+export SSH_KEY_NAME="45641584"
+
+#updated
+export SSH_KEY_NAME="Christian Lauridsen"
+```
