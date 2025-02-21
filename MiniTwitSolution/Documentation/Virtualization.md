@@ -32,19 +32,19 @@ Otherwise send the public key to @ChrBank.
 #### Local setup (Windows)
 
 Create the following two environment variables:
-
+```txt
 First:
 
 Name: DIGITAL_OCEAN_TOKEN
+Value: <our digital ocean token> (found on discord under resources)
+```
 
-Value: \<our digital ocean token> (found on discord under resources)
-
+```
 Second:
 
 Name: SHH_KEY_NAME
-
-Value: \<your first name>
-
+Value: <your first name>
+```
 
 #### Local setup (macOS)
 
