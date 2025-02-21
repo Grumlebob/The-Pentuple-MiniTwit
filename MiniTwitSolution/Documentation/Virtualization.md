@@ -85,6 +85,8 @@ Everything with ssh should work now :)
 Make sure these tools are installed:
 * Vagrant
 
+Make sure to have the newest version of vagrant (2.4.3).
+
 Make sure this plugin is installed:
 ```bash
 vagrant plugin install vagrant-digitalocean
