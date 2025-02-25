@@ -1,0 +1,72 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: minitwit_db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=MiniTwitDb
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5433:5432"
+
+  migrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrator
+    # Wait for the database to be healthy
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
+      - ClientBaseUrl=https://whatever-url-or-placeholder
+    # Mark migrator healthy only after /tmp/migrations_done is created
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/migrations_done"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
+
+  api:
+    build:
+      context: .
+      dockerfile: MiniTwit.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
+    # IMPORTANT: Wait for db (healthy) and migrator (healthy)
+    depends_on:
+      db:
+        condition: service_healthy
+      migrator:
+        condition: service_healthy
+    ports:
+      - "5002:8080"
+
+  client:
+    build:
+      context: .
+      dockerfile: MiniTwit.Client/Dockerfile
+    # Wait for the API container to start (which itself waits for migrator)
+    ports:
+      - "5001:80"
+
+  simulator:
+    build:
+      context: ./Simulator
+      dockerfile: Dockerfile
+     # Also wait for the API container to start
+    depends_on:
+      api:
+        condition: service_started
+    environment:
+      - SIMULATOR_HOST=http://api:8080
