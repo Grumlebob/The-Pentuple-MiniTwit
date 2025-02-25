@@ -1,18 +1,34 @@
+# Stage 1: Build the migrations bundle using the .NET SDK
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS builder
+WORKDIR /src
+
+# Copy all necessary files to build the migrations bundle
+COPY . .
+
+# Restore the solution (adjust path if needed)
+RUN dotnet restore MiniTwitSolution/MiniTwitSolution.sln
+
+# Run the EF migrations bundle command
+RUN dotnet ef migrations bundle \
+      --project MiniTwit.Api/MiniTwit.Api.csproj \
+      --startup-project MiniTwit.Api/MiniTwit.Api.csproj \
+      --self-contained -r linux-x64 -o ef-migrations-bundle
+
+# Stage 2: Prepare the runtime image
 FROM mcr.microsoft.com/dotnet/runtime-deps:9.0
 WORKDIR /app
 
-# 1) Install Bash and dos2unix so we can convert CRLF -> LF if needed
+# Install Bash and dos2unix for script compatibility
 RUN apt-get update && apt-get install -y bash dos2unix
 
-# 2) Copy in your self-contained EF migrations bundle and the script
-# COPY ./MiniTwitSolution/ef-migrations-bundle .
+# Copy the generated bundle from the builder stage
+COPY --from=builder /src/ef-migrations-bundle .
+
+# Copy the migrate script
 COPY ./MiniTwitSolution/migrate.sh .
 
-# 3) Convert line endings from CRLF to LF (in case you're on Windows)
-RUN dos2unix ./migrate.sh
+# Convert line endings and make files executable
+RUN dos2unix ./migrate.sh && chmod +x ./ef-migrations-bundle ./migrate.sh
 
-# 4) Make the files executable
-RUN chmod +x ./ef-migrations-bundle ./migrate.sh
-
-# 5) Use Bash explicitly as the entrypoint
+# Use Bash as the entrypoint
 ENTRYPOINT ["bash", "./migrate.sh"]
