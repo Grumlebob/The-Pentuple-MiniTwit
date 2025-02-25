@@ -77,7 +77,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
+        
+        
+      - name: Debug List files in the runner
+        run: |
+          echo "=== Listing files at the repository root ==="
+          ls -la
+          echo ""
+          echo "=== Listing files in MiniTwitSolution ==="
+          ls -la MiniTwitSolution
+          echo ""
+          echo "=== Searching for Dockerfile.migrator ==="
+          find . -name "Dockerfile.migrator" -print
+              
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -92,7 +104,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: MiniTwitSolution
-          file: Dockerfile.migrator
+          file: ./Dockerfile.migrator
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-migrator:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-migrator:buildcache
