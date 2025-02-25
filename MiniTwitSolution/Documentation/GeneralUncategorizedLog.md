@@ -208,8 +208,8 @@ It is currently hardcoded in appsettings.json as http//localhost:5001 (notice no
 In Client program.cs:
 It sets up the typed client again with a hardcoded baseurl to the api in appsettings.json http//:localhost:5000.
 
-The migration happens in Dockerfile.migrator where it copies run.sh into the container and runs it.
-The run.sh is a script that runs the migration. Perhaps this could be done directly.
+The migration happens in Dockerfile.migrator where it copies migrate.sh into the container and runs it.
+The migrate.sh is a script that runs the migration. Perhaps this could be done directly.
 We kept changing a "bug" where it said something like "could not find Migrations__History". 
 But there is a chance that this was not a bug and would have worked regardless.
 
