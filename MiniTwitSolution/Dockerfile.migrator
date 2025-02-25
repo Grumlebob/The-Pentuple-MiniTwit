@@ -5,13 +5,13 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y bash dos2unix unzip
 
 # Copy the pre-built migrations bundle ZIP file from the build context
-COPY ./MiniTwitSolution/ef-migrations-bundle.zip .
+COPY ef-migrations-bundle.zip .
 
 # Unzip the bundle, remove the ZIP file, and ensure the extracted file is executable
 RUN unzip ef-migrations-bundle.zip && rm ef-migrations-bundle.zip && chmod +x ./ef-migrations-bundle
 
 # Copy the migrate script
-COPY ./MiniTwitSolution/migrate.sh .
+COPY migrate.sh .
 
 # Convert line endings and make the migration script executable
 RUN dos2unix ./migrate.sh && chmod +x ./migrate.sh
