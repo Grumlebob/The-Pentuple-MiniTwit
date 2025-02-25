@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y bash dos2unix
 
 # 2) Copy in your self-contained EF migrations bundle and the script
-COPY ./MiniTwitSolution/ef-migrations-bundle .
+# COPY ./MiniTwitSolution/ef-migrations-bundle .
 COPY ./MiniTwitSolution/migrate.sh .
 
 # 3) Convert line endings from CRLF to LF (in case you're on Windows)
