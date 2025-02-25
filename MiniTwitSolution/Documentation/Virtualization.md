@@ -109,3 +109,7 @@ If this does not work try:
 vagrant destroy -f
 vagrant up --provider=digital_ocean
 ```
+
+Whenever a droplet is created. Go to the Mintwit project on digital ocean.
+Under unattached reserved ips click assign to droplet. 
+This makes sure the droplet runs on the same ip every time.
