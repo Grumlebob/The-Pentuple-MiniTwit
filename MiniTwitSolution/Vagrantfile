@@ -2,108 +2,104 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-    config.vm.box = 'digital_ocean'
-    config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
-    config.ssh.private_key_path = '~/.ssh/do_ssh_key' 
-    # Sync project folder to VM
-    config.vm.synced_folder "remote_files", "/minitwit", type: "rsync"
-    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+  config.vm.box = 'digital_ocean'
+  config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+  config.ssh.private_key_path = '~/.ssh/do_ssh_key'
+  # Sync folders: remote_files to /minitwit and entire repo to /vagrant
+  config.vm.synced_folder "remote_files", "/minitwit", type: "rsync"
+  config.vm.synced_folder ".", "/vagrant", type: "rsync"
     
-
+  config.vm.define "minitwit", primary: true do |server|
     # DigitalOcean Provider Configuration
-    config.vm.provider :digital_ocean do |provider|
-        # DigitalOcean-specific settings
-        provider.ssh_key_name = ENV["SSH_KEY_NAME"]  
-        provider.token = ENV["DIGITAL_OCEAN_TOKEN"] 
-        provider.image = 'ubuntu-22-04-x64'
-        provider.region = 'fra1'  # Frankfurt region
-        provider.size = 's-2vcpu-2gb'  # Droplet size
-        provider.private_networking = true
-       
-        #provider.droplet_name = "ubuntu-s-2vcpu-2gb-fra1-01" 
-        #provider.create = true 
+    server.vm.provider :digital_ocean do |provider|
+      provider.ssh_key_name = ENV["SSH_KEY_NAME"]
+      provider.token = ENV["DIGITAL_OCEAN_TOKEN"]
+      provider.image = 'ubuntu-22-04-x64'
+      provider.region = 'fra1'  # Frankfurt region
+      provider.size = 's-2vcpu-2gb'  # Droplet size
+      provider.private_networking = true
     end
-  
-    # Forward ports for external access
-    config.vm.network "forwarded_port", guest: 80, host: 8080
-    config.vm.network "forwarded_port", guest: 5001, host: 5001
-    config.vm.network "forwarded_port", guest: 5002, host: 5002
-    config.vm.network "forwarded_port", guest: 5432, host: 5433
-  
+
+    # Add Docker credentials to the environment by appending them to .bash_profile
+    server.vm.provision "shell", inline: 'echo "export DOCKER_USERNAME=' + "'" + ENV["DOCKER_USERNAME"] + "'" + '" >> ~/.bash_profile'
+    server.vm.provision "shell", inline: 'echo "export DOCKER_PASSWORD=' + "'" + ENV["DOCKER_PASSWORD"] + "'" + '" >> ~/.bash_profile'
     
-  
-    # Shell provisioning for our setup
-    config.vm.provision "shell", inline: <<-SHELL
-      echo "Waiting for synced folder to be ready"
-  
+    # Provisioning script for setting up the environment, debugging, and deployment
+    server.vm.provision "shell", inline: <<-SHELL
+      echo "Waiting for synced folders to be ready..."
       while [ ! -d "/vagrant/MiniTwit.Api" ]; do
         sleep 1
       done
-  
       echo "Synced folder ready!"
-      
+
+      # Debugging: list the contents of both synced folders
+      echo "Listing files in /vagrant (full repository):"
+      ls -la /vagrant
+      echo "Listing files in /minitwit (deployment files):"
+      ls -la /minitwit
+
+      # Ensure deploy.sh is executable
       chmod +x /minitwit/deploy.sh
-  
-      echo "Running shell provisioner"
-  
-      # Update and install prerequisites
+
+      echo "Starting system update and prerequisite installation..."
       apt-get update
       apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-  
-      echo "Finished installing prerequisites"
-  
-      # Install Docker
+      echo "Prerequisites installed."
+
+      echo "Installing Docker..."
       curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
       add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable"
       apt-get update
       apt-get install -y docker-ce docker-ce-cli containerd.io
       usermod -aG docker vagrant
-  
-      echo "Finished installing Docker"
-  
-      # Install Docker Compose
+      echo "Docker installed."
+
+      echo "Installing Docker Compose..."
       curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
       chmod +x /usr/local/bin/docker-compose
-  
-      echo "Finished installing Docker Compose"
-  
-      # Install .NET 9.0 SDK
+      echo "Docker Compose installed."
+
+      echo "Installing .NET 9.0 SDK..."
       wget https://builds.dotnet.microsoft.com/dotnet/Sdk/9.0.200/dotnet-sdk-9.0.200-linux-x64.tar.gz -O dotnet-sdk.tar.gz
       mkdir -p /usr/share/dotnet
       tar -xzf dotnet-sdk.tar.gz -C /usr/share/dotnet
       ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
-  
-      echo "Finished installing .NET 9.0 SDK"
-  
+      echo "Finished installing .NET 9.0 SDK."
+
       # Verify .NET installation
       if ! dotnet --version; then
         echo "Dotnet SDK installation failed!"
         exit 1
       fi
-  
-      # Install EF Core tool
+
+      echo "Installing EF Core tool..."
       dotnet tool install --global dotnet-ef
       echo 'export PATH="$PATH:$HOME/.dotnet/tools"' >> ~/.bashrc
       export PATH="$PATH:$HOME/.dotnet/tools"
-  
-      # Set up PostgreSQL connection strings
+
+      echo "Configuring PostgreSQL connection strings..."
       echo 'export ConnectionStrings__DefaultConnection="Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres"' >> ~/.bashrc
       echo 'export ConnectionStrings__ExternalConnection="Host=localhost;Port=5433;Database=MiniTwitDb;Username=postgres;Password=postgres"' >> ~/.bashrc
       source ~/.bashrc
-  
-      # Move into the correct project directory
+
+      # Build EF migrations bundle (from the repository folder)
       cd /vagrant/
-  
-      # Build EF migrations bundle
       dotnet ef migrations bundle --project MiniTwit.Api/MiniTwit.Api.csproj \\
         --startup-project MiniTwit.Api/MiniTwit.Api.csproj --self-contained -r linux-x64 -o ef-migrations-bundle
-  
-      # Apply group changes immediately to use Docker without restarting
-      #newgrp docker
-  
-      echo "Running docker-compose up --build"
-      # Start Docker Compose
-      docker-compose up --build -d
+
+      echo "Executing deploy.sh..."
+      # Change to the folder where your production docker-compose file is located
+      chmod +x /minitwit/deploy.sh
+      cd /minitwit
+      ./deploy.sh
+
+      echo "Vagrant setup and deployment completed."
     SHELL
   end
-  
+
+  # Forward ports for external access
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network "forwarded_port", guest: 5001, host: 5001
+  config.vm.network "forwarded_port", guest: 5002, host: 5002
+  config.vm.network "forwarded_port", guest: 5432, host: 5433
+end
