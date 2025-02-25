@@ -1,9 +1,14 @@
 version: "3.8"
 
+networks:
+  main:
+
 services:
   db:
     image: postgres:15-alpine
     container_name: minitwit_db
+    networks:
+      - main
     restart: always
     environment:
       - POSTGRES_USER=postgres
@@ -18,9 +23,10 @@ services:
       - "5433:5432"
 
   migrator:
-    build:
-      context: .
-      dockerfile: Dockerfile.migrator
+    image: ${DOCKER_USERNAME}/migratorimage
+    container_name: minitwit-migrator
+    networks:
+      - main
     # Wait for the database to be healthy
     depends_on:
       db:
@@ -37,9 +43,10 @@ services:
       start_period: 40s
 
   api:
-    build:
-      context: .
-      dockerfile: MiniTwit.Api/Dockerfile
+    image: ${DOCKER_USERNAME}/apiimage
+    container_name: minitwit-api
+    networks:
+      - main
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
@@ -53,18 +60,19 @@ services:
       - "5002:8080"
 
   client:
-    build:
-      context: .
-      dockerfile: MiniTwit.Client/Dockerfile
+    image: ${DOCKER_USERNAME}/clientimage
+    container_name: minitwit-client
+    networks:
+      - main
     # Wait for the API container to start (which itself waits for migrator)
     ports:
       - "5001:80"
 
   simulator:
-    build:
-      context: ./Simulator
-      dockerfile: Dockerfile
-     # Also wait for the API container to start
+    image: ${DOCKER_USERNAME}/simulatorimage
+    container_name: minitwit-simulator
+    networks:
+      - main
     depends_on:
       api:
         condition: service_started
