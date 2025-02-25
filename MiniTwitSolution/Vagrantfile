@@ -43,7 +43,6 @@ Vagrant.configure("2") do |config|
       echo "Synced folder ready!"
       
       chmod +x /remote_files/deploy.sh
-      chmod +x /remote_files/migrate.sh
   
       echo "Running shell provisioner"
   

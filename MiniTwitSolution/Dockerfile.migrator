@@ -6,13 +6,13 @@ RUN apt-get update && apt-get install -y bash dos2unix
 
 # 2) Copy in your self-contained EF migrations bundle and the script
 COPY ef-migrations-bundle .
-COPY remote_files/migrate.sh ./remote_files/
+COPY migrate.sh .
 
 # 3) Convert line endings from CRLF to LF (in case you're on Windows)
-RUN dos2unix remote_files/migrate.sh
+RUN dos2unix migrate.sh
 
 # 4) Make the files executable
-RUN chmod +x ef-migrations-bundle remote_files/migrate.sh
+RUN chmod +x ef-migrations-bundle migrate.sh
 
 # 5) Use Bash explicitly as the entrypoint
-ENTRYPOINT ["bash", "./remote_files/migrate.sh"]
+ENTRYPOINT ["bash", "./migrate.sh"]
