@@ -10,24 +10,28 @@ A: The only reason is because we can use free credits via. the Github Education 
 ### Step 1
 
 (If windows open git bash) and type command:
-```cat ~/.ssh/id_rsa.pub``` to get your public key.
+```cat ~/.ssh/do_ssh_key.pub``` to get your public key.
 
-If key doesn't exist create a ssh key pair with a private and public key inside the directory ~/.ssh/. https://git-scm.com/book/be/v2/Git-on-the-Server-Generating-Your-SSH-Public-Key
+If key doesn't exist create an ssh key pair inside the directory ~/.ssh/.
 
-Make sure that the name of the file containing the private key has the name **id_rsa**
+```bash
+ssh-keygen -f ~/.ssh/do_ssh_key -t rsa -b 4096 -m "PEM"
+```
+
+Make sure that the name of the file containing the private key has the name **do_ssh_key**
 
 Summary: Make sure that the private key is located at:
 ```txt
-~/.ssh/id_rsa
+~/.ssh/do_ssh_key
 ```
 
 ### Step 2
 
-If you have access to our digital ocean add the key value pair: \<your first name>, \<your public key>
+If you have access to our digital ocean add the key value pair: ```<your first name>```, ```<your public key>```
 
-Otherwise send the public key to @ChrBank.
+Navigate to the project > settings > security > add ssh key
 
-@ChrBank will register your public key and assign you a with a SSH_KEY_NAME.
+Otherwise, send the public key to someone with access who can do it.
 
 #### Local setup (Windows)
 
@@ -40,9 +44,9 @@ Value: <our digital ocean token> (found on discord under resources)
 ```
 
 ```
-Second:
+Second: (value must match the name of the ssh key in digital ocean)
 
-Name: SHH_KEY_NAME
+Name: SSH_KEY_NAME
 Value: <your first name>
 ```
 
@@ -102,5 +106,6 @@ vagrant up
 If this does not work try:
 
 ```bash
+vagrant destroy -f
 vagrant up --provider=digital_ocean
 ```
