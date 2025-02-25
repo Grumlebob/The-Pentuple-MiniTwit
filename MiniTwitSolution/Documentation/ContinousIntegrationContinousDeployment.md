@@ -20,3 +20,10 @@ So we are prepared for future lecture, where github actions is mentioned
 Added codefactor, github code scan.
 
 Mostly for gaining experience, as to prepare ourselves for the future lecture about static tools.
+
+
+## 25.02.2025
+
+![img.png](img.png)
+
+
