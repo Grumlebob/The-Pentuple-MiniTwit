@@ -64,7 +64,6 @@ services:
     container_name: minitwit-client
     networks:
       - main
-    # Wait for the API container to start (which itself waits for migrator)
     ports:
       - "5001:80"
 
