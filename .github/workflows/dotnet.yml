@@ -113,7 +113,7 @@ jobs:
       - name: Build & Push API
         uses: docker/build-push-action@v6
         with:
-          context: ./MiniTwitSolution/MiniTwit.Api
+          context: ./MiniTwitSolution
           file: ./MiniTwitSolution/MiniTwit.Api/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-api:latest
@@ -124,7 +124,7 @@ jobs:
       - name: Build & Push Client
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./MiniTwitSolution
           file: MiniTwitSolution/MiniTwit.Client/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-client:latest
@@ -135,7 +135,7 @@ jobs:
       - name: Build & Push Simulator
         uses: docker/build-push-action@v6
         with:
-          context: MiniTwitSolution/Simulator
+          context: ./MiniTwitSolution/Simulator
           file: Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:latest
