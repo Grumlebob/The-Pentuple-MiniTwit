@@ -4,18 +4,7 @@ WORKDIR /app
 # 1) Install Bash and dos2unix so we can convert CRLF -> LF if needed
 RUN apt-get update && apt-get install -y bash dos2unix
 
-# 1.5) Debug listing
-RUN echo "=== Debug: Current directory ===" \
- && pwd \
- && echo "=== Debug: Listing . (relative path) ===" \
- && ls -la . \
- && echo "=== Debug: Listing /app (absolute path) ===" \
- && ls -la /app \
- && echo "=== Debug: Listing / (root path) ===" \
- && ls -la /
-
 # 2) Copy in your self-contained EF migrations bundle and the script
-
 COPY ./ef-migrations-bundle .
 COPY ./migrate.sh .
 
