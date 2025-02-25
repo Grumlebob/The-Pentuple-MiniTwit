@@ -1,7 +1,18 @@
+#!/bin/bash
+
+# Error handling: stops on errors
+set -e
+
+echo "Loading environment variables..."
 source ~/.bash_profile
 
-cd /minitwit
+echo "Changing directory to MiniTwitSolution..."
+cd /minitwit/MiniTwitSolution
 
-docker compose -f docker-compose.yml pull
-docker compose -f docker-compose.yml up -d
-docker pull $DOCKER_USERNAME/flagtoolimage:latest
+echo "Pulling latest Docker images..."
+docker compose pull
+
+echo "Starting containers in detached mode..."
+docker compose up -d
+
+echo "Deployment completed successfully."
