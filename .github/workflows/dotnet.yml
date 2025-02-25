@@ -113,8 +113,8 @@ jobs:
       - name: Build & Push API
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: MiniTwitSolution/MiniTwit.Api/Dockerfile
+          context: MiniTwitSolution/MiniTwit.Api
+          file: Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-api:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-api:buildcache
