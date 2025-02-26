@@ -23,7 +23,7 @@ services:
       - "5433:5432"
 
   migrator:
-    image: ${DOCKER_USERNAME}/migratorimage
+    image: ${DOCKER_USERNAME}/minitwit-migrator
     container_name: minitwit-migrator
     networks:
       - main
@@ -43,7 +43,7 @@ services:
       start_period: 40s
 
   api:
-    image: ${DOCKER_USERNAME}/apiimage
+    image: ${DOCKER_USERNAME}/minitwit-api
     container_name: minitwit-api
     networks:
       - main
@@ -60,7 +60,7 @@ services:
       - "5002:8080"
 
   client:
-    image: ${DOCKER_USERNAME}/clientimage
+    image: ${DOCKER_USERNAME}/minitwit-client
     container_name: minitwit-client
     networks:
       - main
@@ -68,7 +68,7 @@ services:
       - "5001:80"
 
   simulator:
-    image: ${DOCKER_USERNAME}/simulatorimage
+    image: ${DOCKER_USERNAME}/minitwit-simulator
     container_name: minitwit-simulator
     networks:
       - main

@@ -19,7 +19,7 @@ docker compose -f docker-compose.yml pull || {
 }
 
 echo "Starting Docker containers..."
-docker compose -f docker-compose.yml up -d --force-recreate || {
+docker compose -f docker-compose.yml up -d || {
   echo "Docker up failed."
   docker compose -f docker-compose.yml logs
   exit 1
