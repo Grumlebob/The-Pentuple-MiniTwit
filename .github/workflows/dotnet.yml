@@ -106,9 +106,9 @@ jobs:
           # if full path isn't given to the Dockerfile, it won't find it
           file: ./MiniTwitSolution/Dockerfile.migrator
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-migrator:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-migrator:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-migrator:buildcache,mode=max
+          tags: ${{ secrets.DOCKER_USERNAME }}/migratorimage:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/migratorimage:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/migratorimage:buildcache,mode=max
 
       # Build & push the API image
       - name: Build & Push API
@@ -118,9 +118,9 @@ jobs:
           # if full path isn't given to the Dockerfile, it won't find it
           file: ./MiniTwitSolution/MiniTwit.Api/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-api:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-api:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-api:buildcache,mode=max
+          tags: ${{ secrets.DOCKER_USERNAME }}/apiimage:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/apiimage:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/apiimage:buildcache,mode=max
 
       # Build & push the Client image
       - name: Build & Push Client
@@ -130,9 +130,9 @@ jobs:
           # if full path isn't given to the Dockerfile, it won't find it
           file: MiniTwitSolution/MiniTwit.Client/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-client:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-client:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-client:buildcache,mode=max
+          tags: ${{ secrets.DOCKER_USERNAME }}/clientimage:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/clientimage:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/clientimage:buildcache,mode=max
 
       # Build & push the Simulator image
       - name: Build & Push Simulator
@@ -142,9 +142,9 @@ jobs:
           # if full path isn't given to the Dockerfile, it won't find it
           file: ./MiniTwitSolution/Simulator/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:buildcache,mode=max
+          tags: ${{ secrets.DOCKER_USERNAME }}/simulatorimage:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/simulatorimage:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/simulatorimage:buildcache,mode=max
 
       - name: Configure SSH for deployment
         run: |
