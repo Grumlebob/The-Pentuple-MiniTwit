@@ -194,6 +194,6 @@ jobs:
         run: |
           echo "Starting deployment..."
           ssh -v ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
-            'chmod +x /minitwit/deploy.sh && bash -x /minitwit/deploy.sh || { echo "DEPLOYMENT FAILED WITH ERROR $?"; cat /minitwit/deploy.sh; }'
+          -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
+          'cd /minitwit && chmod +x deploy.sh && bash -x deploy.sh || { echo "DEPLOYMENT FAILED WITH ERROR $?"; }'
 
