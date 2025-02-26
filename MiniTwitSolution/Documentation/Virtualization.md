@@ -31,6 +31,8 @@ If you have access to our digital ocean add the key value pair: ```<your first n
 
 Navigate to the project > settings > security > add ssh key
 
+![add-ssh-user](images/add-ssh-user.PNG)
+
 Otherwise, send the public key to someone with access who can do it.
 
 #### Local setup (Windows)

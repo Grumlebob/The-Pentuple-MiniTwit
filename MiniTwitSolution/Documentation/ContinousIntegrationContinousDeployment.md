@@ -50,6 +50,6 @@ Mostly for gaining experience, as to prepare ourselves for the future lecture ab
 
 ## 25.02.2025
 
-![img.png](img.png)
+
 
 
