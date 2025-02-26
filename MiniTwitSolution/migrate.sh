@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-echo "=== Debug: Checking if 'ef-migrations-bundle' exists in /app ==="
-if [ -f /app/ef-migrations-bundle ]; then
+echo "=== Debug: Checking if 'ef-migrations-bundle' exists ==="
+if [ -f ef-migrations-bundle ]; then
     echo "=== Found 'ef-migrations-bundle'! ==="
 else
     echo "=== ERROR: 'ef-migrations-bundle' not found. Exiting. ==="
@@ -10,10 +10,12 @@ else
 fi
 
 echo "=== Debug: Listing files in /app ==="
-ls -la /app
+ls -la ./
+
+ls -la
 
 echo "=== Debug: Running migrations-bundle ==="
-/app/ef-migrations-bundle
+./ef-migrations-bundle
 
 echo "=== Debug: Migrations complete ==="
 

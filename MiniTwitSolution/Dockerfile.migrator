@@ -1,20 +1,40 @@
+# Build stage: Generate the self-contained EF Core migrations bundle
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+# Install the EF Core CLI tool globally
+RUN dotnet tool install --global dotnet-ef
+
+# Ensure the global tools folder is in the PATH
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+# Copy all project files. (Adjust COPY commands if you want to limit to specific projects.)
+COPY . .
+
+# Restore dependencies and generate the migration bundle.
+RUN dotnet restore && \
+    dotnet ef migrations bundle \
+      --project MiniTwit.Api/MiniTwit.Api.csproj \
+      --startup-project MiniTwit.Api/MiniTwit.Api.csproj \
+      --self-contained -r linux-x64 -o ef-migrations-bundle
+
+
+# Runtime stage: Lightweight image with only what is needed to run the bundle
 FROM mcr.microsoft.com/dotnet/runtime-deps:9.0
 WORKDIR /app
 
-# Install Bash, dos2unix, and unzip
-RUN apt-get update && apt-get install -y bash dos2unix unzip
+# Install Bash and dos2unix for proper script execution
+RUN apt-get update && apt-get install -y bash dos2unix
 
-# Copy the pre-built migrations bundle ZIP file from the build context
-COPY ef-migrations-bundle.zip .
+# Copy the generated migration bundle from the build stage
+COPY --from=build /src/ef-migrations-bundle ./
+RUN chmod +x ./ef-migrations-bundle
 
-# Unzip the bundle, remove the ZIP file, and ensure the extracted file is executable
-RUN unzip ef-migrations-bundle.zip && rm ef-migrations-bundle.zip && chmod +x ./ef-migrations-bundle
-
-# Copy the migrate script
-COPY migrate.sh .
-
-# Convert line endings and make the migration script executable
+# Copy the migration runner script
+COPY migrate.sh ./
 RUN dos2unix ./migrate.sh && chmod +x ./migrate.sh
 
-# Set Bash as the entrypoint
+# When the migration bundle runs, it should perform the necessary database updates.
+# Optionally, your migrate.sh script can create a file like /tmp/migrations_done
+# to signal a successful migration for the healthcheck.
 ENTRYPOINT ["bash", "./migrate.sh"]
