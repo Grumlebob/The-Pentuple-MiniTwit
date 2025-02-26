@@ -12,8 +12,7 @@ jobs:
     name: Deploy to DigitalOcean
     # only deploy on successful build test and push
     if: >
-      ${{ github.event.workflow_run.conclusion == 'success' &&
-          github.event.workflow_run.event == 'push' }}
+      ${{ github.event.workflow_run.conclusion == 'success'  }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
