@@ -4,8 +4,6 @@ set -ex  # prints every command + stops on error
 echo "====== DEPLOYMENT STARTED ======"
 echo "Running as user: $(whoami)"
 echo "Current directory: $(pwd)"
-echo "Server environment:"
-uname -a
 
 source ~/.bash_profile
 
