@@ -2,6 +2,8 @@
 
 ## 26.02.2025
 
+We followed this guide: https://github.com/itu-devops/itu-minitwit-ci
+
 ### Vagrant
 
 The vagrantfile handles creating a droplet on digital ocean with our application synced to a "vagrant" folder
