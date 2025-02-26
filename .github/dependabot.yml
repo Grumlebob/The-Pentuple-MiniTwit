@@ -8,18 +8,18 @@ updates:
     open-pull-requests-limit: 5
     rebase-strategy: "auto"
 
-  # Docker updates: check weekly.
+  # Docker updates: check daily.
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     open-pull-requests-limit: 5
     rebase-strategy: "auto"
 
-  # NuGet updates (for .NET projects): check weekly.
+  # NuGet updates (for .NET projects): check daily.
   - package-ecosystem: "nuget"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     open-pull-requests-limit: 5
     rebase-strategy: "auto"
