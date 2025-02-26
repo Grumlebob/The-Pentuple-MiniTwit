@@ -1,23 +1,44 @@
 #!/bin/bash
-set -ex  # -e to exit on error, -x to print each command
+set -ex  # prints every command + stops on error
 
-# Load environment variables (DOCKER_USERNAME, etc.)
 source ~/.bash_profile
 
-# Debug: Print current working directory and file listing
-echo "DEBUG: Current working directory: $(pwd)"
-echo "DEBUG: Listing files in current directory:"
+echo "DEBUG: Home directory is $HOME"
+echo "DEBUG: Current directory is $(pwd)"
+echo "DEBUG: Listing files in current directory..."
 ls -la
-echo ""
-echo "DEBUG: Recursively listing files (max depth 3):"
-find . -maxdepth 3 -ls
+echo
 
-# Ensure we're in the correct directory
-cd /minitwit || { echo "ERROR: /minitwit not found"; exit 1; }
-echo "DEBUG: Now in directory: $(pwd)"
+echo "DEBUG: Searching for docker-compose.yml everywhere..."
+find / -name "docker-compose.yml" -maxdepth 5 -ls 2>/dev/null || true
+# ^ This may produce a lot of output, but it’s thorough.
+
+# If you *expect* docker-compose.yml in /minitwit:
+if [ -d /minitwit ]; then
+  echo "DEBUG: Listing files in /minitwit..."
+  ls -la /minitwit
+else
+  echo "ERROR: /minitwit directory does not exist."
+fi
+
+# Now, cd into /minitwit if that’s where you keep docker-compose.yml
+cd /minitwit || {
+  echo "ERROR: /minitwit not found on the server"
+  exit 1
+}
+
+echo "DEBUG: Now in $(pwd). Listing files again..."
 ls -la
 
-# Now use the local docker-compose.yml
+# Try a quick sanity check: is docker-compose.yml here?
+if [ -f docker-compose.yml ]; then
+  echo "DEBUG: Found docker-compose.yml in /minitwit"
+else
+  echo "ERROR: docker-compose.yml not found in /minitwit"
+  exit 1
+fi
+
+# Pull and start containers
 echo "Pulling latest Docker images..."
 docker compose -f docker-compose.yml pull
 
