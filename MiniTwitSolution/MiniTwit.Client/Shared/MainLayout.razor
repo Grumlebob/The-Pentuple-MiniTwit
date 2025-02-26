@@ -10,17 +10,17 @@
         @if (Session.IsLoggedIn)
         {
             <NavLink href="/">My Timeline</NavLink>
-            <span>&#124;</span>
+            <span>-&#124;-</span>
             <NavLink href="/timeline">Public Timeline</NavLink>
-            <span>&#124;</span>
+            <span>-&#124;-</span>
             <button class="nav-link" @onclick="Logout">Sign Out (@Session.Username)</button>
         }
         else
         {
             <NavLink href="/timeline">Public Timeline</NavLink>
-            <span>&#124;</span>
+            <span>-&#124;-</span>
             <NavLink href="/register">Sign Up</NavLink>
-            <span>&#124;</span>
+            <span>-&#124;-</span>
             <NavLink href="/login">Sign In</NavLink>
         }
     </nav>

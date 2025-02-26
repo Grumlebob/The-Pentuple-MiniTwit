@@ -9,6 +9,8 @@ uname -a
 
 source ~/.bash_profile
 
+chmod +x docker-compose.yml
+
 echo "Pulling latest Docker images..."
 docker compose -f docker-compose.yml pull || {
   echo "Docker pull failed. Checking Docker Compose file:"
