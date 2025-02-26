@@ -1,4 +1,4 @@
-﻿version: 2
+version: 2
 updates:
   # GitHub Actions updates: check daily for new versions.
   - package-ecosystem: "github-actions"
