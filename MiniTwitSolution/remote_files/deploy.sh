@@ -1,48 +1,52 @@
 #!/bin/bash
 set -ex  # prints every command + stops on error
 
-source ~/.bash_profile
+echo "====== DEPLOYMENT STARTED ======"
+echo "Running as user: $(whoami)"
+echo "Current directory: $(pwd)"
+echo "Server environment:"
+uname -a
+docker --version
+docker compose version
 
-echo "DEBUG: Home directory is $HOME"
-echo "DEBUG: Current directory is $(pwd)"
-echo "DEBUG: Listing files in current directory..."
+source ~/.bash_profile || echo "No .bash_profile found"
+
+echo "====== CHECKING FILES ======"
+echo "Checking /minitwit directory..."
+if [ ! -d /minitwit ]; then
+  echo "ERROR: /minitwit directory does not exist. Creating it..."
+  mkdir -p /minitwit
+fi
+cd /minitwit
+echo "Files in /minitwit:"
 ls -la
-echo
 
-echo "DEBUG: Searching for docker-compose.yml everywhere..."
-find / -name "docker-compose.yml" -maxdepth 5 -ls 2>/dev/null || true
-# ^ This may produce a lot of output, but it’s thorough.
-
-# If you *expect* docker-compose.yml in /minitwit:
-if [ -d /minitwit ]; then
-  echo "DEBUG: Listing files in /minitwit..."
-  ls -la /minitwit
-else
-  echo "ERROR: /minitwit directory does not exist."
+echo "Checking for docker-compose.yml..."
+if [ ! -f docker-compose.yml ]; then
+  echo "ERROR: docker-compose.yml not found in /minitwit!"
+  echo "Searching for docker-compose.yml elsewhere..."
+  find / -name "docker-compose.yml" -maxdepth 3 2>/dev/null || echo "No docker-compose.yml found on system"
+  exit 1
 fi
 
-# Now, cd into /minitwit if that’s where you keep docker-compose.yml
-cd /minitwit || {
-  echo "ERROR: /minitwit not found on the server"
+echo "====== DOCKER OPERATIONS ======"
+echo "Pulling latest Docker images..."
+docker compose -f docker-compose.yml pull || {
+  echo "Docker pull failed. Checking Docker Compose file:"
+  cat docker-compose.yml
+  echo "Docker status:"
+  docker info
   exit 1
 }
 
-echo "DEBUG: Now in $(pwd). Listing files again..."
-ls -la
-
-# Try a quick sanity check: is docker-compose.yml here?
-if [ -f docker-compose.yml ]; then
-  echo "DEBUG: Found docker-compose.yml in /minitwit"
-else
-  echo "ERROR: docker-compose.yml not found in /minitwit"
-  exit 1
-fi
-
-# Pull and start containers
-echo "Pulling latest Docker images..."
-docker compose -f docker-compose.yml pull
-
 echo "Starting Docker containers..."
-docker compose -f docker-compose.yml up -d
+docker compose -f docker-compose.yml up -d || {
+  echo "Docker up failed."
+  docker compose -f docker-compose.yml logs
+  exit 1
+}
 
-echo "Deployment completed successfully."
+echo "Docker containers running:"
+docker ps
+
+echo "====== DEPLOYMENT COMPLETED SUCCESSFULLY ======"

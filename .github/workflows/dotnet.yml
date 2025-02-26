@@ -152,9 +152,48 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/do_ssh_key
           chmod 600 ~/.ssh/do_ssh_key
 
+      - name: Debug - List repository contents
+        run: |
+          echo "=== Repository Structure ==="
+          find . -type f -name "deploy.sh" -o -name "docker-compose.yml" | sort
+          echo ""
+          echo "=== Content of MiniTwitSolution/remote_files directory ==="
+          ls -la MiniTwitSolution/remote_files || echo "Directory not found"
+    
+      - name: Copy deployment script to server
+        run: |
+          echo "Copying deploy.sh to server..."
+          if [ -f ./MiniTwitSolution/remote_files/deploy.sh ]; then
+            scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/minitwit/deploy.sh
+            echo "Copy completed"
+          else
+            echo "ERROR: deploy.sh not found at expected location!"
+            exit 1
+          fi
+    
+      - name: Copy docker-compose.yml to server
+        run: |
+          echo "Copying docker-compose.yml to server..."
+          if [ -f ./MiniTwitSolution/remote_files/docker-compose.yml ]; then
+            scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/minitwit/docker-compose.yml
+            echo "Copy completed"
+          else
+            echo "ERROR: docker-compose.yml not found at expected location!"
+            # Don't fail the workflow here, let's continue to see other issues
+            echo "Will continue but deployment might fail"
+          fi
+    
+      - name: Verify files on server
+        run: |
+          echo "Verifying files on server..."
+          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
+            'echo "Files in /minitwit:"; ls -la /minitwit/; echo ""; echo "File permissions:"; stat /minitwit/deploy.sh || echo "deploy.sh not found"'
+    
       - name: Deploy to Server
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+          echo "Starting deployment..."
+          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
             -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
-            'bash -x /minitwit/deploy.sh'
+            'chmod +x /minitwit/deploy.sh && bash -x /minitwit/deploy.sh || { echo "DEPLOYMENT FAILED WITH ERROR $?"; cat /minitwit/deploy.sh; }'
 
