@@ -1,11 +1,37 @@
 # CI/CD
 
-## 12.02.2025
+## 26.02.2025
+
+### Vagrant
+
+The vagrantfile handles creating a droplet on digital ocean with our application synced to a "vagrant" folder
+and our "remote-files" folder synced to a "minitwit" folder, both in the droplet.
+It is run using vagrant up. But this should not be necessary in the future once the droplet is running.
+
+### Docker compose files
+
+We have a "local" docker-compose file, which is allows us to run docker compose up on our local machine.
+We have another docker-compose file in the remote-files folder which our droplet uses when run github actions.
+It gets the newest images from Jacob's docker hub and runs the application.
+
+
+### Github Actions
+
+Other than code scanning and analysis we have a build and test which runs on pull request and push to main.
+Then we have a deploy action which runs after the build and test if it is a push to main.
+The deploy action updates our docker images on Jacob's docker hub and then ssh into the droplet and runs deploy.sh
+which uses the docker-compose file in the remote-files folder to update the application.
+The github actions uses github secrets that has information about the host (droplet ip), user (root) 
+and Jacobs private do_ssh_key.
 
 
 ### Migrations
 
-indsæt guide til hvordan man migrater mv.
+Currently handled in the Dockerfile.migrator, which creates a migration-bundle. 
+It then runs the migrate.sh file, which runs the migration. 
+(For future clean up we could handle everything in the Dockerfile, and discard the .sh file.)
+
+```Dockerfile
 
 
 ### Github Actions
