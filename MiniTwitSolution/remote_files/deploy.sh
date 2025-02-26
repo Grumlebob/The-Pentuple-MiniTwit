@@ -1,17 +1,20 @@
 #!/bin/bash
-
-# Error handling: exit immediately if a command fails
-set -e 
+set -e
 
 # Load environment variables (DOCKER_USERNAME, etc.)
 source ~/.bash_profile
 
-# Pull the latest images
-echo "Pulling latest Docker images..."
-docker compose -f docker-compose.yml pull
+# Debug: Print the current directory and list files
+echo "DEBUG: Current working directory: $(pwd)"
+echo "DEBUG: Listing files in current directory:"
+ls -la
+echo ""
+echo "DEBUG: Recursively listing files (max depth 2):"
+find . -maxdepth 2 -ls
 
-# Bring up the containers in detached mode
-echo "Starting Docker containers..."
-docker compose -f docker-compose.yml up -d
-
-echo "Deployment completed successfully."
+# Optionally, check specifically for docker-compose.yml
+if [ -f docker-compose.yml ]; then
+    echo "DEBUG: docker-compose.yml found in $(pwd)"
+else
+    echo "DEBUG: docker-compose.yml NOT found in $(pwd)"
+fi
