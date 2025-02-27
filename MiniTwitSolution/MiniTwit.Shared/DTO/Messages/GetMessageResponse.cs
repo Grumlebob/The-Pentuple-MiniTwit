@@ -3,6 +3,6 @@
 public record GetMessageResponse(
     int MessageId,
     int? PubDate,
-    string? AuthorUsername,
-    string Text = ""
+    string? User,
+    string Content = ""
 );
