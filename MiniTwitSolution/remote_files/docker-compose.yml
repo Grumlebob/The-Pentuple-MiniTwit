@@ -41,7 +41,18 @@ services:
       timeout: 5s
       retries: 20
       start_period: 40s
-
+      
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    networks:
+      - main
+    restart: always
+    environment:
+        - ACCEPT_EULA=Y
+    ports:
+      - "5341:80"
+      
   api:
     image: ${DOCKER_USERNAME}/minitwit-api
     container_name: minitwit-api
@@ -56,6 +67,8 @@ services:
         condition: service_healthy
       migrator:
         condition: service_healthy
+      seq:
+        condition: service_started
     ports:
       - "5002:8080"
 
