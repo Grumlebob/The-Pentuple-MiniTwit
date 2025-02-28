@@ -849,7 +849,8 @@ fabric.properties
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -1131,6 +1132,16 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+### Vagrant ###
+# General
+.vagrant/
+
+# Log files (if you are creating logs in debug mode, uncomment this)
+# *.log
+
+### Vagrant Patch ###
+*.box
 
 ### VisualStudio ###
 
