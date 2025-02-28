@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Shared.DTO.Messages;
+using MiniTwit.Api.Utility;
 
 namespace MiniTwit.Api.Features.Messages.GetMessages
 {
@@ -17,7 +18,8 @@ namespace MiniTwit.Api.Features.Messages.GetMessages
                     MiniTwitDbContext db,
                     HybridCache hybridCache,
                     CancellationToken cancellationToken,
-                    [FromQuery] int no = 100
+                    [FromQuery] int no = 100,
+                    [FromQuery] int latest = -1
                 ) =>
                 {
                     // Cache key includes the limit
@@ -49,7 +51,7 @@ namespace MiniTwit.Api.Features.Messages.GetMessages
                         cancellationToken: cancellationToken,
                         tags: new[] { "publicTimeline" }
                     );
-
+                    await UpdateLatest.UpdateLatestStateAsync(latest, db);
                     return Results.Json(response);
                 }
             );

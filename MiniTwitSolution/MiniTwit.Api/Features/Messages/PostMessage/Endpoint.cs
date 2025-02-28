@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Shared.DTO.Messages;
+using MiniTwit.Api.Utility;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MiniTwit.Api.Features.Messages.PostMessage
 {
@@ -16,7 +18,8 @@ namespace MiniTwit.Api.Features.Messages.PostMessage
                     PostMessageRequest request,
                     MiniTwitDbContext db,
                     HybridCache hybridCache,
-                    CancellationToken cancellationToken
+                    CancellationToken cancellationToken,
+                    [FromQuery] int latest = -1
                 ) =>
                 {
                     // Validate that the author exists.
@@ -62,7 +65,7 @@ namespace MiniTwit.Api.Features.Messages.PostMessage
                             cancellationToken
                         );
                     }
-
+                    await UpdateLatest.UpdateLatestStateAsync(latest, db);
                     return Results.NoContent();
                 }
             );

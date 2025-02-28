@@ -1,4 +1,6 @@
-﻿using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
+﻿using Microsoft.AspNetCore.Mvc;
+using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
+using MiniTwit.Api.Utility;
 
 namespace MiniTwit.Api.Features.Users.Authentication.RegisterUser;
 
@@ -8,7 +10,11 @@ public static class Endpoint
     {
         routes.MapPost(
             "/register",
-            async (RegisterUserRequest request, MiniTwitDbContext db) =>
+            async (
+                RegisterUserRequest request, 
+                MiniTwitDbContext db,
+                [FromQuery] int latest = -1
+            ) =>
             {
                 // Check if a user with the same email or username already exists.
                 var existingUser = await db.Users.FirstOrDefaultAsync(u =>
@@ -31,6 +37,7 @@ public static class Endpoint
                 db.Users.Add(newUser);
                 await db.SaveChangesAsync();
 
+                await UpdateLatest.UpdateLatestStateAsync(latest, db);
                 return Results.NoContent();
             }
         );

@@ -1,4 +1,6 @@
 using MiniTwit.Shared.DTO.Users.Authentication.LoginUser;
+using MiniTwit.Api.Utility;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MiniTwit.Api.Features.Users.Authentication.LoginUser;
 
@@ -8,7 +10,11 @@ public static class Endpoint
     {
         routes.MapPost(
             "/login",
-            async (LoginUserRequest request, MiniTwitDbContext db) =>
+            async (
+                LoginUserRequest request, 
+                MiniTwitDbContext db,
+                [FromQuery] int latest = -1
+            ) =>
             {
                 // Find the user by username.
                 var user = await db.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
@@ -32,6 +38,7 @@ public static class Endpoint
                     user.Email,
                     token
                 );
+                await UpdateLatest.UpdateLatestStateAsync(latest, db);
                 return Results.Ok(responseDto);
             }
         );
