@@ -79,9 +79,9 @@ public partial class MiniTwitDbContext : DbContext, IMiniTwitDbContext
         {
             entity.ToTable("latest");
 
-            entity.HasKey(e => e.Id); // Ensure only one row exists for latest
+            entity.HasKey(e => e.LatestId); // Ensure only one row exists for latest
 
-            entity.Property(e => e.Id)
+            entity.Property(e => e.LatestId)
                 .HasColumnName("id");
 
             entity.Property(e => e.LatestEventId)

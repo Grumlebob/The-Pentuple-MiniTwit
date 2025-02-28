@@ -30,11 +30,9 @@ public static class Endpoint
                     {
                         var latest = await db.Latests
                             .AsNoTracking()
-                            .Where(l => l.Id == 1)
-                            .Select(l => l.LatestEventId)
                             .FirstOrDefaultAsync(ct);
 
-                        return new GetLatestResponse(latest);
+                        return new GetLatestResponse(latest!.LatestId);
                     },
                     cacheEntryOptions,
                     cancellationToken: cancellationToken,
