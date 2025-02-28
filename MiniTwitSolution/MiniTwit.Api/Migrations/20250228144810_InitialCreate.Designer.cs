@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MiniTwit.Api.Migrations
 {
     [DbContext(typeof(MiniTwitDbContext))]
-    [Migration("20250218161232_InitialPostgres")]
-    partial class InitialPostgres
+    [Migration("20250228144810_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,6 +41,24 @@ namespace MiniTwit.Api.Migrations
                     b.HasIndex("WhomId");
 
                     b.ToTable("follower", (string)null);
+                });
+
+            modelBuilder.Entity("MiniTwit.Api.Domain.Latest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("LatestEventId")
+                        .HasColumnType("integer")
+                        .HasColumnName("latest_event");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("latest", (string)null);
                 });
 
             modelBuilder.Entity("MiniTwit.Api.Domain.Message", b =>

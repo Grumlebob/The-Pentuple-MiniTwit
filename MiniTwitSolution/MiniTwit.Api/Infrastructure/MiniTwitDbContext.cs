@@ -5,6 +5,7 @@ public interface IMiniTwitDbContext
     DbSet<Follower> Followers { get; set; }
     DbSet<Message> Messages { get; set; }
     DbSet<User> Users { get; set; }
+    DbSet<Latest> Latests { get; set; }
 }
 
 public partial class MiniTwitDbContext : DbContext, IMiniTwitDbContext
@@ -79,11 +80,10 @@ public partial class MiniTwitDbContext : DbContext, IMiniTwitDbContext
         {
             entity.ToTable("latest");
 
-            entity.HasKey(e => e.LatestId); // Ensure only one row exists for latest
+            entity.HasKey(e => e.Id); // Ensure only one row exists for latest
 
-            entity.Property(e => e.LatestId).HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id").IsRequired();
 
-            entity.Property(e => e.LatestEventId).HasColumnName("latest_event_id").IsRequired();
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -52,6 +52,7 @@ namespace MiniTwit.Api.Features.Messages.GetMessages
                         tags: new[] { "publicTimeline" }
                     );
                     await UpdateLatest.UpdateLatestStateAsync(latest, db);
+
                     return Results.Json(response);
                 }
             );

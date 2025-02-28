@@ -8,7 +8,7 @@ public static class UpdateLatest
     {
         //Update latest
         await db
-            .Latests.Where(l => l.LatestId == 1)
-            .ExecuteUpdateAsync(set => set.SetProperty(l => l.LatestId, latest));
+            .Latests.Where(l => l.Id == 1)
+            .ExecuteUpdateAsync(set => set.SetProperty(l => l.LatestEventId, latest));
     }
 }
