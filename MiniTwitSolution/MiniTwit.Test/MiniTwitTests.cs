@@ -133,7 +133,7 @@ public class MiniTwitTests : IAsyncLifetime
         // Assert: Only one message should belong to user1.
         Assert.NotNull(userMessages);
         Assert.Single(userMessages);
-        Assert.Equal("user1", userMessages[0].AuthorUsername);
+        Assert.Equal("user1", userMessages[0].User);
     }
 
     [Fact]
