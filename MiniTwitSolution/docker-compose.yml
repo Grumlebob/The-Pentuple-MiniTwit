@@ -15,7 +15,7 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   migrator:
     build:
@@ -35,7 +35,16 @@ services:
       timeout: 5s
       retries: 20
       start_period: 40s
-
+      
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - "5341:80"
+      
   api:
     build:
       context: .
@@ -49,8 +58,10 @@ services:
         condition: service_healthy
       migrator:
         condition: service_healthy
+      seq:
+        condition: service_started
     ports:
-      - "5000:8080"
+      - "5002:8080"
 
   client:
     build:

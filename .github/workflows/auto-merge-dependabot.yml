@@ -1,0 +1,15 @@
+﻿name: Auto Merge Dependabot Updates
+
+on:
+  pull_request:
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Merge Dependabot PR
+        uses: peter-evans/merge-pull-request@v2
+        with:
+          merge_method: squash
+          commit_title: 'Auto-merged Dependabot update'

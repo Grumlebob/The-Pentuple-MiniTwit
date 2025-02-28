@@ -17,3 +17,13 @@
 [![GitHub issues](https://img.shields.io/github/issues/Grumlebob/The-Pentuple-MiniTwit.svg)](https://github.com/Grumlebob/The-Pentuple-MiniTwit/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/Grumlebob/The-Pentuple-MiniTwit.svg)](https://github.com/Grumlebob/The-Pentuple-MiniTwit/commits/main)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Grumlebob/The-Pentuple-MiniTwit)
+
+## Application:
+
+(When it is running)
+
+Client:
+http://157.245.26.8:5001/
+
+Api:
+http://157.245.26.8:5002/
