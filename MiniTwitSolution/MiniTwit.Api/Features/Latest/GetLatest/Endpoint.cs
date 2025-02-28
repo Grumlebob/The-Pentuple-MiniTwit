@@ -29,6 +29,7 @@ public static class Endpoint
                     async ct =>
                     {
                         var latest = await db.Latests
+                            .AsNoTracking()
                             .Where(l => l.Id == 1)
                             .Select(l => l.LatestEventId)
                             .FirstOrDefaultAsync(ct);
