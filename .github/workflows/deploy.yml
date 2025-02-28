@@ -60,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./MiniTwitSolution
-          file: MiniTwitSolution/MiniTwit.Client/Dockerfile
+          file: ./MiniTwitSolution/MiniTwit.Client/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/clientimage:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/clientimage:buildcache
