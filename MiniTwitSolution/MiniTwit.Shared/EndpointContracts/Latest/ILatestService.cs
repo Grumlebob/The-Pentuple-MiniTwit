@@ -6,7 +6,7 @@ namespace MiniTwit.Shared.EndpointContracts.Latest
     {
         /// <returns>The latest event ID.</returns>
         Task<GetLatestResponse> GetLatestAsync();
-        
+
         //Task<HttpResponseMessage> UpdateLatestAsync(int latest);
     }
 }

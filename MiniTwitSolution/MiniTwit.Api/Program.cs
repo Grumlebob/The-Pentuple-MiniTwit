@@ -1,13 +1,13 @@
 using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.Features.Followers.GetFollowers;
 using MiniTwit.Api.Features.Followers.PostFollowUser;
+using MiniTwit.Api.Features.Latest.GetLatest;
 using MiniTwit.Api.Features.Messages.GetMessages;
 using MiniTwit.Api.Features.Messages.GetUserMessages;
 using MiniTwit.Api.Features.Messages.PostMessage;
 using MiniTwit.Api.Features.Users.Authentication.LoginUser;
 using MiniTwit.Api.Features.Users.Authentication.LogoutUser;
 using MiniTwit.Api.Features.Users.Authentication.RegisterUser;
-using MiniTwit.Api.Features.Latest.GetLatest;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);

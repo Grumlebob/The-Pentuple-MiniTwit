@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
 using MiniTwit.Api.Utility;
+using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
 
 namespace MiniTwit.Api.Features.Users.Authentication.RegisterUser;
 
@@ -11,7 +11,7 @@ public static class Endpoint
         routes.MapPost(
             "/register",
             async (
-                RegisterUserRequest request, 
+                RegisterUserRequest request,
                 MiniTwitDbContext db,
                 [FromQuery] int latest = -1
             ) =>

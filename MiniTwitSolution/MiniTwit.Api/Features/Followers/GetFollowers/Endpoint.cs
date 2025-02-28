@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
-using MiniTwit.Shared.DTO.Followers.FollowUser;
 using MiniTwit.Api.Utility;
+using MiniTwit.Shared.DTO.Followers.FollowUser;
 
 namespace MiniTwit.Api.Features.Followers.GetFollowers
 {

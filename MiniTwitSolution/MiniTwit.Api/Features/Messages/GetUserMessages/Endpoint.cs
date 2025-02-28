@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Hybrid;
-using MiniTwit.Shared.DTO.Messages;
 using MiniTwit.Api.Utility;
+using MiniTwit.Shared.DTO.Messages;
 
 namespace MiniTwit.Api.Features.Messages.GetUserMessages
 {
@@ -62,7 +62,7 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                         cancellationToken: cancellationToken,
                         tags: new[] { $"userTimeline:{username}" }
                     );
-                    
+
                     await UpdateLatest.UpdateLatestStateAsync(latest, db);
                     return Results.Json(response);
                 }

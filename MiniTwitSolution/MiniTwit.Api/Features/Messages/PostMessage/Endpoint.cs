@@ -1,7 +1,7 @@
-using Microsoft.Extensions.Caching.Hybrid;
-using MiniTwit.Shared.DTO.Messages;
-using MiniTwit.Api.Utility;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Hybrid;
+using MiniTwit.Api.Utility;
+using MiniTwit.Shared.DTO.Messages;
 
 namespace MiniTwit.Api.Features.Messages.PostMessage
 {

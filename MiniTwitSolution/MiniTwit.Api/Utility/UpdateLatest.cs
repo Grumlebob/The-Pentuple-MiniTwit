@@ -7,7 +7,8 @@ public static class UpdateLatest
     public static async Task UpdateLatestStateAsync(int latest, MiniTwitDbContext db)
     {
         //Update latest
-        await db.Latests.Where(l => l.LatestId == 1)
+        await db
+            .Latests.Where(l => l.LatestId == 1)
             .ExecuteUpdateAsync(set => set.SetProperty(l => l.LatestId, latest));
     }
 }

@@ -28,9 +28,7 @@ public static class Endpoint
                     cacheKey,
                     async ct =>
                     {
-                        var latest = await db.Latests
-                            .AsNoTracking()
-                            .FirstOrDefaultAsync(ct);
+                        var latest = await db.Latests.AsNoTracking().FirstOrDefaultAsync(ct);
 
                         return new GetLatestResponse(latest!.LatestId);
                     },
