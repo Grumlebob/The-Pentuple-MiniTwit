@@ -7,6 +7,7 @@ using MiniTwit.Api.Features.Messages.PostMessage;
 using MiniTwit.Api.Features.Users.Authentication.LoginUser;
 using MiniTwit.Api.Features.Users.Authentication.LogoutUser;
 using MiniTwit.Api.Features.Users.Authentication.RegisterUser;
+using MiniTwit.Api.Features.Latest.GetLatest;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -105,6 +106,9 @@ app.MapGetFollowersEndpoints(); // registers GET "/fllws/{username}"
 app.MapRegisterUserEndpoints(); // registers POST "/register"
 app.MapLoginUserEndpoints(); // registers POST "/login"
 app.MapLogoutUserEndpoints(); // registers POST "/logout"
+
+// Map latest endpoints.
+app.MapGetLatestEndpoint();
 
 app.Run();
 
