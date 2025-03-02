@@ -306,7 +306,12 @@ public class MiniTwitTests : IAsyncLifetime
 
         // Update the latest value to a known value.
         int updatedLatestValue = 200;
-        await UpdateLatest.UpdateLatestStateAsync(updatedLatestValue, _dbContext, hybridCache, CancellationToken.None);
+        await UpdateLatest.UpdateLatestStateAsync(
+            updatedLatestValue,
+            _dbContext,
+            hybridCache,
+            CancellationToken.None
+        );
 
         // Act: Call the /latest endpoint via the typed client.
         var response = await _typedClient.GetLatestAsync();
@@ -315,5 +320,4 @@ public class MiniTwitTests : IAsyncLifetime
         Assert.NotNull(response);
         Assert.Equal(updatedLatestValue, response.Latest);
     }
-
 }
