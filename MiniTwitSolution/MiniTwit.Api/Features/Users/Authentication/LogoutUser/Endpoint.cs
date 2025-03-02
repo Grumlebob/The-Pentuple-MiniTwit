@@ -13,8 +13,8 @@ public static class LogoutUserEndpoints
         routes.MapPost(
             "/logout",
             async (
-                HttpContext context, 
-                MiniTwitDbContext db, 
+                HttpContext context,
+                MiniTwitDbContext db,
                 HybridCache hybridCache,
                 CancellationToken cancellationToken,
                 [FromQuery] int latest = -1
@@ -22,7 +22,12 @@ public static class LogoutUserEndpoints
             {
                 // In a real application, you might clear authentication cookies or invalidate a token.
                 var responseDto = new LogoutUserResponse(true, "Logged out successfully.");
-                await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
+                await UpdateLatest.UpdateLatestStateAsync(
+                    latest,
+                    db,
+                    hybridCache,
+                    cancellationToken
+                );
                 return Results.Ok(responseDto);
             }
         );

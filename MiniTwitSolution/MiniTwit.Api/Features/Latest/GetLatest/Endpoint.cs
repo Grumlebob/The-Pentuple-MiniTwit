@@ -5,7 +5,7 @@ namespace MiniTwit.Api.Features.Latest.GetLatest;
 
 public static class Endpoint
 {
-    public static IEndpointRouteBuilder MapGetLatestEndpoint    (this IEndpointRouteBuilder routes)
+    public static IEndpointRouteBuilder MapGetLatestEndpoint(this IEndpointRouteBuilder routes)
     {
         routes.MapGet(
             "/latest",
@@ -28,10 +28,10 @@ public static class Endpoint
                     cacheKey,
                     async ct =>
                     {
-                        var latest = await db.Latests
-                        .AsNoTracking()
-                        .Where(l => l.Id == 1)
-                        .FirstAsync(ct);
+                        var latest = await db
+                            .Latests.AsNoTracking()
+                            .Where(l => l.Id == 1)
+                            .FirstAsync(ct);
                         return new GetLatestResponse(latest.LatestEventId);
 
                         // .FirstAsync(ct);

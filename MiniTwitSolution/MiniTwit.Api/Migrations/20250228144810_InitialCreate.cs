@@ -20,36 +20,46 @@ namespace MiniTwit.Api.Migrations
                 name: "latest",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    latest_event = table.Column<int>(type: "integer", nullable: false)
+                    id = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
+                    latest_event = table.Column<int>(type: "integer", nullable: false),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_latest", x => x.id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "user",
                 columns: table => new
                 {
-                    user_id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_id = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     username = table.Column<string>(type: "TEXT", nullable: false),
                     email = table.Column<string>(type: "TEXT", nullable: false),
-                    pw_hash = table.Column<string>(type: "TEXT", nullable: true)
+                    pw_hash = table.Column<string>(type: "TEXT", nullable: true),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_user", x => x.user_id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "follower",
                 columns: table => new
                 {
                     who_id = table.Column<int>(type: "integer", nullable: false),
-                    whom_id = table.Column<int>(type: "integer", nullable: false)
+                    whom_id = table.Column<int>(type: "integer", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -59,25 +69,32 @@ namespace MiniTwit.Api.Migrations
                         column: x => x.who_id,
                         principalTable: "user",
                         principalColumn: "user_id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Restrict
+                    );
                     table.ForeignKey(
                         name: "FK_follower_user_whom_id",
                         column: x => x.whom_id,
                         principalTable: "user",
                         principalColumn: "user_id",
-                        onDelete: ReferentialAction.Restrict);
-                });
+                        onDelete: ReferentialAction.Restrict
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "message",
                 columns: table => new
                 {
-                    message_id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    message_id = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     author_id = table.Column<int>(type: "integer", nullable: false),
                     text = table.Column<string>(type: "TEXT", nullable: false),
                     pub_date = table.Column<int>(type: "integer", nullable: true),
-                    flagged = table.Column<int>(type: "integer", nullable: true)
+                    flagged = table.Column<int>(type: "integer", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -87,35 +104,34 @@ namespace MiniTwit.Api.Migrations
                         column: x => x.author_id,
                         principalTable: "user",
                         principalColumn: "user_id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_follower_whom_id",
                 table: "follower",
-                column: "whom_id");
+                column: "whom_id"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_message_author_id",
                 table: "message",
-                column: "author_id");
+                column: "author_id"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "follower");
+            migrationBuilder.DropTable(name: "follower");
 
-            migrationBuilder.DropTable(
-                name: "latest");
+            migrationBuilder.DropTable(name: "latest");
 
-            migrationBuilder.DropTable(
-                name: "message");
+            migrationBuilder.DropTable(name: "message");
 
-            migrationBuilder.DropTable(
-                name: "user");
+            migrationBuilder.DropTable(name: "user");
         }
     }
 }

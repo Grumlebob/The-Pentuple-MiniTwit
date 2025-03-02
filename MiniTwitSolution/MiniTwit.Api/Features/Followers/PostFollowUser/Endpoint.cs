@@ -86,7 +86,12 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
                             cancellationToken
                         );
 
-                        await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
+                        await UpdateLatest.UpdateLatestStateAsync(
+                            latest,
+                            db,
+                            hybridCache,
+                            cancellationToken
+                        );
                         return Results.NoContent();
                     }
 
@@ -100,7 +105,12 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
                     // Invalidate all cache entries for the current user's follows.
                     await hybridCache.RemoveByTagAsync($"followers:{username}", cancellationToken);
 
-                    await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
+                    await UpdateLatest.UpdateLatestStateAsync(
+                        latest,
+                        db,
+                        hybridCache,
+                        cancellationToken
+                    );
                     return Results.NoContent();
                 }
             );

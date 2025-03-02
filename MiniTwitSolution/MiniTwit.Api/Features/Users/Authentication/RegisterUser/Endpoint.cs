@@ -40,7 +40,12 @@ public static class Endpoint
                 db.Users.Add(newUser);
                 await db.SaveChangesAsync();
 
-                await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
+                await UpdateLatest.UpdateLatestStateAsync(
+                    latest,
+                    db,
+                    hybridCache,
+                    cancellationToken
+                );
                 return Results.NoContent();
             }
         );

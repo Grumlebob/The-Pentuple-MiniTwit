@@ -52,8 +52,12 @@ namespace MiniTwit.Api.Features.Messages.GetMessages
                         tags: new[] { "publicTimeline" }
                     );
 
-                   
-                    await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
+                    await UpdateLatest.UpdateLatestStateAsync(
+                        latest,
+                        db,
+                        hybridCache,
+                        cancellationToken
+                    );
                     // Remove the latestEvent tag from the cache
                     await hybridCache.RemoveAsync("latestEvent");
 

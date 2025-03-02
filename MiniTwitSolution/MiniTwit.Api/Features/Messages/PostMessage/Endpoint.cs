@@ -65,7 +65,12 @@ namespace MiniTwit.Api.Features.Messages.PostMessage
                             cancellationToken
                         );
                     }
-                    await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
+                    await UpdateLatest.UpdateLatestStateAsync(
+                        latest,
+                        db,
+                        hybridCache,
+                        cancellationToken
+                    );
                     return Results.NoContent();
                 }
             );

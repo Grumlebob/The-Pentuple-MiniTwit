@@ -41,7 +41,12 @@ public static class Endpoint
                     user.Email,
                     token
                 );
-                await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
+                await UpdateLatest.UpdateLatestStateAsync(
+                    latest,
+                    db,
+                    hybridCache,
+                    cancellationToken
+                );
                 return Results.Ok(responseDto);
             }
         );

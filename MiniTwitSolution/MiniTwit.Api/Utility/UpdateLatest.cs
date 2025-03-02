@@ -5,7 +5,12 @@ namespace MiniTwit.Api.Utility;
 
 public static class UpdateLatest
 {
-    public static async Task UpdateLatestStateAsync(int latest, MiniTwitDbContext db, HybridCache hybridCache, CancellationToken cancellationToken)
+    public static async Task UpdateLatestStateAsync(
+        int latest,
+        MiniTwitDbContext db,
+        HybridCache hybridCache,
+        CancellationToken cancellationToken
+    )
     {
         await db
             .Latests.Where(l => l.Id == 1)
@@ -15,4 +20,3 @@ public static class UpdateLatest
         await hybridCache.RemoveAsync("latestEvent", cancellationToken);
     }
 }
-  

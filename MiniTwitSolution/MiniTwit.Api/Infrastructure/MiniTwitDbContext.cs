@@ -83,7 +83,6 @@ public partial class MiniTwitDbContext : DbContext, IMiniTwitDbContext
             entity.HasKey(e => e.Id); // Ensure only one row exists for latest
 
             entity.Property(e => e.Id).HasColumnName("id").IsRequired();
-
         });
 
         OnModelCreatingPartial(modelBuilder);

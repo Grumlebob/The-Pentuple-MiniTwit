@@ -9,5 +9,4 @@ public class Latest
 
     [Column("latest_event")]
     public int LatestEventId { get; set; }
-        
 }

@@ -63,7 +63,12 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                         tags: new[] { $"userTimeline:{username}" }
                     );
 
-                    await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
+                    await UpdateLatest.UpdateLatestStateAsync(
+                        latest,
+                        db,
+                        hybridCache,
+                        cancellationToken
+                    );
                     return Results.Json(response);
                 }
             );
