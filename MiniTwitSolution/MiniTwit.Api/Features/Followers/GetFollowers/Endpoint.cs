@@ -66,7 +66,7 @@ namespace MiniTwit.Api.Features.Followers.GetFollowers
                     );
 
                     //Update latest request
-                    await UpdateLatest.UpdateLatestStateAsync(latest, db);
+                    await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
                     return Results.Json(response);
                 }
             );

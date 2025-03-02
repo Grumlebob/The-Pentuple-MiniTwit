@@ -32,7 +32,10 @@ public static class Endpoint
                         .AsNoTracking()
                         .Where(l => l.Id == 1)
                         .FirstAsync(ct);
-                        return new GetLatestResponse(latest!.Id);
+                        return new GetLatestResponse(latest.LatestEventId);
+
+                        // .FirstAsync(ct);
+                        // return new GetLatestResponse(latest!.Id);
                     },
                     cacheEntryOptions,
                     cancellationToken: cancellationToken,

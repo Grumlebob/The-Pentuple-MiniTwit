@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.Utility;
 using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
 
@@ -13,6 +14,8 @@ public static class Endpoint
             async (
                 RegisterUserRequest request,
                 MiniTwitDbContext db,
+                HybridCache hybridCache,
+                CancellationToken cancellationToken,
                 [FromQuery] int latest = -1
             ) =>
             {
@@ -37,7 +40,7 @@ public static class Endpoint
                 db.Users.Add(newUser);
                 await db.SaveChangesAsync();
 
-                await UpdateLatest.UpdateLatestStateAsync(latest, db);
+                await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
                 return Results.NoContent();
             }
         );
