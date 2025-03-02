@@ -40,6 +40,31 @@ namespace MiniTwit.Api.Migrations
                     b.ToTable("follower", (string)null);
                 });
 
+            modelBuilder.Entity("MiniTwit.Api.Domain.Latest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("LatestEventId")
+                        .HasColumnType("integer")
+                        .HasColumnName("latest_event");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("latest", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            LatestEventId = 0
+                        });
+                });
+
             modelBuilder.Entity("MiniTwit.Api.Domain.Message", b =>
                 {
                     b.Property<int>("MessageId")
