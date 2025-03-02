@@ -11,11 +11,6 @@ namespace MiniTwit.Api.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("DROP TABLE IF EXISTS \"latest\" CASCADE;");
-            migrationBuilder.Sql("DROP TABLE IF EXISTS \"user\" CASCADE;");
-            migrationBuilder.Sql("DROP TABLE IF EXISTS \"follower\" CASCADE;");
-            migrationBuilder.Sql("DROP TABLE IF EXISTS \"message\" CASCADE;");
-
             migrationBuilder.CreateTable(
                 name: "latest",
                 columns: table => new
@@ -107,6 +102,12 @@ namespace MiniTwit.Api.Migrations
                         onDelete: ReferentialAction.Cascade
                     );
                 }
+            );
+
+            migrationBuilder.InsertData(
+                table: "latest",
+                columns: new[] { "id", "latest_event" },
+                values: new object[] { 1, 0 }
             );
 
             migrationBuilder.CreateIndex(

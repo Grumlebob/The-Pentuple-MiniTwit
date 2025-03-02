@@ -56,6 +56,13 @@ namespace MiniTwit.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("latest", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            LatestEventId = 0
+                        });
                 });
 
             modelBuilder.Entity("MiniTwit.Api.Domain.Message", b =>

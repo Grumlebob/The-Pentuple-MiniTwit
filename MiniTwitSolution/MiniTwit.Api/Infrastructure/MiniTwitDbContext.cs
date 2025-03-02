@@ -83,7 +83,12 @@ public partial class MiniTwitDbContext : DbContext, IMiniTwitDbContext
             entity.HasKey(e => e.Id); // Ensure only one row exists for latest
 
             entity.Property(e => e.Id).HasColumnName("id").IsRequired();
+
+            entity.Property(e => e.LatestEventId).HasColumnName("latest_event");
         });
+
+        // Seed the "latest" table with an initial record.
+        modelBuilder.Entity<Latest>().HasData(new Latest { Id = 1, LatestEventId = 0 });
 
         OnModelCreatingPartial(modelBuilder);
     }

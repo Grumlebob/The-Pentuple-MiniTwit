@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MiniTwit.Api.Migrations
 {
     [DbContext(typeof(MiniTwitDbContext))]
-    [Migration("20250228144810_InitialCreate")]
+    [Migration("20250302114421_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -59,6 +59,13 @@ namespace MiniTwit.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("latest", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            LatestEventId = 0
+                        });
                 });
 
             modelBuilder.Entity("MiniTwit.Api.Domain.Message", b =>
