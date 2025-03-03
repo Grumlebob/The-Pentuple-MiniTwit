@@ -11,6 +11,11 @@ namespace MiniTwit.Api.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("DROP TABLE IF EXISTS \"user\" CASCADE;");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS \"follower\" CASCADE;");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS \"message\" CASCADE;");
+            migrationBuilder.Sql("DROP TABLE IF EXISTS \"latest\" CASCADE;");
+
             migrationBuilder.CreateTable(
                 name: "latest",
                 columns: table => new
