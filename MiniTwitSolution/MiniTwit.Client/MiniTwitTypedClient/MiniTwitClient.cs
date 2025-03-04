@@ -1,15 +1,17 @@
 ﻿using System.Net.Http.Json;
 using MiniTwit.Shared.DTO.Followers.FollowUser;
+using MiniTwit.Shared.DTO.Latest;
 using MiniTwit.Shared.DTO.Messages;
 using MiniTwit.Shared.DTO.Users.Authentication.LoginUser;
 using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
 using MiniTwit.Shared.EndpointContracts.Followers;
+using MiniTwit.Shared.EndpointContracts.Latest;
 using MiniTwit.Shared.EndpointContracts.Messages;
 using MiniTwit.Shared.EndpointContracts.Users;
 
 namespace MiniTwit.Client.MiniTwitTypedClient;
 
-public class MiniTwitClient : IFollowerService, IUserServices, IMessageService
+public class MiniTwitClient : IFollowerService, IUserServices, IMessageService, ILatestService
 {
     private readonly HttpClient _httpClient;
 
@@ -95,5 +97,16 @@ public class MiniTwitClient : IFollowerService, IUserServices, IMessageService
     )
     {
         return await _httpClient.PostAsJsonAsync($"/msgs/{currentUsername}", messageRequest);
+    }
+
+    public async Task<GetLatestResponse> GetLatestAsync()
+    {
+        var response = await _httpClient.GetAsync("/latest");
+        if (response.IsSuccessStatusCode)
+        {
+            return (await response.Content.ReadFromJsonAsync<GetLatestResponse>())!;
+        }
+
+        return new GetLatestResponse(-1); //Return -1 for failure
     }
 }

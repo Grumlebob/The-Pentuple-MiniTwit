@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.Features.Followers.GetFollowers;
 using MiniTwit.Api.Features.Followers.PostFollowUser;
+using MiniTwit.Api.Features.Latest.GetLatest;
 using MiniTwit.Api.Features.Messages.GetMessages;
 using MiniTwit.Api.Features.Messages.GetUserMessages;
 using MiniTwit.Api.Features.Messages.PostMessage;
@@ -105,6 +106,9 @@ app.MapGetFollowersEndpoints(); // registers GET "/fllws/{username}"
 app.MapRegisterUserEndpoints(); // registers POST "/register"
 app.MapLoginUserEndpoints(); // registers POST "/login"
 app.MapLogoutUserEndpoints(); // registers POST "/logout"
+
+// Map latest endpoints.
+app.MapGetLatestEndpoint();
 
 app.Run();
 

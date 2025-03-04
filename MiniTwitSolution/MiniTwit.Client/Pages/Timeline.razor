@@ -151,7 +151,7 @@ else
             var followersResponse = await MiniTwitClient.GetFollowersAsync(Session.Username);
             var followedUsernames = followersResponse.Followers.ToHashSet(StringComparer.OrdinalIgnoreCase);
             followedUsernames.Add(Session.Username); // Include own messages in the private timeline.
-            _messages = publicMessages.Where(m => followedUsernames.Contains(m.AuthorUsername)).ToList();
+            _messages = publicMessages.Where(m => followedUsernames.Contains(m.User!)).ToList();
         }
         else // Public timeline
         {

@@ -1,8 +1,5 @@
 # The-Pentuple-MiniTwit
 
-**Build and test badge**
-[![Build Status](https://github.com/Grumlebob/The-Pentuple-MiniTwit/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Grumlebob/The-Pentuple-MiniTwit/actions/workflows/dotnet.yml)
-
 **CodeFactor Badge**
 [![CodeFactor](https://www.codefactor.io/repository/github/Grumlebob/The-Pentuple-MiniTwit/badge)](https://www.codefactor.io/repository/github/Grumlebob/The-Pentuple-MiniTwit)
 
