@@ -6,11 +6,11 @@ services:
     container_name: minitwit_db
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=${MINITWIT_DB_USER}
+      - POSTGRES_PASSWORD=${MINITWIT_DB_PASSWORD}
       - POSTGRES_DB=MiniTwitDb
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: ["CMD", "pg_isready", "-U", "${MINITWIT_DB_USER}", "-d", "MiniTwitDb"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -26,8 +26,8 @@ services:
       db:
         condition: service_healthy
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
-      - ClientBaseUrl=https://whatever-url-or-placeholder
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=${MINITWIT_DB_USER};Password=${MINITWIT_DB_PASSWORD}
+      - ClientBaseUrl=https://whatever-url-or-placeholder # value must be set before it can build, but only api uses it
     # Mark migrator healthy only after /tmp/migrations_done is created
     healthcheck:
       test: ["CMD", "test", "-f", "/tmp/migrations_done"]
@@ -51,7 +51,7 @@ services:
       dockerfile: MiniTwit.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniTwitDb;Username=${MINITWIT_DB_USER};Password=${MINITWIT_DB_PASSWORD}
     # IMPORTANT: Wait for db (healthy) and migrator (healthy)
     depends_on:
       db:
