@@ -378,3 +378,8 @@ Fix. Using this command detroys the droplet in digital ocean:
 ```bash
 vagrant destroy -f
 ```
+
+# 04.3
+
+We disabled our own simulator now that the course simulator is running. 
+Enable it by going to the simulator Dockerfile and uncommenting the last line, that runs the simulator script.
