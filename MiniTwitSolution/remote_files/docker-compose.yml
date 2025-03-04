@@ -36,7 +36,7 @@ services:
       - ClientBaseUrl=https://whatever-url-or-placeholder # value must be set before it can build, but only api uses it
     # Mark migrator healthy only after /tmp/migrations_done is created
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${MINITWIT_DB_USER}", "-d", "MiniTwitDb"]
+      test: ["CMD", "test", "-f", "/tmp/migrations_done"]
       interval: 10s
       timeout: 5s
       retries: 20
