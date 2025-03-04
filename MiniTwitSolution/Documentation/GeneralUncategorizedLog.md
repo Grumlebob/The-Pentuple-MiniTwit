@@ -379,7 +379,18 @@ Fix. Using this command detroys the droplet in digital ocean:
 vagrant destroy -f
 ```
 
+# 28.02"
+
+## Secure database
+
+Changed user and password for the database (before was "postgres" "postgres").
+To implement it a vagrant update was needed. 
+
+In the vagrant file 4 environment variables are added to the droplet. 2 docker and 2 postgres
+
 # 04.3
 
-We disabled our own simulator now that the course simulator is running. 
+## disabled simulator
+
+We disabled our own simulator now that the course simulator is running.
 Enable it by going to the simulator Dockerfile and uncommenting the last line, that runs the simulator script.
