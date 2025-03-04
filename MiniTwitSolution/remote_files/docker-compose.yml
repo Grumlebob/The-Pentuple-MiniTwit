@@ -15,7 +15,7 @@ services:
       - POSTGRES_PASSWORD=${MINITWIT_DB_PASSWORD}
       - POSTGRES_DB=MiniTwitDb
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${MINITWIT_DB_USER}"]
+      test: ["CMD", "pg_isready", "-U", "${MINITWIT_DB_USER}", "-d", "MiniTwitDb"]
       interval: 5s
       timeout: 5s
       retries: 5
