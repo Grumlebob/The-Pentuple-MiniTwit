@@ -47,6 +47,12 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                                 .Take(no)
                                 .ToListAsync(ct);
 
+                            // If no messages exist, return an empty list
+                            if (!messages.Any())
+                            {
+                                return [];
+                            }
+
                             // Map each message to the DTO.
                             var dto = messages
                                 .Select(m => new GetMessageResponse(
@@ -69,6 +75,13 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                         hybridCache,
                         cancellationToken
                     );
+
+                    // If no messages exist, return 204 No Content instead of an empty list
+                    if (response.Count == 0)
+                    {
+                        return Results.NoContent();
+                    }
+
                     return Results.Json(response);
                 }
             );
