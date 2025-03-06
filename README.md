@@ -25,6 +25,9 @@ http://157.245.26.8:5001/
 Api:
 http://157.245.26.8:5002/
 
+Monitor:
+http://157.245.26.8:5341/
+
 ## Docker hub:
 
 https://hub.docker.com/repositories/grumlebob
