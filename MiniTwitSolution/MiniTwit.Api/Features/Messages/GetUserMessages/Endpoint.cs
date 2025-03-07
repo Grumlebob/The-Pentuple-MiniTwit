@@ -50,7 +50,7 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                             // If no messages exist, return an empty list
                             if (!messages.Any())
                             {
-                                return [];
+                                return new List<GetMessageResponse>();
                             }
 
                             // Map each message to the DTO.
@@ -82,7 +82,7 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                         return Results.NoContent();
                     }
 
-                    return Results.Json(response);
+                    return Results.Ok(response);
                 }
             );
 
