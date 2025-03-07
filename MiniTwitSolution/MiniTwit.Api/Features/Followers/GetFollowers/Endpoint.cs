@@ -72,7 +72,7 @@ namespace MiniTwit.Api.Features.Followers.GetFollowers
                         hybridCache,
                         cancellationToken
                     );
-                    return Results.Json(response);
+                    return Results.Ok(response);
                 }
             );
 
