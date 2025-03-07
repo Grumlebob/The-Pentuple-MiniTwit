@@ -61,7 +61,7 @@ namespace MiniTwit.Api.Features.Messages.GetMessages
                     // Remove the latestEvent tag from the cache
                     await hybridCache.RemoveAsync("latestEvent");
 
-                    return Results.Json(response);
+                    return Results.Ok(response);
                 }
             );
 

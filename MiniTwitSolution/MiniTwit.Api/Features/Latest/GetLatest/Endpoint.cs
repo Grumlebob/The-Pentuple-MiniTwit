@@ -42,7 +42,7 @@ public static class Endpoint
                     tags: new[] { "latestEvent" }
                 );
 
-                return Results.Json(response);
+                return Results.Ok(response);
             }
         );
 
