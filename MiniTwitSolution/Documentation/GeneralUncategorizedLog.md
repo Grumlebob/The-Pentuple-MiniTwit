@@ -394,3 +394,17 @@ In the vagrant file 4 environment variables are added to the droplet. 2 docker a
 
 We disabled our own simulator now that the course simulator is running.
 Enable it by going to the simulator Dockerfile and uncommenting the last line, that runs the simulator script.
+
+# 07.3
+
+## Add automated relases with github actions
+
+In the pull request template there are the steps you need to check when creating a release.
+
+The latest commit **must** contain the commit message:
+
+```txt
+Release: x.y (replace x and y with version numbers)
+```
+
+Update the changelog to make sure that the release gets the correct tag and description
