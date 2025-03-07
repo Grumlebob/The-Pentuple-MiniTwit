@@ -141,6 +141,29 @@ public class MiniTwitTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task GetUserTimelineReturns204NoContentWhenUserHasNoMessages()
+    {
+        // Arrange: Create a user with no messages.
+        var user = new User
+        {
+            UserId = 10,
+            Username = "emptyuser",
+            Email = "emptyuser@example.com",
+            PwHash = "hash10",
+        };
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
+
+        // Act: Call the /msgs/{username} endpoint directly using the factory's HttpClient.
+        var response = await _factory.HttpClient.GetAsync(
+            $"/msgs/{user.Username}?no=100&latest=-1"
+        );
+
+        // Assert: Expect HTTP 204 NoContent when no messages are available.
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    [Fact]
     public async Task FollowUserEndpoint_WorksAsExpected()
     {
         // Arrange: Create two users.
