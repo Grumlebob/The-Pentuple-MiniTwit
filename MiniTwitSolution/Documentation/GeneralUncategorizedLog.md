@@ -388,14 +388,14 @@ To implement it a vagrant update was needed.
 
 In the vagrant file 4 environment variables are added to the droplet. 2 docker and 2 postgres
 
-# 04.3
+# 04.03
 
 ## disabled simulator
 
 We disabled our own simulator now that the course simulator is running.
 Enable it by going to the simulator Dockerfile and uncommenting the last line, that runs the simulator script.
 
-# 07.3
+# 07.03
 
 ## Add automated relases with github actions
 
