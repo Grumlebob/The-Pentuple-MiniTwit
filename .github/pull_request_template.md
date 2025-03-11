@@ -14,4 +14,4 @@ fixes (issue)
 ### For releases
 
 - [ ] Added content to CHANGELOG.md (using existing format)
-- [ ] Added commit message with ```Release: x.y``` (replace x and y with version numbers)
+- [ ] Added commit message with ```Release: x.y``` (replace x and y with version numbers - Check latest release and increment with 1 on y. Unless it is a major change, then increment x by 1)
