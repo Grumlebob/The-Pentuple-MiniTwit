@@ -22,9 +22,10 @@ jobs:
       - uses: CupOfTea696/gh-action-auto-release@v1.0.2
         with:
           title: "Release: $version"
-          tag: "v$semver"
+          # use tag: vx.y (x.y defined below)
+          tag: "v$version"
           draft: false
           # match Release: x.y (x and y being numbers). It must be at the start of a line, but it is not case sensitive
-          regex: '/^Release: [0-9]+\.[0-9]+/i'
+          regex: '/^Release: (?<version>[0-9]+\.[0-9]+)/i'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
