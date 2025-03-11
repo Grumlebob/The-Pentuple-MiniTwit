@@ -24,6 +24,7 @@ jobs:
           title: "Release: $version"
           tag: "v$semver"
           draft: false
-          regex: "/^Release: #{semver}$/i"
+          # match Release: x.y (x and y being numbers). It must be at the start of a line, but it is not case sensitive
+          regex: '/^Release: [0-9]+\.[0-9]+/i'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
