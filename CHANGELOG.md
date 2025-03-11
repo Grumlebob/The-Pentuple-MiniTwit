@@ -7,6 +7,7 @@
 - Add file for automated releases
 - Add Changelog markdown file
 - Fix [#46](https://github.com/Grumlebob/The-Pentuple-MiniTwit/issues/46)
+- Performed an auto release to test if it works
 
 ## v2.3
 
