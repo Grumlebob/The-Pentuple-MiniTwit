@@ -2,14 +2,24 @@
 
 on:
   pull_request:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+  contents: read
 
 jobs:
-  automerge:
-    runs-on: ubuntu-latest
+  auto-merge:
     if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
     steps:
-      - name: Merge Dependabot PR
-        uses: peter-evans/merge-pull-request@v2
-        with:
-          merge_method: squash
-          commit_title: 'Auto-merged Dependabot update'
+      - name: Approve Pull Request
+        run: gh pr review "${{ github.event.pull_request.number }}" --approve
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable Pull Request Automerge
+        run: gh pr merge --merge --auto "${{ github.event.pull_request.number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
