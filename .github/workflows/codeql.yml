@@ -51,7 +51,8 @@ jobs:
           git add .
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "Apply code formatting with Csharpier"
-            # Push to the branch that triggered the pull request using github.head_ref
+            # Pull the remote changes and rebase to integrate any new commits
+            git pull --rebase origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
           else
             echo "No formatting changes to commit."
