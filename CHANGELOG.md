@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.5
+
+### Changed
+
+- Add automatic code formatting on pull requests
+
 ## v2.4
 
 ### Changed
