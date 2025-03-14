@@ -21,7 +21,7 @@ jobs:
       packages: read
       # Only required for workflows in private repositories
       actions: read
-      contents: read
+      contents: write
 
     strategy:
       fail-fast: false
@@ -36,13 +36,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Initializes the CodeQL tools for scanning.
+      - name: Format C# code with Csharpier
+        if: matrix.language == 'csharp'
+        run: |
+          dotnet tool install -g csharpier || true
+          export PATH="$PATH:~/.dotnet/tools"
+          csharpier .
+
+      - name: Commit and push formatted code
+        if: github.event_name == 'pull_request' && matrix.language == 'csharp'
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add .
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Apply code formatting with Csharpier"
+            # Push to the branch that triggered the pull request using github.head_ref
+            git push origin HEAD:${{ github.head_ref }}
+          else
+            echo "No formatting changes to commit."
+          fi
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-          # You can optionally specify custom queries here.
 
       # If the analyze step fails for a language set to manual build mode, run custom build commands.
       - if: matrix.build-mode == 'manual'
