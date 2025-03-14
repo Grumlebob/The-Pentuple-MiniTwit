@@ -69,7 +69,14 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                         hybridCache,
                         cancellationToken
                     );
-                    return Results.Json(response);
+
+                    // If no messages exist, return 204 No Content instead of an empty list
+                    if (response.Count == 0)
+                    {
+                        return Results.NoContent();
+                    }
+
+                    return Results.Ok(response);
                 }
             );
 

@@ -17,6 +17,6 @@ public static class UpdateLatest
             .ExecuteUpdateAsync(set => set.SetProperty(l => l.LatestEventId, latest));
 
         // Remove the latestEvent tag from the cache
-        await hybridCache.RemoveAsync("latestEvent", cancellationToken);
+        await hybridCache.SetAsync("latestEvent", latest, cancellationToken: cancellationToken);
     }
 }
