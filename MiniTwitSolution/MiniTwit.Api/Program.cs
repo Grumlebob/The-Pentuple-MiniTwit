@@ -21,7 +21,7 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // Add services to the container.
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddEndpointsApiExplorer()   ;
 builder.Services.AddSwaggerGen();
 
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
@@ -49,7 +49,9 @@ if (string.IsNullOrEmpty(clientBaseUrl))
 
 //allow client to use api
 builder.Services.AddCors(options =>
+
 {
+    
     options.AddPolicy(
         "AllowBlazorClient",
         policy =>
