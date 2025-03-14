@@ -41,7 +41,7 @@ jobs:
         run: |
           dotnet tool install -g csharpier || true
           export PATH="$PATH:~/.dotnet/tools"
-          csharpier .
+          dotnet-csharpier .
 
       - name: Commit and push formatted code
         if: github.event_name == 'pull_request' && matrix.language == 'csharp'
