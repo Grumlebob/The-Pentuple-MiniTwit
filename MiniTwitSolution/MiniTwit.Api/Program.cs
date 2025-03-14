@@ -123,12 +123,10 @@ app.UseSerilogRequestLogging(options =>
         if (httpContext.Request.ContentLength > 0 && httpContext.Request.Body.CanSeek)
         {
             httpContext.Request.Body.Position = 0; // Reset stream position
-            using (var reader = new StreamReader(httpContext.Request.Body, leaveOpen: true))
-            {
-                var content = reader.ReadToEnd();
-                diagnosticContext.Set("Content", content);
-                httpContext.Request.Body.Position = 0; // Reset again for further processing
-            }
+            using var reader = new StreamReader(httpContext.Request.Body, leaveOpen: true);
+            var content = reader.ReadToEnd();
+            diagnosticContext.Set("Content", content);
+            httpContext.Request.Body.Position = 0; // Reset again for further processing
         }
         else
         {
