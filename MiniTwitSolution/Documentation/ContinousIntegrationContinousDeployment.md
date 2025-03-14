@@ -33,10 +33,8 @@ Currently handled in the Dockerfile.migrator, which creates a migration-bundle.
 It then runs the migrate.sh file, which runs the migration. 
 (For future clean up we could handle everything in the Dockerfile, and discard the .sh file.)
 
-```Dockerfile
 
-
-### Github Actions
+### GitHub Actions
 
 We took earlier github actions made in a previous project, for a fast head-start on the setup.
 So we are prepared for future lecture, where github actions is mentioned
@@ -50,8 +48,14 @@ Added codefactor, github code scan.
 Mostly for gaining experience, as to prepare ourselves for the future lecture about static tools.
 
 
-## 25.02.2025
+## 14.03.2025
 
+### Automated code formatting
+
+The codeql GitHub action now runs Csharpier on code in pull requests and 
+pushes the changes, so we don't have to remember to do it. 
+This means it happens behind the scenes, and we assume it does not do
+something crazy that we wouldn't want on our main branch.
 
 
 
