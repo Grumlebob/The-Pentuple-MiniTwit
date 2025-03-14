@@ -42,9 +42,9 @@ jobs:
           context: ./MiniTwitSolution
           file: ./MiniTwitSolution/Dockerfile.migrator
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/migratorimage:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/migratorimage:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/migratorimage:buildcache,mode=max
+          tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-migrator:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-migrator:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-migrator:buildcache,mode=max
 
       - name: Build & Push API
         uses: docker/build-push-action@v6
@@ -52,19 +52,19 @@ jobs:
           context: ./MiniTwitSolution
           file: ./MiniTwitSolution/MiniTwit.Api/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/apiimage:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/apiimage:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/apiimage:buildcache,mode=max
+          tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-api:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-api:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-api:buildcache,mode=max
 
       - name: Build & Push Client
         uses: docker/build-push-action@v6
         with:
           context: ./MiniTwitSolution
-          file: MiniTwitSolution/MiniTwit.Client/Dockerfile
+          file: ./MiniTwitSolution/MiniTwit.Client/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/clientimage:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/clientimage:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/clientimage:buildcache,mode=max
+          tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-client:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-client:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-client:buildcache,mode=max
 
       - name: Build & Push Simulator
         uses: docker/build-push-action@v6
@@ -72,9 +72,9 @@ jobs:
           context: ./MiniTwitSolution/Simulator
           file: ./MiniTwitSolution/Simulator/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/simulatorimage:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/simulatorimage:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/simulatorimage:buildcache,mode=max
+          tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:buildcache,mode=max
 
       - name: Configure SSH for deployment
         run: |

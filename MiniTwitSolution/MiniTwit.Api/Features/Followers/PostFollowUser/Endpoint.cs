@@ -1,5 +1,8 @@
 ﻿using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Hybrid;
+using MiniTwit.Api.Utility;
 
 namespace MiniTwit.Api.Features.Followers.PostFollowUser
 {
@@ -19,7 +22,8 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
                     HttpRequest request,
                     MiniTwitDbContext db,
                     HybridCache hybridCache,
-                    CancellationToken cancellationToken
+                    CancellationToken cancellationToken,
+                    [FromQuery] int latest = -1
                 ) =>
                 {
                     string requestBody;
@@ -81,6 +85,13 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
                             $"followers:{username}",
                             cancellationToken
                         );
+
+                        await UpdateLatest.UpdateLatestStateAsync(
+                            latest,
+                            db,
+                            hybridCache,
+                            cancellationToken
+                        );
                         return Results.NoContent();
                     }
 
@@ -93,6 +104,13 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
                     await db.SaveChangesAsync(cancellationToken);
                     // Invalidate all cache entries for the current user's follows.
                     await hybridCache.RemoveByTagAsync($"followers:{username}", cancellationToken);
+
+                    await UpdateLatest.UpdateLatestStateAsync(
+                        latest,
+                        db,
+                        hybridCache,
+                        cancellationToken
+                    );
                     return Results.NoContent();
                 }
             );

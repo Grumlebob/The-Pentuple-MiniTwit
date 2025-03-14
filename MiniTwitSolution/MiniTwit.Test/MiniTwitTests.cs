@@ -1,7 +1,11 @@
-﻿[Collection("MiniTwitCollection")]
+﻿using Microsoft.Extensions.Caching.Hybrid;
+
+[Collection("MiniTwitCollection")]
 public class MiniTwitTests : IAsyncLifetime
 {
     private readonly MiniTwitApiWebAppFactory _factory;
+
+    private HybridCache HybridCache => _factory.Services.GetRequiredService<HybridCache>();
 
     // Create the typed client from the factory's HttpClient.
     private readonly MiniTwitClient _typedClient;
@@ -133,7 +137,30 @@ public class MiniTwitTests : IAsyncLifetime
         // Assert: Only one message should belong to user1.
         Assert.NotNull(userMessages);
         Assert.Single(userMessages);
-        Assert.Equal("user1", userMessages[0].AuthorUsername);
+        Assert.Equal("user1", userMessages[0].User);
+    }
+
+    [Fact]
+    public async Task GetUserTimelineReturns204NoContentWhenUserHasNoMessages()
+    {
+        // Arrange: Create a user with no messages.
+        var user = new User
+        {
+            UserId = 10,
+            Username = "emptyuser",
+            Email = "emptyuser@example.com",
+            PwHash = "hash10",
+        };
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
+
+        // Act: Call the /msgs/{username} endpoint directly using the factory's HttpClient.
+        var response = await _factory.HttpClient.GetAsync(
+            $"/msgs/{user.Username}?no=100&latest=-1"
+        );
+
+        // Assert: Expect HTTP 204 NoContent when no messages are available.
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
     [Fact]
@@ -283,5 +310,37 @@ public class MiniTwitTests : IAsyncLifetime
         Assert.NotNull(logoutResponse);
         Assert.True(logoutResponse!.Success);
         Assert.Equal("Logged out successfully.", logoutResponse.Message);
+    }
+
+    [Fact]
+    public async Task GetLatestEndpoint_ReturnsUpdatedValue()
+    {
+        // Arrange: Ensure the Latest record exists.
+        var latestRecord = await _dbContext.Latests.FirstOrDefaultAsync(l => l.Id == 1);
+        if (latestRecord == null)
+        {
+            latestRecord = new Latest { Id = 1, LatestEventId = 0 };
+            _dbContext.Latests.Add(latestRecord);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        // Get the HybridCache instance.
+        var hybridCache = _factory.Services.GetRequiredService<HybridCache>();
+
+        // Update the latest value to a known value.
+        int updatedLatestValue = 200;
+        await UpdateLatest.UpdateLatestStateAsync(
+            updatedLatestValue,
+            _dbContext,
+            hybridCache,
+            CancellationToken.None
+        );
+
+        // Act: Call the /latest endpoint via the typed client.
+        var response = await _typedClient.GetLatestAsync();
+
+        // Assert: Ensure that the returned LatestEventId equals the updated value.
+        Assert.NotNull(response);
+        Assert.Equal(updatedLatestValue, response.Latest);
     }
 }

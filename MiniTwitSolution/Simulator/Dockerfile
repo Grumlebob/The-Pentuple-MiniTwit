@@ -16,4 +16,5 @@ COPY . .
 ENV SIMULATOR_HOST="http://localhost:5000"
 
 # Run the simulator, passing the API host URL as an argument.
-CMD python minitwit_simulator.py "$SIMULATOR_HOST"
+#Uncomment to run the simulator on deployment
+#CMD python minitwit_simulator.py "$SIMULATOR_HOST"

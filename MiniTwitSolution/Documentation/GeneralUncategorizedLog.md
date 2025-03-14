@@ -378,3 +378,33 @@ Fix. Using this command detroys the droplet in digital ocean:
 ```bash
 vagrant destroy -f
 ```
+
+# 28.02"
+
+## Secure database
+
+Changed user and password for the database (before was "postgres" "postgres").
+To implement it a vagrant update was needed. 
+
+In the vagrant file 4 environment variables are added to the droplet. 2 docker and 2 postgres
+
+# 04.03
+
+## disabled simulator
+
+We disabled our own simulator now that the course simulator is running.
+Enable it by going to the simulator Dockerfile and uncommenting the last line, that runs the simulator script.
+
+# 07.03
+
+## Add automated relases with github actions
+
+In the pull request template there are the steps you need to check when creating a release.
+
+The latest commit **must** contain the commit message:
+
+```txt
+Release: x.y (replace x and y with version numbers)
+```
+
+Update the changelog to make sure that the release gets the correct tag and description

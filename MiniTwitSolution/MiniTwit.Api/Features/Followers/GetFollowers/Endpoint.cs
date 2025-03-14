@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
+using MiniTwit.Api.Utility;
 using MiniTwit.Shared.DTO.Followers.FollowUser;
 
 namespace MiniTwit.Api.Features.Followers.GetFollowers
@@ -18,7 +19,8 @@ namespace MiniTwit.Api.Features.Followers.GetFollowers
                     MiniTwitDbContext db,
                     HybridCache hybridCache,
                     CancellationToken cancellationToken,
-                    [FromQuery] int no = 100
+                    [FromQuery] int no = 100,
+                    [FromQuery] int latest = -1
                 ) =>
                 {
                     // Retrieve the user by username.
@@ -63,7 +65,14 @@ namespace MiniTwit.Api.Features.Followers.GetFollowers
                         tags: new[] { $"followers:{username}" }
                     );
 
-                    return Results.Json(response);
+                    //Update latest request
+                    await UpdateLatest.UpdateLatestStateAsync(
+                        latest,
+                        db,
+                        hybridCache,
+                        cancellationToken
+                    );
+                    return Results.Ok(response);
                 }
             );
 

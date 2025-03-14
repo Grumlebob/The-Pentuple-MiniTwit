@@ -5,6 +5,7 @@ public interface IMiniTwitDbContext
     DbSet<Follower> Followers { get; set; }
     DbSet<Message> Messages { get; set; }
     DbSet<User> Users { get; set; }
+    DbSet<Latest> Latests { get; set; }
 }
 
 public partial class MiniTwitDbContext : DbContext, IMiniTwitDbContext
@@ -15,6 +16,8 @@ public partial class MiniTwitDbContext : DbContext, IMiniTwitDbContext
     public virtual DbSet<Follower> Followers { get; set; }
     public virtual DbSet<Message> Messages { get; set; }
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<Latest> Latests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -71,6 +74,21 @@ public partial class MiniTwitDbContext : DbContext, IMiniTwitDbContext
 
         // The User entity is already configured via data annotations.
         // (You can add additional configuration here if needed.)
+
+        // Configure Latest entity
+        modelBuilder.Entity<Latest>(entity =>
+        {
+            entity.ToTable("latest");
+
+            entity.HasKey(e => e.Id); // Ensure only one row exists for latest
+
+            entity.Property(e => e.Id).HasColumnName("id").IsRequired();
+
+            entity.Property(e => e.LatestEventId).HasColumnName("latest_event");
+        });
+
+        // Seed the "latest" table with an initial record.
+        modelBuilder.Entity<Latest>().HasData(new Latest { Id = 1, LatestEventId = 0 });
 
         OnModelCreatingPartial(modelBuilder);
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Hybrid;
+using MiniTwit.Api.Utility;
 using MiniTwit.Shared.DTO.Messages;
 
 namespace MiniTwit.Api.Features.Messages.GetUserMessages
@@ -17,7 +18,8 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                     MiniTwitDbContext db,
                     HybridCache hybridCache,
                     CancellationToken cancellationToken,
-                    [FromQuery] int no = 100
+                    [FromQuery] int no = 100,
+                    [FromQuery] int latest = -1
                 ) =>
                 {
                     // First, check if the user exists.
@@ -61,7 +63,20 @@ namespace MiniTwit.Api.Features.Messages.GetUserMessages
                         tags: new[] { $"userTimeline:{username}" }
                     );
 
-                    return Results.Json(response);
+                    await UpdateLatest.UpdateLatestStateAsync(
+                        latest,
+                        db,
+                        hybridCache,
+                        cancellationToken
+                    );
+
+                    // If no messages exist, return 204 No Content instead of an empty list
+                    if (response.Count == 0)
+                    {
+                        return Results.NoContent();
+                    }
+
+                    return Results.Ok(response);
                 }
             );
 
