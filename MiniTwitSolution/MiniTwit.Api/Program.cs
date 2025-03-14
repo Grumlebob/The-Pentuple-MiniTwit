@@ -9,8 +9,6 @@ using MiniTwit.Api.Features.Users.Authentication.LoginUser;
 using MiniTwit.Api.Features.Users.Authentication.LogoutUser;
 using MiniTwit.Api.Features.Users.Authentication.RegisterUser;
 using Serilog;
-using Serilog.Events;
-using Serilog.Enrichers;
 using Serilog.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +22,6 @@ Log.Logger = new LoggerConfiguration()
 
 // Replace the default logging provider with Serilog
 builder.Host.UseSerilog();
-
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
@@ -96,29 +93,39 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Enable buffering for request bodies early in the pipeline.
-app.Use(async (context, next) =>
-{
-    context.Request.EnableBuffering();
-    await next();
-});
+app.Use(
+    async (context, next) =>
+    {
+        context.Request.EnableBuffering();
+        await next();
+    }
+);
 
 app.UseSerilogRequestLogging(options =>
 {
-    options.MessageTemplate = "Handled {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.MessageTemplate =
+        "Handled {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
     options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
     {
         // Top-level properties for easy querying in Seq
         diagnosticContext.Set("RequestMethod", httpContext.Request.Method);
         diagnosticContext.Set("RequestPath", httpContext.Request.Path);
-        
+
         // Composite property with additional HTTP request details
-        diagnosticContext.Set("HttpRequest", new {
-            Method = httpContext.Request.Method,
-            Path = httpContext.Request.Path,
-            QueryString = httpContext.Request.QueryString.ToString(),
-            Headers = httpContext.Request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString())
-        });
-        
+        diagnosticContext.Set(
+            "HttpRequest",
+            new
+            {
+                Method = httpContext.Request.Method,
+                Path = httpContext.Request.Path,
+                QueryString = httpContext.Request.QueryString.ToString(),
+                Headers = httpContext.Request.Headers.ToDictionary(
+                    h => h.Key,
+                    h => h.Value.ToString()
+                ),
+            }
+        );
+
         // Log request content (if available)
         if (httpContext.Request.ContentLength > 0 && httpContext.Request.Body.CanSeek)
         {
