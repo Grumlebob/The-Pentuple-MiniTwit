@@ -67,7 +67,6 @@ services:
     build:
       context: .
       dockerfile: MiniTwit.Client/Dockerfile
-    # Wait for the API container to start (which itself waits for migrator)
     ports:
       - "5001:80"
 
