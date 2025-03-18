@@ -24,7 +24,9 @@ FROM mcr.microsoft.com/dotnet/runtime-deps:9.0
 WORKDIR /app
 
 # Install Bash and dos2unix for proper script execution
-RUN apt-get update && apt-get install -y bash dos2unix
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y dos2unix=7.4.3-1 && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the generated migration bundle from the build stage
 COPY --from=build /src/ef-migrations-bundle ./
