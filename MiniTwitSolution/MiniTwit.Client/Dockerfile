@@ -15,7 +15,7 @@ RUN dotnet restore "MiniTwit.Client/MiniTwit.Client.csproj"
 COPY . .
 
 # Switch working directory to the Client project
-WORKDIR "/src/MiniTwit.Client"
+WORKDIR /src/MiniTwit.Client
 
 # Publish the Blazor WASM app
 RUN dotnet publish -c Release -o /app/publish
