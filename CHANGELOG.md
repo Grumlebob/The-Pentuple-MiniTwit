@@ -5,6 +5,8 @@
 ### Changed
 
 - Add automatic code formatting on pull requests
+- Fixed seq not receiving logs
+- Fix dependabot using an outdated repository
 
 ## v2.4
 
