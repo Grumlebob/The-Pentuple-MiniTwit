@@ -1,8 +1,7 @@
-﻿using System.Text.Json;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.Utility;
+using MiniTwit.Shared.DTO.Followers.FollowUser;
 
 namespace MiniTwit.Api.Features.Followers.PostFollowUser
 {
@@ -19,36 +18,21 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
                 "/fllws/{username}",
                 async (
                     string username,
-                    HttpRequest request,
+                    [FromBody] FollowOrUnfollowRequest request,
                     MiniTwitDbContext db,
                     HybridCache hybridCache,
                     CancellationToken cancellationToken,
                     [FromQuery] int latest = -1
                 ) =>
                 {
-                    string requestBody;
-                    using (var reader = new StreamReader(request.Body))
+                    if ((request.Follow is not null && request.Unfollow is not null) || 
+                        (request.Follow is null && request.Unfollow is null))
                     {
-                        requestBody = await reader.ReadToEndAsync(cancellationToken);
+                        return Results.BadRequest("You must provide either 'follow' or 'unfollow', but not both.");
                     }
-                    using var document = JsonDocument.Parse(requestBody);
-                    var targetUsername = "";
-                    var followAction = FollowAction.Follow;
-                    if (document.RootElement.TryGetProperty("follow", out var followElement))
-                    {
-                        targetUsername = followElement.GetString();
-                    }
-                    else if (
-                        document.RootElement.TryGetProperty("unfollow", out var unfollowElement)
-                    )
-                    {
-                        targetUsername = unfollowElement.GetString();
-                        followAction = FollowAction.Unfollow;
-                    }
-                    else
-                    {
-                        return Results.BadRequest("Invalid request body.");
-                    }
+                    
+                    var targetUsername = request.Follow ?? request.Unfollow!;
+                    var followAction = request.Follow is not null ? FollowAction.Follow : FollowAction.Unfollow;
 
                     var currentUser = await db.Users.FirstOrDefaultAsync(
                         u => u.Username == username,
@@ -61,7 +45,7 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
 
                     if (currentUser == null || targetUser == null)
                     {
-                        return Results.BadRequest("Invalid usernames.");
+                        return Results.BadRequest("Invalid usernames");
                     }
 
                     // Build the follow relationship.
