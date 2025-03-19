@@ -25,14 +25,20 @@ namespace MiniTwit.Api.Features.Followers.PostFollowUser
                     [FromQuery] int latest = -1
                 ) =>
                 {
-                    if ((request.Follow is not null && request.Unfollow is not null) || 
-                        (request.Follow is null && request.Unfollow is null))
+                    if (
+                        (request.Follow is not null && request.Unfollow is not null)
+                        || (request.Follow is null && request.Unfollow is null)
+                    )
                     {
-                        return Results.BadRequest("You must provide either 'follow' or 'unfollow', but not both.");
+                        return Results.BadRequest(
+                            "You must provide either 'follow' or 'unfollow', but not both."
+                        );
                     }
-                    
+
                     var targetUsername = request.Follow ?? request.Unfollow!;
-                    var followAction = request.Follow is not null ? FollowAction.Follow : FollowAction.Unfollow;
+                    var followAction = request.Follow is not null
+                        ? FollowAction.Follow
+                        : FollowAction.Unfollow;
 
                     var currentUser = await db.Users.FirstOrDefaultAsync(
                         u => u.Username == username,
