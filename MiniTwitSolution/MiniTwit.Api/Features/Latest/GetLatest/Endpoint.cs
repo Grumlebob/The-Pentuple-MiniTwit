@@ -33,13 +33,10 @@ public static class Endpoint
                             .Where(l => l.Id == 1)
                             .FirstAsync(ct);
                         return new GetLatestResponse(latest.LatestEventId);
-
-                        // .FirstAsync(ct);
-                        // return new GetLatestResponse(latest!.Id);
                     },
                     cacheEntryOptions,
                     cancellationToken: cancellationToken,
-                    tags: new[] { "latestEvent" }
+                    tags: new[] { cacheKey }
                 );
 
                 return Results.Ok(response);
