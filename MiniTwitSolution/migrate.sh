@@ -12,8 +12,6 @@ fi
 echo "=== Debug: Listing files in /app ==="
 ls -la ./
 
-ls -la
-
 echo "=== Debug: Running migrations-bundle ==="
 ./ef-migrations-bundle
 

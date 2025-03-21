@@ -14,7 +14,7 @@ RUN dotnet restore "MiniTwit.Api/MiniTwit.Api.csproj"
 
 # Copy the remaining source code.
 COPY . .
-WORKDIR "/src/MiniTwit.Api"
+WORKDIR /src/MiniTwit.Api
 RUN dotnet build "MiniTwit.Api.csproj" -c Release -o /app/build
 
 # Publish the application.

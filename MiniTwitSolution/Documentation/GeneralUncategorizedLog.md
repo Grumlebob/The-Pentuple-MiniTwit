@@ -11,7 +11,7 @@ We also found a linux tool called "tldr", which was helpful in understanding lin
 ## General usage notes
 
 
-What does ./ means in front of file: The ./ at the beginning refers to the current directory.
+What does ./ means in front of file?: The ./ at the beginning refers to the current directory.
 
 
 Activate python environment:
@@ -53,9 +53,9 @@ Stop server:
 
 * We want to use a language, everyone in the group is familiar with. This is also the technology we want to work with professionally, and therefore to increase our skills in this technology, is valuable for us.
 * We want to make it simple to work with different database vendors, therefore we use EF Core, as everyone in the group is familiar.
-* We want to use tools that simplies work. Such as generating appropiate gitignores through https://www.toptal.com/developers/gitignore/
-* We want to setup an empty .net solution, with 3 projects.
-* We want to use the same formatting tool, and Csharpier provides a working opinionated out-of-the-box solution, which can be added to github actions aswell later.
+* We want to use tools that simplifies work. Such as generating appropriate gitignore through https://www.toptal.com/developers/gitignore/
+* We want to set up an empty .net solution, with 3 projects.
+* We want to use the same formatting tool, and Csharpier provides a working opinionated out-of-the-box solution, which can be added to GitHub actions as well later.
 
 
 ### First .net considerations
@@ -65,13 +65,13 @@ Stop server:
 * Documentation
 * Client (Wasm). Scales better than server, if we are to expect the simulation to perhaps give 100k concurrent users.
 * API (Minimal API). Minimal API is the latest way to work with API's in .net. It is supposedly faster than old-school controllers
-* Shared. For example DTO's, as both the visual presentation and the API should use same DTO's. Thus we avoid code duplication
+* Shared. For example DTO's, as both the visual presentation and the API should use same DTO's. Thus, we avoid code duplication
 * Testing.
 
 ### Initial skeleton
 
 We all worked on a single PC, to analyze the python version of MiniTwit, to decide vertical slices to be implemented in our C# version.
-Thus we all agreed on the same language and file structure for the initial slices, to increase expected consistency, when working in parallel.
+Thus, we all agreed on the same language and file structure for the initial slices, to increase expected consistency, when working in parallel.
 But in order to be certain of consistency, we decided to follow a pull-request structure, where we as a group approve of the PR.
 
 
@@ -84,7 +84,7 @@ But in order to be certain of consistency, we decided to follow a pull-request s
 
 ### Vendor
 
-Current vendor is SQLite, we will initially use SQLite aswell.
+Current vendor is SQLite, we will initially use SQLite as well.
 
 But we use EF Core, which enables us to easily change vendor at a later point.
 
@@ -131,7 +131,7 @@ Adding dependencies agreed upon above:
 
 The added tests are not complete. We plan to rely on the already given python tests, after
 the initial first versions of the C# is being done.
-The tests mostly server to see if we setup EF core relationships correctly,
+The tests mostly server to see if we set up EF core relationships correctly,
 such as the common tricky many-to-many cases, where we need to avoid cyclic dependencies.
 
 ## Docker
@@ -154,14 +154,14 @@ http://localhost:5001/
 
 ## CodeQL
 
-Added github security scanning to pipeline called CodeQL Advanced.
+Added GitHub security scanning to pipeline called CodeQL Advanced.
 Ensures we don't try to leak sensitive information, such as keys.
 
 # 18.02.2025
 
 ## Authentication
 
-We are currently not supporting proper authentication so we can focus on deploying. 
+We are currently not supporting proper authentication, so we can focus on deploying. 
 We handle current user with a singleton service that relies on Blazored library localStorage.
 
 ## Ef core migrations
@@ -213,13 +213,13 @@ The migrate.sh is a script that runs the migration. Perhaps this could be done d
 We kept changing a "bug" where it said something like "could not find Migrations__History". 
 But there is a chance that this was not a bug and would have worked regardless.
 
-The simulator was activated afterwards and we tried again. ConnectionErrors...
+The simulator was activated afterward and we tried again. ConnectionErrors...
 But the solution was just to use port 8080 instead of 80 in compose.
 
 # 20.02
 
 ## Running docker compose
-On macOs the docker compose up does not use "-" command is
+On macOS the docker compose up does not use "-" command is
 ```bash
 docker compose up --build
 ```
@@ -235,7 +235,7 @@ dotnet tool install --global dotnet-ef
 ```
 We might need to add this to the Vagrant file...
 
-We needed to delete the existing migrations file, as it was deprecated/uncompatable with our version of dotnet. 
+We needed to delete the existing migrations file, as it was deprecated/incompatible with our version of dotnet. 
 
 After deleting the file, we ran the following command:
 ```bash
@@ -248,21 +248,21 @@ On Linux (fedoraOS):
 There were several issues when docker compose. We had an error where port 5432 was used by Postgres and as such could not be used when building the project. And was subsequently changed to 5433. 
 
 On Mac:
-Another was that specifically on MacOS, the port 5000 is occupied by the control center, which is a process that should not be killed.
+Another was that specifically on macOS, the port 5000 is occupied by the control center, which is a process that should not be killed.
 For the client to work, we had to change its port from 8080 to 80.
 Port 5432 was already occupied by postgress, this seems to be the port that postgress occupies on machines.
-These we changes to (docker-compose.yml):
+These were changes to (docker-compose.yml):
 ```yml 
 ...
 api: 
-    ...
+    #...
     ports:
       - "5002:8080"
 
 ...
 
 client:
-    ...
+    #...
     ports:
       - "5001:80"
 ...
@@ -281,13 +281,13 @@ There is a syntax error in one of the files when running vagrant up.
 
 To fix this we had to manually fix this file by removing an "s" from "exists" to "exist".
 
-For some reason specifying the VM provider in the vagrant file does not seem to work. Instead by explicitly specifiying the provider when calling
+For some reason specifying the VM provider in the vagrant file does not seem to work. Instead, by explicitly specifying the provider when calling
 ```bash
 vagrant up --provider=virtualbox
 ```
 seems to work. We are not sure why.
 
-We have a theory that the plugin that virtualBox uses aka. "vagrant-vbguest" when being freshly installed/or updated does not auto-update when vagrant up is being run afterwards. Which is what we think is what vagrant keeps getting stuck on for some reason. 
+We have a theory that the plugin that virtualBox uses aka. "vagrant-vbguest" when being freshly installed/or updated does not auto-update when vagrant up is being run afterward. Which is what we think is what vagrant keeps getting stuck on for some reason. 
 
 This has been fixed by adding the following line to the vagrantFile: 
 ```ruby
@@ -308,7 +308,7 @@ There were also issues with syncing the project folders into the VM. As such the
 ```ruby 
 config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
 ```
-(ie. adding - type: "virtualbox").
+(i.e. adding - type: "virtualbox").
 
 Running with digital ocean
 ```bash
@@ -358,7 +358,7 @@ dotnet ef migrations bundle --project MiniTwit.Api/MiniTwit.Api.csproj \\
         --startup-project MiniTwit.Api/MiniTwit.Api.csproj --self-contained -r linux-x64 -o ef-migrations-bundle
 ```
 
-Instead of having to run this command inside the Vagrantfile, we want this command to be executed in another Dockercontainer (either using the API or migrations dockercontainer, using API makes sense since it contains the Migrations folder).
+Instead of having to run this command inside the Vagrantfile, we want this command to be executed in another Docker container (either using the API or migrations docker container, using API makes sense since it contains the Migrations folder).
 
 ## Problem with droplets in digital ocean
 
@@ -374,7 +374,7 @@ vagrant destroy
 ```
 Does not destroy the droplet in digital ocean.
 
-Fix. Using this command detroys the droplet in digital ocean:
+Fix. Using this command destroys the droplet in digital ocean:
 ```bash
 vagrant destroy -f
 ```
@@ -397,7 +397,7 @@ Enable it by going to the simulator Dockerfile and uncommenting the last line, t
 
 # 07.03
 
-## Add automated relases with github actions
+## Add automated releases with GitHub actions
 
 In the pull request template there are the steps you need to check when creating a release.
 
@@ -408,3 +408,49 @@ Release: x.y (replace x and y with version numbers)
 ```
 
 Update the changelog to make sure that the release gets the correct tag and description
+
+# 18.03
+
+## Run shellcheck on all .sh files in solution.
+The only unresolved line is 
+```bash
+source ~/.bash_profile
+```
+It is a warning that the shellcheck cannot check it because it cannot resolve the path.
+
+## Docker linter
+
+Used hadolint by pasting docker files into the page https://hadolint.github.io/hadolint/
+
+Used ```docker-compose config``` to lint the docker-compose file.
+Then used dclint (https://github.com/zavoloklom/docker-compose-linter)
+to look for further suggestions. It wants a certain order on fields 
+and says that services like api, client etc. should be alphabetically ordered.
+However, this doesn't seem intuitive. Instead, we ordered them based on dependencies.
+It also complains about ports being exposed without specifying an IP-address. 
+But this would require hard-coded IP's all over.
+
+## Vagrant validate
+
+This command found nothing wrong with our script.
+
+## Versions
+
+Replaced ":latest" with ":<version>" in docker and docker-compose files.
+The migrator uses dos2unix. To get the latest version you can open the image it uses:
+```bash
+docker run --rm -it mcr.microsoft.com/dotnet/runtime-deps:9.0 bash
+```
+Then check the latest version like this:
+```bash
+apt-get update
+apt-cache policy dos2unix
+```
+
+Here we also discovered that bash was already installed in the image.
+And therefore the bash is now not getting installed in our script.
+
+Our own docker images currently does not use versioning. 
+We just give them the tag latest. 
+This is the easiest since we have continuous deployment.
+To change this we need to edit the deploy.yaml script in GitHub workflows.
