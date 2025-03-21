@@ -8,6 +8,7 @@ using MiniTwit.Api.Features.Messages.PostMessage;
 using MiniTwit.Api.Features.Users.Authentication.LoginUser;
 using MiniTwit.Api.Features.Users.Authentication.LogoutUser;
 using MiniTwit.Api.Features.Users.Authentication.RegisterUser;
+using MiniTwit.Api.Utility;
 using Serilog;
 using Serilog.Extensions;
 
@@ -107,38 +108,36 @@ app.UseSerilogRequestLogging(options =>
         "Handled {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
     options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
     {
-        // Top-level properties for easy querying in Seq
+        // Info from user request
         diagnosticContext.Set("RequestMethod", httpContext.Request.Method);
         diagnosticContext.Set("RequestPath", httpContext.Request.Path);
-
-        // Composite property with additional HTTP request details
-        diagnosticContext.Set(
-            "HttpRequest",
-            new
-            {
-                Method = httpContext.Request.Method,
-                Path = httpContext.Request.Path,
-                QueryString = httpContext.Request.QueryString.ToString(),
-                Headers = httpContext.Request.Headers.ToDictionary(
-                    h => h.Key,
-                    h => h.Value.ToString()
-                ),
-            }
-        );
-
+        diagnosticContext.Set("RequestQuery", httpContext.Request.QueryString.ToString());
+        // request body if any
         // Log request content (if available)
-        if (httpContext.Request.ContentLength > 0 && httpContext.Request.Body.CanSeek)
+        if (httpContext.Request.ContentLength > 0)
         {
-            httpContext.Request.Body.Position = 0; // Reset stream position
-            using var reader = new StreamReader(httpContext.Request.Body, leaveOpen: true);
-            var content = reader.ReadToEnd();
-            diagnosticContext.Set("Content", content);
-            httpContext.Request.Body.Position = 0; // Reset again for further processing
+            var body = HttpHelper.GetHttpBodyAsString(httpContext.Request.Body);
+            diagnosticContext.Set("ResponseBody", body);
         }
         else
         {
-            diagnosticContext.Set("Content", "Not Available");
+            diagnosticContext.Set("ResponseBody", "Not Content");
         }
+        
+        // Info from response
+        diagnosticContext.Set("StatusCode", httpContext.Response.StatusCode);
+        diagnosticContext.Set("ResponseBody", httpContext.Response.Body);
+        // Response body if any
+        if (httpContext.Response.ContentLength > 0)
+        {
+            var body = HttpHelper.GetHttpBodyAsString(httpContext.Response.Body);
+            diagnosticContext.Set("ResponseBody", body);
+        }
+        else
+        {
+            diagnosticContext.Set("ResponseBody", "Not Content");
+        }
+        
     };
 });
 
