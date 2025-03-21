@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.6
+
+### Changed
+
+- Fixed requests and response body to be showed on Seq
+
 ## v2.5
 
 ### Changed
