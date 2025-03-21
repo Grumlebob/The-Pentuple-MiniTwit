@@ -93,7 +93,7 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
-// Enable buffering for request bodies early in the pipeline.
+// Enable buffering for request bodies
 app.Use(
     async (context, next) =>
     {
@@ -117,16 +117,15 @@ app.UseSerilogRequestLogging(options =>
         if (httpContext.Request.ContentLength > 0)
         {
             var body = HttpHelper.GetHttpBodyAsString(httpContext.Request.Body);
-            diagnosticContext.Set("ResponseBody", body);
+            diagnosticContext.Set("RequestBody", body);
         }
         else
         {
-            diagnosticContext.Set("ResponseBody", "Not Content");
+            diagnosticContext.Set("RequestBody", "No Content");
         }
         
         // Info from response
         diagnosticContext.Set("StatusCode", httpContext.Response.StatusCode);
-        diagnosticContext.Set("ResponseBody", httpContext.Response.Body);
         // Response body if any
         if (httpContext.Response.ContentLength > 0)
         {
@@ -135,7 +134,7 @@ app.UseSerilogRequestLogging(options =>
         }
         else
         {
-            diagnosticContext.Set("ResponseBody", "Not Content");
+            diagnosticContext.Set("ResponseBody", "No Content");
         }
         
     };
