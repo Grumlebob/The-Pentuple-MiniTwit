@@ -102,6 +102,29 @@ app.Use(
     }
 );
 
+// Enable buffering for response bodies
+app.Use(async (context, next) =>
+{
+    // Swap out the response stream with a memory stream to capture output
+    var originalBodyStream = context.Response.Body;
+    using var responseBody = new MemoryStream();
+    context.Response.Body = responseBody;
+
+    await next();
+
+    // Reset the response body position to read from the beginning
+    context.Response.Body.Seek(0, SeekOrigin.Begin);
+    var responseText = await new StreamReader(context.Response.Body).ReadToEndAsync();
+    context.Response.Body.Seek(0, SeekOrigin.Begin);
+
+    // Log the response text here
+    // e.g., diagnosticContext.Set("ResponseBody", responseText);
+
+    // Copy the content of the memory stream to the original stream
+    await responseBody.CopyToAsync(originalBodyStream);
+});
+
+
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate =
