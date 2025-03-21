@@ -129,7 +129,7 @@ app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate =
         "Handled {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
-    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    options.EnrichDiagnosticContext = async (diagnosticContext, httpContext) =>
     {
         // Info from user request
         diagnosticContext.Set("RequestMethod", httpContext.Request.Method);
@@ -137,28 +137,17 @@ app.UseSerilogRequestLogging(options =>
         diagnosticContext.Set("RequestQuery", httpContext.Request.QueryString.ToString());
         // request body if any
         // Log request content (if available)
-        if (httpContext.Request.ContentLength > 0)
-        {
-            var body = HttpHelper.GetHttpBodyAsString(httpContext.Request.Body);
-            diagnosticContext.Set("RequestBody", body);
-        }
-        else
-        {
-            diagnosticContext.Set("RequestBody", "No Content");
-        }
+        
+        var requestBody = await HttpHelper.GetHttpBodyAsStringAsync(httpContext.Request.Body);
+        diagnosticContext.Set("RequestBody", requestBody);
+        
         
         // Info from response
         diagnosticContext.Set("StatusCode", httpContext.Response.StatusCode);
         // Response body if any
-        if (httpContext.Response.ContentLength > 0)
-        {
-            var body = HttpHelper.GetHttpBodyAsString(httpContext.Response.Body);
-            diagnosticContext.Set("ResponseBody", body);
-        }
-        else
-        {
-            diagnosticContext.Set("ResponseBody", "No Content");
-        }
+        
+        var reponseBody = await HttpHelper.GetHttpBodyAsStringAsync(httpContext.Response.Body);
+        diagnosticContext.Set("ResponseBody", reponseBody);
         
     };
 });
