@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.DependencyInjection;
 using MiniTwit.Api.Features.Followers.GetFollowers;
 using MiniTwit.Api.Features.Followers.PostFollowUser;
@@ -21,21 +20,8 @@ builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
     .AddDatabase(builder.Configuration)
-    .AllowClient(builder.Configuration)
-    .AddMemoryCache();
-
-// Register HybridCache (using the new .NET 9 API or a preview package)
-#pragma warning disable EXTEXP0018
-builder.Services.AddHybridCache(options =>
-{
-    options.DefaultEntryOptions = new HybridCacheEntryOptions()
-    {
-        LocalCacheExpiration = TimeSpan.FromMinutes(5),
-        Expiration = TimeSpan.FromMinutes(5),
-    };
-});
-#pragma warning restore EXTEXP0018
-
+    .AddClientCors(builder.Configuration)
+    .AddCaching();
 
 var app = builder.Build();
 

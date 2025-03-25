@@ -1,6 +1,6 @@
 ﻿namespace MiniTwit.Api.DependencyInjection;
 
-public static class Database
+public static class DatabaseConfiguration
 {
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration) {
         services.AddDbContext<MiniTwitDbContext>(options =>
