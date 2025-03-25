@@ -11,7 +11,6 @@ global using MiniTwit.Api.Infrastructure;
 global using MiniTwit.Api.Utility;
 global using MiniTwit.Client.MiniTwitTypedClient;
 global using MiniTwit.Shared.DTO.Followers.FollowUser;
-global using MiniTwit.Shared.DTO.Latest;
 global using MiniTwit.Shared.DTO.Messages;
 global using MiniTwit.Shared.DTO.Users.Authentication.LoginUser;
 global using MiniTwit.Shared.DTO.Users.Authentication.LogoutUser;
