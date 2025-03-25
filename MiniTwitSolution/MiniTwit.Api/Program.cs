@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Caching.Hybrid;
+using MiniTwit.Api.DependencyInjection;
 using MiniTwit.Api.Features.Followers.GetFollowers;
 using MiniTwit.Api.Features.Followers.PostFollowUser;
 using MiniTwit.Api.Features.Latest.GetLatest;
@@ -10,21 +11,19 @@ using MiniTwit.Api.Features.Users.Authentication.LogoutUser;
 using MiniTwit.Api.Features.Users.Authentication.RegisterUser;
 using MiniTwit.Api.Utility;
 using Serilog;
-using Serilog.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
-    .Enrich.WithRequestBody()
-    .Enrich.WithRequestQuery()
-    .CreateLogger();
-
-// Replace the default logging provider with Serilog
-builder.Host.UseSerilog();
+// We are using serilog
+builder.ConfigureLogging();
 
 // Add services to the container.
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen()
+    .AddDatabase(builder.Configuration)
+    .AllowClient(builder.Configuration)
+    .AddMemoryCache();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -174,4 +173,6 @@ app.MapGetLatestEndpoint();
 
 app.Run();
 
-public partial class Program { }
+public partial class Program
+{
+}
