@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.DependencyInjection;
 using MiniTwit.Api.Features.Followers.GetFollowers;
 using MiniTwit.Api.Features.Followers.PostFollowUser;

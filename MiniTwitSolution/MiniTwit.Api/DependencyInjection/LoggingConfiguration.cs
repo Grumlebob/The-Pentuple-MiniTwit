@@ -3,7 +3,7 @@ using Serilog.Extensions;
 
 namespace MiniTwit.Api.DependencyInjection;
 
-public static class Logging
+public static class LoggingConfiguration
 {
     public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
     {
