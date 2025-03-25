@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Hybrid;
 
+namespace MiniTwit.Test;
+
 [Collection("MiniTwitCollection")]
 public class MiniTwitTests : IAsyncLifetime
 {

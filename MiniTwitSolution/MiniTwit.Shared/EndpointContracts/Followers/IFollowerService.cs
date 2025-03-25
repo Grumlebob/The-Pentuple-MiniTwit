@@ -1,7 +1,6 @@
 ﻿// Co-authored by: ChatGPT (https://chat.openai.com/)
 
 using MiniTwit.Shared.DTO.Followers.FollowUser;
-using MiniTwit.Shared.DTO.Users;
 
 namespace MiniTwit.Shared.EndpointContracts.Followers
 {

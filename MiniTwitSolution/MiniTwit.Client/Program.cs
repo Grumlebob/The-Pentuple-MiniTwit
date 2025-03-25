@@ -2,6 +2,7 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MiniTwit.Client;
+using MiniTwit.Client.Authentication;
 using MiniTwit.Client.MiniTwitTypedClient;
 using MiniTwit.Shared.EndpointContracts.Followers;
 using MiniTwit.Shared.EndpointContracts.Messages;
