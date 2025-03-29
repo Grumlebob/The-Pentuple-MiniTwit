@@ -1,7 +1,8 @@
 ﻿using Blazored.LocalStorage;
 
-namespace MiniTwit.Client;
+namespace MiniTwit.Client.Authentication;
 
+// We don't currently have authentication. We use local storage to handle the user sessions.
 public class UserSession
 {
     public bool IsLoggedIn { get; set; }

@@ -28,11 +28,6 @@
     <ProjectReference Include="..\MiniTwit.Shared\MiniTwit.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Infrastructure\minitwit.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
       <Folder Include="Features\Messages\PostMessage\" />
     <Folder Include="Features\Users\Authentication\RegisterUser\" />
   </ItemGroup>
