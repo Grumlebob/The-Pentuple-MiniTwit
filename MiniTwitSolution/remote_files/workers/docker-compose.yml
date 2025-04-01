@@ -2,25 +2,6 @@ networks:
   main:
 
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: minitwit_db
-    networks:
-      - main
-    restart: always
-    environment:
-      POSTGRES_DB: MiniTwitDb
-      POSTGRES_USER: ${MINITWIT_DB_USER}
-      POSTGRES_PASSWORD: ${MINITWIT_DB_PASSWORD}
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${MINITWIT_DB_USER}", "-d", "MiniTwitDb"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    ports:
-      - published: 5433
-        target: 5432
-
   migrator:
     image: ${DOCKER_USERNAME}/minitwit-migrator
     container_name: minitwit-migrator
@@ -40,18 +21,6 @@ services:
       timeout: 5s
       retries: 20
       start_period: 40s
-      
-  seq:
-    image: datalust/seq:2024.3
-    container_name: seq
-    networks:
-      - main
-    restart: always
-    environment:
-        ACCEPT_EULA: "Y"
-    ports:
-      - published: 5341
-        target: 80
 
   api:
     image: ${DOCKER_USERNAME}/minitwit-api
@@ -63,32 +32,8 @@ services:
       ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=MiniTwitDb;Username=${MINITWIT_DB_USER};Password=${MINITWIT_DB_PASSWORD}
     # IMPORTANT: Wait for db (healthy) and migrator (healthy)
     depends_on:
-      db:
-        condition: service_healthy
       migrator:
         condition: service_healthy
-      seq:
-        condition: service_started
     ports:
       - published: 5002
-        target: 8080
-
-  client:
-    image: ${DOCKER_USERNAME}/minitwit-client
-    container_name: minitwit-client
-    networks:
-      - main
-    ports:
-      - published: 5001
         target: 80
-
-  simulator:
-    image: ${DOCKER_USERNAME}/minitwit-simulator
-    container_name: minitwit-simulator
-    networks:
-      - main
-    depends_on:
-      api:
-        condition: service_started
-    environment:
-      SIMULATOR_HOST: http://api:8080

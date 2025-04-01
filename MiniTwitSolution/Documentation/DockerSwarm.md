@@ -14,3 +14,35 @@ We already setup the variable DIGITAL_OCEAN_TOKEN, so this could be skipped.
 
 For the CONFIG varibale where we have to insert our own fingerprint:
 go to our digital ocean project on the web. Go to settings -> security. Here there is a list of ssh keys and their fingerprints. Use your own.
+
+## 01.04
+
+### Droplets
+
+We decided to use a swarm for our API. It consists of three droplets: swarm-manager, worker1 and worker2.
+Each api droplet should also get the migrator. 
+Then there is a separate droplet for each of: the database, client and seq.
+So 6 droplets in total.
+
+After making the droplets. from root
+add varibalbes: (their values are in the resources chat in discord)
+MINITWIT_DB_USER
+MINITWIT_DB_PASSWORD
+DOCKER_USERNAME
+DOCKER_PASSWORD
+We added them by editing the root/.bashrc file with 
+```bash
+export VAR="value"
+export VAR2="value2"
+#...
+```
+
+Then after saving and exiting the file
+```bash
+source ./.bashrc
+```
+
+we copy the relevant files to the droplets with scp
+```bash
+scp -i ~/.ssh/do_ssh_key -r "path\to\files" root@DROPLET_IP:~/minitwit
+```
