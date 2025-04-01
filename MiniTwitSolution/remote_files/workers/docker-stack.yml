@@ -1,0 +1,48 @@
+networks:
+  main:
+    driver: overlay
+
+volumes:
+  migrations-data:
+
+services:
+  migrator:
+    image: ${DOCKER_USERNAME}/minitwit-migrator
+    container_name: minitwit-migrator
+    networks:
+      - main
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=MiniTwitDb;Username=${MINITWIT_DB_USER};Password=${MINITWIT_DB_PASSWORD}"
+      ClientBaseUrl: "https://whatever-url-or-placeholder"
+    deploy:
+      restart_policy:
+        condition: none   # Run once only
+      placement:
+        constraints:
+          - node.role == worker
+    volumes:
+      - migrations-data:/tmp
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/migrations_done"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
+
+  api:
+    image: ${DOCKER_USERNAME}/minitwit-api
+    container_name: minitwit-api
+    networks:
+      - main
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=MiniTwitDb;Username=${MINITWIT_DB_USER};Password=${MINITWIT_DB_PASSWORD}"
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+    ports:
+      - published: 5002
+        target: 80
+    volumes:
+      - migrations-data:/tmp

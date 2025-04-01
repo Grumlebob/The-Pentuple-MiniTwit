@@ -25,11 +25,8 @@ Then there is a separate droplet for each of: the database, client and seq.
 So 6 droplets in total.
 
 After making the droplets. from root
-add varibalbes: (their values are in the resources chat in discord)
-MINITWIT_DB_USER
-MINITWIT_DB_PASSWORD
-DOCKER_USERNAME
-DOCKER_PASSWORD
+add env varibalbes that are used in the docker compose for that droplet. (e.g. DOCKER_USERNAME)
+The values are in the discord resources chat.
 We added them by editing the root/.bashrc file with 
 ```bash
 export VAR="value"
