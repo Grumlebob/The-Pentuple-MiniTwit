@@ -26,9 +26,15 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Copy the entrypoint script into the image.
-COPY MiniTwit.Api/entrypoint.sh MiniTwit.Api/entrypoint.sh
-RUN chmod +x MiniTwit.Api/entrypoint.sh
+# Copy the entrypoint script into the image root (/app)
+COPY MiniTwit.Api/entrypoint.sh /app/entrypoint.sh
+
+# Install dos2unix, convert line endings, and set executable permissions
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y dos2unix=7.4.3-1 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN dos2unix /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
 # Set the entry point for the container.
-ENTRYPOINT ["MiniTwit.Api/entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
