@@ -1,0 +1,13 @@
+networks:
+  main:
+
+services:
+
+  client:
+    image: ${DOCKER_USERNAME}/minitwit-client
+    container_name: minitwit-client
+    networks:
+      - main
+    ports:
+      - published: 5001
+        target: 80

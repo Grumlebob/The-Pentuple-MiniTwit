@@ -1,0 +1,15 @@
+networks:
+  main:
+
+services:
+  seq:
+    image: datalust/seq:2024.3
+    container_name: seq
+    networks:
+      - main
+    restart: always
+    environment:
+        ACCEPT_EULA: "Y"
+    ports:
+      - published: 5341
+        target: 80
