@@ -21,10 +21,14 @@ RUN dotnet build "MiniTwit.Api.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "MiniTwit.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# Final stage/image: copy the published output from the build stage.
+# Final stage: copy the published output and the entrypoint script.
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
+# Copy the entrypoint script into the image.
+COPY MiniTwit.Api/entrypoint.sh MiniTwit.Api/entrypoint.sh
+RUN chmod +x MiniTwit.Api/entrypoint.sh
+
 # Set the entry point for the container.
-ENTRYPOINT ["dotnet", "MiniTwit.Api.dll"]
+ENTRYPOINT ["MiniTwit.Api/entrypoint.sh"]
