@@ -1,0 +1,22 @@
+networks:
+  main:
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: minitwit_db
+    networks:
+      - main
+    restart: always
+    environment:
+      POSTGRES_DB: MiniTwitDb
+      POSTGRES_USER: ${MINITWIT_DB_USER}
+      POSTGRES_PASSWORD: ${MINITWIT_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${MINITWIT_DB_USER}", "-d", "MiniTwitDb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - published: 5433
+        target: 5432
