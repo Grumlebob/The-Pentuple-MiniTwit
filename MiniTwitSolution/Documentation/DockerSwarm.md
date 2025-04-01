@@ -17,7 +17,7 @@ go to our digital ocean project on the web. Go to settings -> security. Here the
 
 ## 01.04
 
-### Droplets
+### Droplets manual setup
 
 We decided to use a swarm for our API. It consists of three droplets: swarm-manager, worker1 and worker2.
 Each api droplet should also get the migrator. 
@@ -42,7 +42,27 @@ Then after saving and exiting the file
 source ./.bashrc
 ```
 
-we copy the relevant files to the droplets with scp
+we copy the relevant remote files to the droplets with scp
 ```bash
-scp -i ~/.ssh/do_ssh_key -r "path\to\files" root@DROPLET_IP:~/minitwit
+scp -i ~/.ssh/do_ssh_key -r "path\to\file" root@DROPLET_IP:~/minitwit
+# the path works on powershell. On other you might need backslashes or without quotation or whatever
 ```
+
+The files are **setup.sh** in the remote files folder. It installs docker and docker-compose. 
+and **deploy.sh** + **docker-compose.yml** in the relevant droplet folder.
+
+run the setup file with 
+```bash
+chmod +x setup.sh # execute permission
+./setup.sh
+```
+then run the deploy file with
+```bash
+bash -x deploy.sh
+```
+
+
+
+
+
+(we plan to automate this for ci/cd)
