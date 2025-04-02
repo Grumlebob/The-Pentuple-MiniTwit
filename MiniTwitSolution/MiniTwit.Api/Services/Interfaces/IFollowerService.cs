@@ -1,21 +1,13 @@
-﻿// Co-authored by: ChatGPT (https://chat.openai.com/)
-
+﻿using Microsoft.AspNetCore.Mvc;
 using MiniTwit.Shared.DTO.Followers.FollowUser;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace MiniTwit.Shared.EndpointContracts.Followers
+namespace MiniTwit.Api.Services.Interfaces
 {
     public interface IFollowerService
     {
-        Task<HttpResponseMessage> FollowUserAsync(
-            string currentUsername,
-            FollowRequest followRequest
-        );
-
-        Task<HttpResponseMessage> UnfollowUserAsync(
-            string currentUsername,
-            UnfollowRequest unfollowRequest
-        );
-
-        Task<GetFollowersResponse> GetFollowersAsync(string currentUsername, int limit = 100);
+        Task<IActionResult> GetFollowersAsync(string username, int no, int latest, CancellationToken cancellationToken);
+        Task<IActionResult> FollowOrUnfollowAsync(string username, FollowOrUnfollowRequest request, int latest, CancellationToken cancellationToken);
     }
 }

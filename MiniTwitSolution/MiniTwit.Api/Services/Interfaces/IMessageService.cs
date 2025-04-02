@@ -1,18 +1,12 @@
-﻿using MiniTwit.Shared.DTO.Messages;
+﻿using Microsoft.AspNetCore.Mvc;
+using MiniTwit.Shared.DTO.Messages;
 
 namespace MiniTwit.Api.Services.Interfaces
 {
     public interface IMessageService
     {
-        Task<IList<GetMessageResponse>> GetMessagesForUserAsync(
-            string currentUsername,
-            int limit = 100
-        );
-        Task<IList<GetMessageResponse>> GetMessagesAsync(int limit = 100);
-
-        Task<HttpResponseMessage> PostMessageAsync(
-            string currentUsername,
-            PostMessageRequest messageRequest
-        );
+        Task<IActionResult> GetPublicMessagesAsync(int no, int latest, CancellationToken cancellationToken);
+        Task<IActionResult> GetUserMessagesAsync(string username, int no, int latest, CancellationToken cancellationToken);
+        Task<IActionResult> PostMessageAsync(string username, PostMessageRequest request, int latest, CancellationToken cancellationToken);
     }
 }

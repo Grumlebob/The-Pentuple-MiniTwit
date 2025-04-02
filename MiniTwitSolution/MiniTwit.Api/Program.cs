@@ -1,12 +1,4 @@
 using Microsoft.Extensions.Caching.Hybrid;
-using MiniTwit.Api.Features.Followers.GetFollowers;
-using MiniTwit.Api.Features.Followers.PostFollowUser;
-using MiniTwit.Api.Features.Latest.GetLatest;
-using MiniTwit.Api.Features.Messages.GetMessages;
-using MiniTwit.Api.Features.Messages.GetUserMessages;
-using MiniTwit.Api.Features.Messages.PostMessage;
-using MiniTwit.Api.Features.Users.Authentication.LogoutUser;
-using MiniTwit.Api.Features.Users.Authentication.RegisterUser;
 using MiniTwit.Api.Services;
 using MiniTwit.Api.Services.Interfaces;
 using MiniTwit.Api.Utility;
@@ -31,6 +23,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IFollowerService, FollowerService>();
+builder.Services.AddScoped<ILatestService, LatestService>();
 
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
@@ -161,22 +156,6 @@ app.UseCors("AllowBlazorClient");
 
 // Map controllers
 app.MapControllers();
-
-//Message endpoints
-app.MapPostMessageEndpoints(); // registers POST "/msgs/{username}" endpoint.
-app.MapGetMessagesEndpoints(); // registers GET "/msgs" endpoint.
-app.MapGetUserMessagesEndpoints(); // registers GET "/msgs/{username}" endpoint.
-
-// Map follow/unfollow endpoints.
-app.MapFollowUserEndpoints(); // registers POST "/fllws/{username}"
-app.MapGetFollowersEndpoints(); // registers GET "/fllws/{username}"
-
-// Map user endpoints.
-app.MapRegisterUserEndpoints(); // registers POST "/register"
-app.MapLogoutUserEndpoints(); // registers POST "/logout"
-
-// Map latest endpoints.
-app.MapGetLatestEndpoint();
 
 app.Run();
 

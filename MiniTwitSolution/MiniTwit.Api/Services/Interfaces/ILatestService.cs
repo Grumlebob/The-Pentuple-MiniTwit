@@ -1,10 +1,10 @@
+using Microsoft.AspNetCore.Mvc;
 using MiniTwit.Shared.DTO.Latest;
 
-namespace MiniTwit.Shared.EndpointContracts.Latest
+namespace MiniTwit.Api.Services.Interfaces
 {
     public interface ILatestService
     {
-        /// <returns>The latest event ID.</returns>
-        Task<GetLatestResponse> GetLatestAsync();
+        Task<IActionResult> GetLatestAsync(CancellationToken cancellationToken);
     }
 }
