@@ -5,11 +5,6 @@ echo "====== DEPLOYMENT STARTED ======"
 echo "Running as user: $(whoami)"
 echo "Current directory: $(pwd)"
 
-# Load environment variables if available
-if [ -f ~/.bash_profile ]; then
-  source ~/.bash_profile
-fi
-
 echo "Pulling latest Docker images..."
 docker compose -f docker-compose.yml pull || {
   echo "Docker pull failed. Checking Docker Compose file:"
