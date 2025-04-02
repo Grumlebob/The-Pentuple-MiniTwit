@@ -4,7 +4,6 @@ networks:
 services:
   api:
       image: ${DOCKER_USERNAME}/minitwit-api
-      container_name: minitwit-api
       networks:
         - main
       environment:
