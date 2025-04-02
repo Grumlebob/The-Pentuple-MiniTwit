@@ -6,17 +6,8 @@ using MiniTwit.Shared.DTO.Followers.FollowUser;
 
 namespace MiniTwit.Api.Services;
 
-public class FollowerService : IFollowerService
+public class FollowerService(MiniTwitDbContext db, HybridCache cache) : IFollowerService
 {
-    private readonly MiniTwitDbContext _db;
-    private readonly HybridCache _cache;
-
-    public FollowerService(MiniTwitDbContext db, HybridCache cache)
-    {
-        _db = db;
-        _cache = cache;
-    }
-
     public async Task<IActionResult> GetFollowersAsync(
         string username,
         int no,
@@ -24,7 +15,7 @@ public class FollowerService : IFollowerService
         CancellationToken cancellationToken
     )
     {
-        var user = await _db.Users.FirstOrDefaultAsync(
+        var user = await db.Users.FirstOrDefaultAsync(
             u => u.Username == username,
             cancellationToken
         );
@@ -34,13 +25,13 @@ public class FollowerService : IFollowerService
         }
 
         var cacheKey = $"followers:{username}:{no}";
-        var response = await _cache.GetOrCreateAsync<GetFollowersResponse>(
+        var response = await cache.GetOrCreateAsync<GetFollowersResponse>(
             cacheKey,
             async ct =>
             {
                 var followUsernames = await (
-                    from f in _db.Followers
-                    join u in _db.Users on f.WhomId equals u.UserId
+                    from f in db.Followers
+                    join u in db.Users on f.WhomId equals u.UserId
                     where f.WhoId == user.UserId
                     select u.Username
                 )
@@ -58,7 +49,7 @@ public class FollowerService : IFollowerService
             tags: new[] { $"followers:{username}" }
         );
 
-        await UpdateLatest.UpdateLatestStateAsync(latest, _db, _cache, cancellationToken);
+        await UpdateLatest.UpdateLatestStateAsync(latest, db, cache, cancellationToken);
         return new OkObjectResult(response);
     }
 
@@ -82,11 +73,11 @@ public class FollowerService : IFollowerService
         var targetUsername = request.Follow ?? request.Unfollow!;
         var followAction = request.Follow is not null;
 
-        var currentUser = await _db.Users.FirstOrDefaultAsync(
+        var currentUser = await db.Users.FirstOrDefaultAsync(
             u => u.Username == username,
             cancellationToken
         );
-        var targetUser = await _db.Users.FirstOrDefaultAsync(
+        var targetUser = await db.Users.FirstOrDefaultAsync(
             u => u.Username == targetUsername,
             cancellationToken
         );
@@ -102,17 +93,17 @@ public class FollowerService : IFollowerService
             WhomId = targetUser.UserId,
         };
 
-        var alreadyFollowing = await _db.Followers.AnyAsync(
+        var alreadyFollowing = await db.Followers.AnyAsync(
             f => f.WhoId == currentUser.UserId && f.WhomId == targetUser.UserId,
             cancellationToken
         );
 
         if (!followAction && alreadyFollowing)
         {
-            _db.Followers.Remove(followRelation);
-            await _db.SaveChangesAsync(cancellationToken);
-            await _cache.RemoveByTagAsync($"followers:{username}", cancellationToken);
-            await UpdateLatest.UpdateLatestStateAsync(latest, _db, _cache, cancellationToken);
+            db.Followers.Remove(followRelation);
+            await db.SaveChangesAsync(cancellationToken);
+            await cache.RemoveByTagAsync($"followers:{username}", cancellationToken);
+            await UpdateLatest.UpdateLatestStateAsync(latest, db, cache, cancellationToken);
             return new NoContentResult();
         }
 
@@ -121,10 +112,10 @@ public class FollowerService : IFollowerService
             return new ConflictObjectResult("Already following this user.");
         }
 
-        _db.Followers.Add(followRelation);
-        await _db.SaveChangesAsync(cancellationToken);
-        await _cache.RemoveByTagAsync($"followers:{username}", cancellationToken);
-        await UpdateLatest.UpdateLatestStateAsync(latest, _db, _cache, cancellationToken);
+        db.Followers.Add(followRelation);
+        await db.SaveChangesAsync(cancellationToken);
+        await cache.RemoveByTagAsync($"followers:{username}", cancellationToken);
+        await UpdateLatest.UpdateLatestStateAsync(latest, db, cache, cancellationToken);
         return new NoContentResult();
     }
 }

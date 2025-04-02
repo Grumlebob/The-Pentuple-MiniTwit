@@ -5,26 +5,17 @@ using MiniTwit.Shared.DTO.Latest;
 
 namespace MiniTwit.Api.Services;
 
-public class LatestService : ILatestService
+public class LatestService(MiniTwitDbContext db, HybridCache cache) : ILatestService
 {
-    private readonly MiniTwitDbContext _db;
-    private readonly HybridCache _cache;
-
-    public LatestService(MiniTwitDbContext db, HybridCache cache)
-    {
-        _db = db;
-        _cache = cache;
-    }
-
     public async Task<IActionResult> GetLatestAsync(CancellationToken cancellationToken)
     {
         const string cacheKey = "latestEvent";
 
-        var response = await _cache.GetOrCreateAsync<GetLatestResponse>(
+        var response = await cache.GetOrCreateAsync<GetLatestResponse>(
             cacheKey,
             async ct =>
             {
-                var latest = await _db.Latests.AsNoTracking().Where(l => l.Id == 1).FirstAsync(ct);
+                var latest = await db.Latests.AsNoTracking().Where(l => l.Id == 1).FirstAsync(ct);
 
                 return new GetLatestResponse(latest.LatestEventId);
             },

@@ -6,17 +6,8 @@ using MiniTwit.Shared.DTO.Messages;
 
 namespace MiniTwit.Api.Services;
 
-public class MessageService : IMessageService
+public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageService
 {
-    private readonly MiniTwitDbContext _db;
-    private readonly HybridCache _cache;
-
-    public MessageService(MiniTwitDbContext db, HybridCache cache)
-    {
-        _db = db;
-        _cache = cache;
-    }
-
     public async Task<IActionResult> GetPublicMessagesAsync(
         int no,
         int latest,
@@ -25,11 +16,11 @@ public class MessageService : IMessageService
     {
         var cacheKey = $"publicTimeline:{no}";
 
-        var response = await _cache.GetOrCreateAsync<List<GetMessageResponse>>(
+        var response = await cache.GetOrCreateAsync<List<GetMessageResponse>>(
             cacheKey,
             async ct =>
             {
-                var messages = await _db
+                var messages = await db
                     .Messages.Where(m => m.Flagged == 0)
                     .Include(m => m.Author)
                     .OrderByDescending(m => m.PubDate)
@@ -49,8 +40,8 @@ public class MessageService : IMessageService
             tags: new[] { "publicTimeline" }
         );
 
-        await UpdateLatest.UpdateLatestStateAsync(latest, _db, _cache, cancellationToken);
-        await _cache.RemoveAsync("latestEvent");
+        await UpdateLatest.UpdateLatestStateAsync(latest, db, cache, cancellationToken);
+        await cache.RemoveAsync("latestEvent");
 
         return new OkObjectResult(response);
     }
@@ -62,7 +53,7 @@ public class MessageService : IMessageService
         CancellationToken cancellationToken
     )
     {
-        var user = await _db.Users.FirstOrDefaultAsync(
+        var user = await db.Users.FirstOrDefaultAsync(
             u => u.Username == username,
             cancellationToken
         );
@@ -73,11 +64,11 @@ public class MessageService : IMessageService
 
         var cacheKey = $"userTimeline:{username}:{no}";
 
-        var response = await _cache.GetOrCreateAsync<List<GetMessageResponse>>(
+        var response = await cache.GetOrCreateAsync<List<GetMessageResponse>>(
             cacheKey,
             async ct =>
             {
-                var messages = await _db
+                var messages = await db
                     .Messages.Where(m => m.AuthorId == user.UserId && m.Flagged == 0)
                     .OrderByDescending(m => m.PubDate)
                     .Take(no)
@@ -96,7 +87,7 @@ public class MessageService : IMessageService
             tags: new[] { $"userTimeline:{username}" }
         );
 
-        await UpdateLatest.UpdateLatestStateAsync(latest, _db, _cache, cancellationToken);
+        await UpdateLatest.UpdateLatestStateAsync(latest, db, cache, cancellationToken);
 
         if (response.Count == 0)
         {
@@ -113,7 +104,7 @@ public class MessageService : IMessageService
         CancellationToken cancellationToken
     )
     {
-        var author = await _db.Users.FirstOrDefaultAsync(
+        var author = await db.Users.FirstOrDefaultAsync(
             u => u.Username == username,
             cancellationToken
         );
@@ -132,23 +123,23 @@ public class MessageService : IMessageService
             Flagged = 0,
         };
 
-        _db.Messages.Add(message);
-        await _db.SaveChangesAsync(cancellationToken);
+        db.Messages.Add(message);
+        await db.SaveChangesAsync(cancellationToken);
 
-        await _cache.RemoveByTagAsync("publicTimeline", cancellationToken);
-        await _cache.RemoveByTagAsync($"userTimeline:{author.Username}", cancellationToken);
+        await cache.RemoveByTagAsync("publicTimeline", cancellationToken);
+        await cache.RemoveByTagAsync($"userTimeline:{author.Username}", cancellationToken);
 
-        var followerIds = await _db
+        var followerIds = await db
             .Followers.Where(f => f.WhomId == author.UserId)
             .Select(f => f.WhoId)
             .ToListAsync(cancellationToken);
 
         foreach (var followerId in followerIds)
         {
-            await _cache.RemoveByTagAsync($"privateTimeline:{followerId}", cancellationToken);
+            await cache.RemoveByTagAsync($"privateTimeline:{followerId}", cancellationToken);
         }
 
-        await UpdateLatest.UpdateLatestStateAsync(latest, _db, _cache, cancellationToken);
+        await UpdateLatest.UpdateLatestStateAsync(latest, db, cache, cancellationToken);
 
         return new NoContentResult();
     }

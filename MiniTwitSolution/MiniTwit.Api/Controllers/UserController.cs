@@ -7,6 +7,7 @@ using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
 namespace MiniTwit.Api.Controllers;
 
 [ApiController]
+[Route("/")]
 public class UserController(IUserService userService) : ControllerBase
 {
     [HttpPost("login")]

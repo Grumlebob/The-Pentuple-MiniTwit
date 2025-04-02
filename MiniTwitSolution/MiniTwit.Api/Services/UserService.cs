@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.Services.Interfaces;
 using MiniTwit.Api.Utility;
@@ -9,17 +6,10 @@ using MiniTwit.Shared.DTO.Users.Authentication.LoginUser;
 using MiniTwit.Shared.DTO.Users.Authentication.LogoutUser;
 using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
 
-public class UserService : IUserService
+namespace MiniTwit.Api.Services;
+
+public class UserService(MiniTwitDbContext db, HybridCache hybridCache) : IUserService
 {
-    private readonly MiniTwitDbContext _db;
-    private readonly HybridCache _hybridCache;
-
-    public UserService(MiniTwitDbContext db, HybridCache hybridCache)
-    {
-        _db = db;
-        _hybridCache = hybridCache;
-    }
-
     public async Task<IActionResult> LoginAsync(
         LoginUserRequest request,
         int latest,
@@ -27,7 +17,7 @@ public class UserService : IUserService
     )
     {
         // Find the user by username.
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
         if (user is null)
         {
             return new NotFoundObjectResult("User not found.");
@@ -44,7 +34,7 @@ public class UserService : IUserService
 
         var responseDto = new LoginUserResponse(user.UserId, user.Username, user.Email, token);
 
-        await UpdateLatest.UpdateLatestStateAsync(latest, _db, _hybridCache, cancellationToken);
+        await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
 
         return new OkObjectResult(responseDto);
     }
@@ -55,7 +45,7 @@ public class UserService : IUserService
         CancellationToken cancellationToken
     )
     {
-        var existingUser = await _db.Users.FirstOrDefaultAsync(
+        var existingUser = await db.Users.FirstOrDefaultAsync(
             u => u.Email == registerRequest.Email || u.Username == registerRequest.Username,
             cancellationToken
         );
@@ -75,10 +65,10 @@ public class UserService : IUserService
             PwHash = registerRequest.Password,
         };
 
-        _db.Users.Add(newUser);
-        await _db.SaveChangesAsync(cancellationToken);
+        db.Users.Add(newUser);
+        await db.SaveChangesAsync(cancellationToken);
 
-        await UpdateLatest.UpdateLatestStateAsync(latest, _db, _hybridCache, cancellationToken);
+        await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
 
         return new NoContentResult();
     }
@@ -91,7 +81,7 @@ public class UserService : IUserService
         // In a real application, you might clear authentication cookies or invalidate a token.
         var responseDto = new LogoutUserResponse(true, "Logged out successfully.");
 
-        await UpdateLatest.UpdateLatestStateAsync(latest, _db, _hybridCache, cancellationToken);
+        await UpdateLatest.UpdateLatestStateAsync(latest, db, hybridCache, cancellationToken);
 
         return new OkObjectResult(responseDto);
     }
