@@ -24,20 +24,18 @@ public class LatestService : ILatestService
             cacheKey,
             async ct =>
             {
-                var latest = await _db.Latests
-                    .AsNoTracking()
-                    .Where(l => l.Id == 1)
-                    .FirstAsync(ct);
+                var latest = await _db.Latests.AsNoTracking().Where(l => l.Id == 1).FirstAsync(ct);
 
                 return new GetLatestResponse(latest.LatestEventId);
             },
             new HybridCacheEntryOptions
             {
                 LocalCacheExpiration = TimeSpan.FromMinutes(5),
-                Expiration = TimeSpan.FromMinutes(5)
+                Expiration = TimeSpan.FromMinutes(5),
             },
             cancellationToken: cancellationToken,
-            tags: new[] { cacheKey });
+            tags: new[] { cacheKey }
+        );
 
         return new OkObjectResult(response);
     }

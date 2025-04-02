@@ -13,7 +13,8 @@ public class FollowerController(IFollowerService followerService) : ControllerBa
         string username,
         [FromQuery] int no = 100,
         [FromQuery] int latest = -1,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await followerService.GetFollowersAsync(username, no, latest, cancellationToken);
     }
@@ -23,8 +24,14 @@ public class FollowerController(IFollowerService followerService) : ControllerBa
         string username,
         [FromBody] FollowOrUnfollowRequest request,
         [FromQuery] int latest = -1,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await followerService.FollowOrUnfollowAsync(username, request, latest, cancellationToken);
+        return await followerService.FollowOrUnfollowAsync(
+            username,
+            request,
+            latest,
+            cancellationToken
+        );
     }
 }

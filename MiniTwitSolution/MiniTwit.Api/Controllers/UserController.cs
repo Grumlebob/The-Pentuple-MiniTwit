@@ -13,7 +13,8 @@ public class UserController(IUserService userService) : ControllerBase
     public async Task<IActionResult> Login(
         [FromBody] LoginUserRequest request,
         [FromQuery] int latest = -1,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await userService.LoginAsync(request, latest, cancellationToken);
     }
@@ -22,7 +23,8 @@ public class UserController(IUserService userService) : ControllerBase
     public async Task<IActionResult> Register(
         [FromBody] RegisterUserRequest request,
         [FromQuery] int latest = -1,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await userService.RegisterUserAsync(request, latest, cancellationToken);
     }
@@ -30,7 +32,8 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpPost("logout")]
     public async Task<IActionResult> Logout(
         [FromQuery] int latest = -1,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await userService.LogoutUserAsync(latest, cancellationToken);
     }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.Services.Interfaces;
@@ -6,8 +8,6 @@ using MiniTwit.Api.Utility;
 using MiniTwit.Shared.DTO.Users.Authentication.LoginUser;
 using MiniTwit.Shared.DTO.Users.Authentication.LogoutUser;
 using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
-using System.Threading;
-using System.Threading.Tasks;
 
 public class UserService : IUserService
 {
@@ -20,7 +20,11 @@ public class UserService : IUserService
         _hybridCache = hybridCache;
     }
 
-    public async Task<IActionResult> LoginAsync(LoginUserRequest request, int latest, CancellationToken cancellationToken)
+    public async Task<IActionResult> LoginAsync(
+        LoginUserRequest request,
+        int latest,
+        CancellationToken cancellationToken
+    )
     {
         // Find the user by username.
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
@@ -38,26 +42,29 @@ public class UserService : IUserService
         // Generate a token (for demonstration, a fake token is returned).
         var token = "fake-token";
 
-        var responseDto = new LoginUserResponse(
-            user.UserId,
-            user.Username,
-            user.Email,
-            token
-        );
+        var responseDto = new LoginUserResponse(user.UserId, user.Username, user.Email, token);
 
         await UpdateLatest.UpdateLatestStateAsync(latest, _db, _hybridCache, cancellationToken);
 
         return new OkObjectResult(responseDto);
     }
 
-    public async Task<IActionResult> RegisterUserAsync(RegisterUserRequest registerRequest, int latest, CancellationToken cancellationToken)
+    public async Task<IActionResult> RegisterUserAsync(
+        RegisterUserRequest registerRequest,
+        int latest,
+        CancellationToken cancellationToken
+    )
     {
-        var existingUser = await _db.Users.FirstOrDefaultAsync(u =>
-            u.Email == registerRequest.Email || u.Username == registerRequest.Username, cancellationToken);
+        var existingUser = await _db.Users.FirstOrDefaultAsync(
+            u => u.Email == registerRequest.Email || u.Username == registerRequest.Username,
+            cancellationToken
+        );
 
         if (existingUser is not null)
         {
-            return new ConflictObjectResult("A user with the same email or username already exists.");
+            return new ConflictObjectResult(
+                "A user with the same email or username already exists."
+            );
         }
 
         // Create a new user. (For demonstration, we use the password directly as the hash.)
@@ -76,7 +83,10 @@ public class UserService : IUserService
         return new NoContentResult();
     }
 
-    public async Task<IActionResult> LogoutUserAsync(int latest, CancellationToken cancellationToken)
+    public async Task<IActionResult> LogoutUserAsync(
+        int latest,
+        CancellationToken cancellationToken
+    )
     {
         // In a real application, you might clear authentication cookies or invalidate a token.
         var responseDto = new LogoutUserResponse(true, "Logged out successfully.");

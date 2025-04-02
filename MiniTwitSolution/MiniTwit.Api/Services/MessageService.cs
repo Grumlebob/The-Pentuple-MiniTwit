@@ -17,7 +17,11 @@ public class MessageService : IMessageService
         _cache = cache;
     }
 
-    public async Task<IActionResult> GetPublicMessagesAsync(int no, int latest, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetPublicMessagesAsync(
+        int no,
+        int latest,
+        CancellationToken cancellationToken
+    )
     {
         var cacheKey = $"publicTimeline:{no}";
 
@@ -25,8 +29,8 @@ public class MessageService : IMessageService
             cacheKey,
             async ct =>
             {
-                var messages = await _db.Messages
-                    .Where(m => m.Flagged == 0)
+                var messages = await _db
+                    .Messages.Where(m => m.Flagged == 0)
                     .Include(m => m.Author)
                     .OrderByDescending(m => m.PubDate)
                     .Take(no)
@@ -37,11 +41,13 @@ public class MessageService : IMessageService
                         m.MessageId,
                         m.PubDate,
                         m.Author!.Username,
-                        m.Text))
+                        m.Text
+                    ))
                     .ToList();
             },
             cancellationToken: cancellationToken,
-            tags: new[] { "publicTimeline" });
+            tags: new[] { "publicTimeline" }
+        );
 
         await UpdateLatest.UpdateLatestStateAsync(latest, _db, _cache, cancellationToken);
         await _cache.RemoveAsync("latestEvent");
@@ -49,9 +55,17 @@ public class MessageService : IMessageService
         return new OkObjectResult(response);
     }
 
-    public async Task<IActionResult> GetUserMessagesAsync(string username, int no, int latest, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUserMessagesAsync(
+        string username,
+        int no,
+        int latest,
+        CancellationToken cancellationToken
+    )
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+        var user = await _db.Users.FirstOrDefaultAsync(
+            u => u.Username == username,
+            cancellationToken
+        );
         if (user == null)
         {
             return new NotFoundObjectResult("User not found.");
@@ -63,8 +77,8 @@ public class MessageService : IMessageService
             cacheKey,
             async ct =>
             {
-                var messages = await _db.Messages
-                    .Where(m => m.AuthorId == user.UserId && m.Flagged == 0)
+                var messages = await _db
+                    .Messages.Where(m => m.AuthorId == user.UserId && m.Flagged == 0)
                     .OrderByDescending(m => m.PubDate)
                     .Take(no)
                     .ToListAsync(ct);
@@ -74,11 +88,13 @@ public class MessageService : IMessageService
                         m.MessageId,
                         m.PubDate,
                         user.Username,
-                        m.Text))
+                        m.Text
+                    ))
                     .ToList();
             },
             cancellationToken: cancellationToken,
-            tags: new[] { $"userTimeline:{username}" });
+            tags: new[] { $"userTimeline:{username}" }
+        );
 
         await UpdateLatest.UpdateLatestStateAsync(latest, _db, _cache, cancellationToken);
 
@@ -90,9 +106,17 @@ public class MessageService : IMessageService
         return new OkObjectResult(response);
     }
 
-    public async Task<IActionResult> PostMessageAsync(string username, PostMessageRequest request, int latest, CancellationToken cancellationToken)
+    public async Task<IActionResult> PostMessageAsync(
+        string username,
+        PostMessageRequest request,
+        int latest,
+        CancellationToken cancellationToken
+    )
     {
-        var author = await _db.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+        var author = await _db.Users.FirstOrDefaultAsync(
+            u => u.Username == username,
+            cancellationToken
+        );
         if (author == null)
         {
             return new BadRequestObjectResult("Author not found.");
@@ -114,8 +138,8 @@ public class MessageService : IMessageService
         await _cache.RemoveByTagAsync("publicTimeline", cancellationToken);
         await _cache.RemoveByTagAsync($"userTimeline:{author.Username}", cancellationToken);
 
-        var followerIds = await _db.Followers
-            .Where(f => f.WhomId == author.UserId)
+        var followerIds = await _db
+            .Followers.Where(f => f.WhomId == author.UserId)
             .Select(f => f.WhoId)
             .ToListAsync(cancellationToken);
 

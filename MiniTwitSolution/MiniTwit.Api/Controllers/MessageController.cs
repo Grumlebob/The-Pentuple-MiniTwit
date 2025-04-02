@@ -12,7 +12,8 @@ public class MessageController(IMessageService messageService) : ControllerBase
     public async Task<IActionResult> GetPublicMessages(
         [FromQuery] int no = 100,
         [FromQuery] int latest = -1,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await messageService.GetPublicMessagesAsync(no, latest, cancellationToken);
     }
@@ -22,7 +23,8 @@ public class MessageController(IMessageService messageService) : ControllerBase
         string username,
         [FromQuery] int no = 100,
         [FromQuery] int latest = -1,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await messageService.GetUserMessagesAsync(username, no, latest, cancellationToken);
     }
@@ -32,7 +34,8 @@ public class MessageController(IMessageService messageService) : ControllerBase
         string username,
         [FromBody] PostMessageRequest request,
         [FromQuery] int latest = -1,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await messageService.PostMessageAsync(username, request, latest, cancellationToken);
     }

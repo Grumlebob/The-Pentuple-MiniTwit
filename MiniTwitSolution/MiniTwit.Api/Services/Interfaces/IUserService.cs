@@ -7,8 +7,16 @@ namespace MiniTwit.Api.Services.Interfaces;
 
 public interface IUserService
 {
-    Task<IActionResult> RegisterUserAsync(RegisterUserRequest registerRequest, int latest, CancellationToken cancellationToken);
-    Task<IActionResult> LoginAsync(LoginUserRequest request, int latest, CancellationToken cancellationToken);
-    
+    Task<IActionResult> RegisterUserAsync(
+        RegisterUserRequest registerRequest,
+        int latest,
+        CancellationToken cancellationToken
+    );
+    Task<IActionResult> LoginAsync(
+        LoginUserRequest request,
+        int latest,
+        CancellationToken cancellationToken
+    );
+
     Task<IActionResult> LogoutUserAsync(int latest, CancellationToken cancellationToken);
 }

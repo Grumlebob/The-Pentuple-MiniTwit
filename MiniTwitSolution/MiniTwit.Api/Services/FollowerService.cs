@@ -17,9 +17,17 @@ public class FollowerService : IFollowerService
         _cache = cache;
     }
 
-    public async Task<IActionResult> GetFollowersAsync(string username, int no, int latest, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetFollowersAsync(
+        string username,
+        int no,
+        int latest,
+        CancellationToken cancellationToken
+    )
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+        var user = await _db.Users.FirstOrDefaultAsync(
+            u => u.Username == username,
+            cancellationToken
+        );
         if (user == null)
         {
             return new NotFoundObjectResult("User not found.");
@@ -35,35 +43,53 @@ public class FollowerService : IFollowerService
                     join u in _db.Users on f.WhomId equals u.UserId
                     where f.WhoId == user.UserId
                     select u.Username
-                ).Take(no).ToListAsync(ct);
+                )
+                    .Take(no)
+                    .ToListAsync(ct);
 
                 return new GetFollowersResponse(followUsernames);
             },
             new HybridCacheEntryOptions
             {
                 LocalCacheExpiration = TimeSpan.FromMinutes(5),
-                Expiration = TimeSpan.FromMinutes(5)
+                Expiration = TimeSpan.FromMinutes(5),
             },
             cancellationToken: cancellationToken,
-            tags: new[] { $"followers:{username}" });
+            tags: new[] { $"followers:{username}" }
+        );
 
         await UpdateLatest.UpdateLatestStateAsync(latest, _db, _cache, cancellationToken);
         return new OkObjectResult(response);
     }
 
-    public async Task<IActionResult> FollowOrUnfollowAsync(string username, FollowOrUnfollowRequest request, int latest, CancellationToken cancellationToken)
+    public async Task<IActionResult> FollowOrUnfollowAsync(
+        string username,
+        FollowOrUnfollowRequest request,
+        int latest,
+        CancellationToken cancellationToken
+    )
     {
-        if ((request.Follow is not null && request.Unfollow is not null) ||
-            (request.Follow is null && request.Unfollow is null))
+        if (
+            (request.Follow is not null && request.Unfollow is not null)
+            || (request.Follow is null && request.Unfollow is null)
+        )
         {
-            return new BadRequestObjectResult("You must provide either 'follow' or 'unfollow', but not both.");
+            return new BadRequestObjectResult(
+                "You must provide either 'follow' or 'unfollow', but not both."
+            );
         }
 
         var targetUsername = request.Follow ?? request.Unfollow!;
         var followAction = request.Follow is not null;
 
-        var currentUser = await _db.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
-        var targetUser = await _db.Users.FirstOrDefaultAsync(u => u.Username == targetUsername, cancellationToken);
+        var currentUser = await _db.Users.FirstOrDefaultAsync(
+            u => u.Username == username,
+            cancellationToken
+        );
+        var targetUser = await _db.Users.FirstOrDefaultAsync(
+            u => u.Username == targetUsername,
+            cancellationToken
+        );
 
         if (currentUser == null || targetUser == null)
         {
@@ -78,7 +104,8 @@ public class FollowerService : IFollowerService
 
         var alreadyFollowing = await _db.Followers.AnyAsync(
             f => f.WhoId == currentUser.UserId && f.WhomId == targetUser.UserId,
-            cancellationToken);
+            cancellationToken
+        );
 
         if (!followAction && alreadyFollowing)
         {
