@@ -35,7 +35,7 @@ jobs:
           echo "=== Content of MiniTwitSolution/remote_files directory ==="
           ls -la MiniTwitSolution/remote_files || echo "Directory not found"
 
-      # Build & push steps for Migrator, API, Client, and Simulator images
+      # Build & push steps for Migrator, API, Client images
       - name: Build & Push Migrator
         uses: docker/build-push-action@v6
         with:
@@ -65,16 +65,6 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-client:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-client:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-client:buildcache,mode=max
-
-      - name: Build & Push Simulator
-        uses: docker/build-push-action@v6
-        with:
-          context: ./MiniTwitSolution/Simulator
-          file: ./MiniTwitSolution/Simulator/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:buildcache,mode=max
 
       - name: Configure SSH for deployment
         run: |

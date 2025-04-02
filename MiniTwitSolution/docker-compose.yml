@@ -71,14 +71,3 @@ services:
     ports:
       - published: 5001
         target: 80
-
-  simulator:
-    build:
-      context: ./Simulator
-      dockerfile: Dockerfile
-     # Also wait for the API container to start
-    depends_on:
-      api:
-        condition: service_started
-    environment:
-      SIMULATOR_HOST: http://api:8080
