@@ -47,7 +47,7 @@ var clientBaseUrl = builder.Configuration["ClientBaseUrl"];
 if (string.IsNullOrEmpty(clientBaseUrl))
 {
     throw new Exception(
-        "API base URL is not configured. Please set ApiBaseUrl in appsettings.json."
+        "Client base URL is not configured. Please set ClientBaseUrl in appsettings.json."
     );
 }
 

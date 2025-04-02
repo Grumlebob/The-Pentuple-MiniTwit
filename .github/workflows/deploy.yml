@@ -35,7 +35,7 @@ jobs:
           echo "=== Content of MiniTwitSolution/remote_files directory ==="
           ls -la MiniTwitSolution/remote_files || echo "Directory not found"
 
-      # Build & push steps for Migrator, API, Client, and Simulator images
+      # Build & push steps for Migrator, API, Client images
       - name: Build & Push Migrator
         uses: docker/build-push-action@v6
         with:
@@ -66,54 +66,64 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-client:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-client:buildcache,mode=max
 
-      - name: Build & Push Simulator
-        uses: docker/build-push-action@v6
-        with:
-          context: ./MiniTwitSolution/Simulator
-          file: ./MiniTwitSolution/Simulator/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-simulator:buildcache,mode=max
-
       - name: Configure SSH for deployment
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/do_ssh_key
           chmod 600 ~/.ssh/do_ssh_key
-
-      - name: Copy deployment script to server
-        run: |
-          echo "Copying deploy.sh to server..."
-          if [ -f ./MiniTwitSolution/remote_files/deploy.sh ]; then
-            scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/minitwit/deploy.sh
-            echo "Copy completed"
-          else
-            echo "ERROR: deploy.sh not found at expected location!"
-            exit 1
-          fi
-
-      - name: Copy docker-compose.yml to server
+          
+      - name: Copy migration docker-compose.yml to api
         run: |
           echo "Copying docker-compose.yml to server..."
-          if [ -f ./MiniTwitSolution/remote_files/docker-compose.yml ]; then
-            scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/minitwit/docker-compose.yml
-            echo "Copy completed"
-          else
-            echo "ERROR: docker-compose.yml not found at expected location!"
-            echo "Will continue but deployment might fail"
-          fi
-
-      - name: Verify files on server
+          scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/migrator/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.API_IP }}:~/migrator/docker-compose.yml
+          echo "Copy completed"
+          
+      - name: Copy migration script to manager
         run: |
-          echo "Verifying files on server..."
-          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+          echo "Copying docker-compose.yml to server..."
+          scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/migrator/doMigration.sh ${{ secrets.SSH_USER }}@${{ secrets.MANAGER_IP }}:~/migrator/doMigration.sh
+          echo "Copy completed"
+          
+      - name: Run Migration on API Droplet
+        run: |
+          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.API_IP }} \
             -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
-            'echo "Files in /minitwit:"; ls -la /minitwit/; echo ""; echo "File permissions:"; stat /minitwit/deploy.sh || echo "deploy.sh not found"'
+            'cd ~/migrator && bash -x doMigration.sh'
 
-      - name: Deploy to Server
+      - name: Copy deployment script to api
+        run: |
+          echo "Copying deploy.sh to server..."
+          scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/api-swarm/deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.API_IP }}:~/minitwit/deploy.sh
+          echo "Copy completed"
+
+      - name: Copy docker-compose.yml to api
+        run: |
+          echo "Copying docker-compose.yml to server..."
+          scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/api-swarm/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.API_IP }}:~/minitwit/docker-compose.yml
+          echo "Copy completed"
+
+      - name: Deploy to api
         run: |
           echo "Starting deployment..."
-          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.API_IP }} \
             -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
-            'cd /minitwit && chmod +x deploy.sh && bash -x deploy.sh || { echo "DEPLOYMENT FAILED WITH ERROR $?"; cat deploy.sh; }'
+            'cd ~/minitwit && chmod +x deploy.sh && bash -x deploy.sh || { echo "DEPLOYMENT FAILED WITH ERROR $?"; cat deploy.sh; }'
+
+      - name: Copy deployment script to client
+        run: |
+          echo "Copying deploy.sh to server..."
+          scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/client/deploy.sh ${{ secrets.SSH_USER }}@${{ secrets.CLIENT_IP }}:~/minitwit/deploy.sh
+          echo "Copy completed"
+
+      - name: Copy docker-compose.yml to client
+        run: |
+          echo "Copying docker-compose.yml to server..."
+          scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/client/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.CLIENT_IP }}:~/minitwit/docker-compose.yml
+          echo "Copy completed"
+
+      - name: Deploy to client
+        run: |
+          echo "Starting deployment..."
+          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.CLIENT_IP }} \
+            -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no \
+            'cd ~/minitwit && chmod +x deploy.sh && bash -x deploy.sh || { echo "DEPLOYMENT FAILED WITH ERROR $?"; cat deploy.sh; }'

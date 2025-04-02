@@ -29,8 +29,6 @@ jobs:
         include:
           - language: csharp
             build-mode: none
-          - language: python
-            build-mode: none
 
     steps:
       - name: Checkout repository

@@ -1,0 +1,18 @@
+networks:
+  main:
+
+services:
+  api:
+      image: ${DOCKER_USERNAME}/minitwit-api
+      networks:
+        - main
+      environment:
+        ASPNETCORE_ENVIRONMENT: "Development"
+        ConnectionStrings__DefaultConnection: "Host=209.38.183.74;Port=5433;Database=MiniTwitDb;Username=${MINITWIT_DB_USER};Password=${MINITWIT_DB_PASSWORD}"
+      ports:
+          - published: 5002
+            target: 8080
+      deploy:
+        placement:
+          constraints:
+            - node.role == worker

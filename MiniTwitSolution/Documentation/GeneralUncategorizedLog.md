@@ -454,3 +454,8 @@ Our own docker images currently does not use versioning.
 We just give them the tag latest. 
 This is the easiest since we have continuous deployment.
 To change this we need to edit the deploy.yaml script in GitHub workflows.
+
+# 02.04
+
+The migration dockerfile has been updated to run once and then terminate. Meaning we cannot do health checks on it. 
+The local docker-compose has been updated to reflect this. However it doesn't guarantee that a migration is run before the api. This needs to be looked at. 
