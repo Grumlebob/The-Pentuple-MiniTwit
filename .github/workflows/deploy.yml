@@ -73,7 +73,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/do_ssh_key
           chmod 600 ~/.ssh/do_ssh_key
-          rm -f .ssh/known_hosts
+          rm -f ~/.ssh/known_hosts
           
       - name: Copy migration docker-compose.yml to api
         run: |
