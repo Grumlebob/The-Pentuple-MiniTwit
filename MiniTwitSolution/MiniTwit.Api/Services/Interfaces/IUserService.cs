@@ -1,9 +1,9 @@
 ﻿using MiniTwit.Shared.DTO.Users.Authentication.LoginUser;
 using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
 
-namespace MiniTwit.Shared.EndpointContracts.Users;
+namespace MiniTwit.Api.Services.Interfaces;
 
-public interface IUserServices
+public interface IUserService
 {
     Task<HttpResponseMessage> RegisterUserAsync(RegisterUserRequest registerRequest);
     Task<HttpResponseMessage> LoginUserAsync(LoginUserRequest loginRequest);

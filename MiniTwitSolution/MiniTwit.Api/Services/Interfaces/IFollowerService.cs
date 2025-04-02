@@ -16,7 +16,6 @@ namespace MiniTwit.Shared.EndpointContracts.Followers
             UnfollowRequest unfollowRequest
         );
 
-        /// <returns>List of usernames that follow current user </returns>
         Task<GetFollowersResponse> GetFollowersAsync(string currentUsername, int limit = 100);
     }
 }

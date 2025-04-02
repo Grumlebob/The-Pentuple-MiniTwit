@@ -5,9 +5,10 @@ using MiniTwit.Api.Features.Latest.GetLatest;
 using MiniTwit.Api.Features.Messages.GetMessages;
 using MiniTwit.Api.Features.Messages.GetUserMessages;
 using MiniTwit.Api.Features.Messages.PostMessage;
-using MiniTwit.Api.Features.Users.Authentication.LoginUser;
 using MiniTwit.Api.Features.Users.Authentication.LogoutUser;
 using MiniTwit.Api.Features.Users.Authentication.RegisterUser;
+using MiniTwit.Api.Services;
+using MiniTwit.Api.Services.Interfaces;
 using MiniTwit.Api.Utility;
 using Serilog;
 using Serilog.Extensions;
@@ -27,6 +28,9 @@ builder.Host.UseSerilog();
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddControllers();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
@@ -155,6 +159,9 @@ app.UseSerilogRequestLogging(options =>
 
 app.UseCors("AllowBlazorClient");
 
+// Map controllers
+app.MapControllers();
+
 //Message endpoints
 app.MapPostMessageEndpoints(); // registers POST "/msgs/{username}" endpoint.
 app.MapGetMessagesEndpoints(); // registers GET "/msgs" endpoint.
@@ -166,7 +173,6 @@ app.MapGetFollowersEndpoints(); // registers GET "/fllws/{username}"
 
 // Map user endpoints.
 app.MapRegisterUserEndpoints(); // registers POST "/register"
-app.MapLoginUserEndpoints(); // registers POST "/login"
 app.MapLogoutUserEndpoints(); // registers POST "/logout"
 
 // Map latest endpoints.

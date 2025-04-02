@@ -4,14 +4,10 @@ using MiniTwit.Shared.DTO.Latest;
 using MiniTwit.Shared.DTO.Messages;
 using MiniTwit.Shared.DTO.Users.Authentication.LoginUser;
 using MiniTwit.Shared.DTO.Users.Authentication.RegisterUser;
-using MiniTwit.Shared.EndpointContracts.Followers;
-using MiniTwit.Shared.EndpointContracts.Latest;
-using MiniTwit.Shared.EndpointContracts.Messages;
-using MiniTwit.Shared.EndpointContracts.Users;
 
 namespace MiniTwit.Client.MiniTwitTypedClient;
 
-public class MiniTwitClient : IFollowerService, IUserServices, IMessageService, ILatestService
+public class MiniTwitClient
 {
     private readonly HttpClient _httpClient;
 

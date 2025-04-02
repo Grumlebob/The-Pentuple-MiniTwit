@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MiniTwit.Client;
 using MiniTwit.Client.Authentication;
 using MiniTwit.Client.MiniTwitTypedClient;
-using MiniTwit.Shared.EndpointContracts.Followers;
-using MiniTwit.Shared.EndpointContracts.Messages;
-using MiniTwit.Shared.EndpointContracts.Users;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -30,10 +27,6 @@ builder.Services.AddScoped<MiniTwitClient>(sp =>
     var httpClient = new HttpClient { BaseAddress = new Uri(apiBaseUrl) };
     return new MiniTwitClient(httpClient);
 });
-
-builder.Services.AddScoped<IFollowerService>(sp => sp.GetRequiredService<MiniTwitClient>());
-builder.Services.AddScoped<IUserServices>(sp => sp.GetRequiredService<MiniTwitClient>());
-builder.Services.AddScoped<IMessageService>(sp => sp.GetRequiredService<MiniTwitClient>());
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddSingleton<UserSession>();
