@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ex  # prints every command and stops on error
 # get env vars
-source ~/.bashrc
+source ~/.bash_profile
 
 echo "Pulling latest Docker images..."
 docker compose -f docker-compose.yml pull || {
