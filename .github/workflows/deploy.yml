@@ -73,7 +73,6 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/do_ssh_key
           chmod 600 ~/.ssh/do_ssh_key
-          rm -f ~/.ssh/known_hosts
           
       - name: Copy migration docker-compose.yml to api
         run: |
@@ -81,10 +80,10 @@ jobs:
           scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/migrator/docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.API_IP }}:~/migrator/docker-compose.yml
           echo "Copy completed"
           
-      - name: Copy migration script to manager
+      - name: Copy migration script to server
         run: |
           echo "Copying docker-compose.yml to server..."
-          scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/migrator/doMigration.sh ${{ secrets.SSH_USER }}@${{ secrets.MANAGER_IP }}:~/migrator/doMigration.sh
+          scp -v -i ~/.ssh/do_ssh_key -o StrictHostKeyChecking=no ./MiniTwitSolution/remote_files/migrator/doMigration.sh ${{ secrets.SSH_USER }}@${{ secrets.API_IP }}:~/migrator/doMigration.sh
           echo "Copy completed"
           
       - name: Run Migration on API Droplet
