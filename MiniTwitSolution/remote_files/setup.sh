@@ -1,4 +1,5 @@
-﻿echo "Starting system update and prerequisite installation..."
+﻿# This script installs the things needed for a droplet to run docker compose.
+echo "Starting system update and prerequisite installation..."
 apt-get update
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 echo "Prerequisites installed."

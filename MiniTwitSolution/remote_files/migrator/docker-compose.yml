@@ -1,0 +1,7 @@
+﻿#This is used to run a migration on the manager node in our swarm
+services:
+  migrator:
+    image: ${DOCKER_USERNAME}/minitwit-migrator
+    container_name: minitwit-migrator
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=209.38.183.74;Port=5433;Database=MiniTwitDb;Username=${MINITWIT_DB_USER};Password=${MINITWIT_DB_PASSWORD}"

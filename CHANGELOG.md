@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.7
+
+### Changed
+
+- Our system has been deployed on different droplet:
+  - db, seq and client each has their own droplet
+  - api is run on a swarm of three droplets. One being the manager.
+  - The GitHub workflow has been updated to run a migration on the manager droplet. Then deploy api and client separately.
+
 ## v2.6
 
 ### Changed

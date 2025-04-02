@@ -19,22 +19,13 @@ services:
   migrator:
     build:
       context: .
-      dockerfile: Dockerfile.migrator
+      dockerfile: MiniTwit.Api/Dockerfile.migrator
     # Wait for the database to be healthy
     depends_on:
       db:
         condition: service_healthy
     environment:
       ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=MiniTwitDb;Username=${MINITWIT_DB_USER};Password=${MINITWIT_DB_PASSWORD}
-      ClientBaseUrl: https://whatever-url-or-placeholder # value must be set before it can build, but only api uses it
-    # Mark migrator healthy only after /tmp/migrations_done is created
-    healthcheck:
-      test: ["CMD", "test", "-f", "/tmp/migrations_done"]
-      interval: 10s
-      timeout: 5s
-      retries: 20
-      start_period: 40s
-      
   seq:
     image: datalust/seq:2024.3
     container_name: seq
@@ -56,10 +47,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      migrator:
-        condition: service_healthy
       seq:
         condition: service_started
+        # The migration should not be kept alive. It should be run once and then stop.
+        #migrator:
+        #condition: service_healthy
     ports:
       - published: 5002
         target: 8080

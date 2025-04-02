@@ -1,10 +1,6 @@
 #!/bin/bash
 set -ex  # prints every command and stops on error
 
-echo "====== DEPLOYMENT STARTED ======"
-echo "Running as user: $(whoami)"
-echo "Current directory: $(pwd)"
-
 echo "Pulling latest Docker images..."
 docker compose -f docker-compose.yml pull || {
   echo "Docker pull failed. Checking Docker Compose file:"
@@ -14,8 +10,8 @@ docker compose -f docker-compose.yml pull || {
   exit 1
 }
 
-echo "Starting Docker containers..."
-docker compose -f docker-compose.yml up -d || {
+echo "Running Docker migrator container..."
+docker compose run --rm migrator || {
   echo "Docker up failed."
   docker compose -f docker-compose.yml logs
   exit 1
