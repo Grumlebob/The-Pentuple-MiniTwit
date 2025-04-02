@@ -40,7 +40,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./MiniTwitSolution
-          file: ./MiniTwitSolution/Dockerfile.migrator
+          file: ./MiniTwitSolution/MiniTwit.Api/Dockerfile.migrator
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/minitwit-migrator:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/minitwit-migrator:buildcache
