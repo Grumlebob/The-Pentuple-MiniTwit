@@ -20,13 +20,13 @@
 (When it is running)
 
 Client:
-http://157.245.26.8:5001/
+http://143.244.206.14:5001/
 
 Api:
 http://157.245.26.8:5002/
 
 Monitor:
-http://157.245.26.8:5341/
+http://134.199.188.179:5341/
 
 ## Docker hub:
 
