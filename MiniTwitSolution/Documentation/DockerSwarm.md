@@ -27,7 +27,8 @@ So 6 droplets in total.
 After making the droplets. from root
 add env varibalbes that are used in the docker compose for that droplet. (e.g. DOCKER_USERNAME)
 The values are in the discord resources chat.
-We added them by editing the root/.bashrc file with 
+We added them by adding a ~/.bash_profile file with 
+
 ```bash
 export VAR="value"
 export VAR2="value2"
@@ -36,7 +37,7 @@ export VAR2="value2"
 
 Then after saving and exiting the file
 ```bash
-source ./.bashrc
+source ~/.bash_profile
 ```
 
 we copy the relevant remote files to the droplets with scp
