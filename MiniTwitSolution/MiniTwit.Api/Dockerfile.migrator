@@ -9,6 +9,7 @@ RUN dotnet tool install --global dotnet-ef
 ENV PATH="${PATH}:/root/.dotnet/tools"
 
 COPY ["MiniTwit.Api/MiniTwit.Api.csproj", "MiniTwit.Api/"]
+RUN dotnet restore "MiniTwit.Api/MiniTwit.Api.csproj"
 
 # Copy remaining source code
 COPY . .
@@ -16,8 +17,7 @@ COPY . .
 WORKDIR /src/MiniTwit.Api
 
 # Restore dependencies and generate the migration bundle.
-RUN dotnet restore && \
-    dotnet ef migrations bundle \
+RUN dotnet ef migrations bundle \
       --project MiniTwit.Api.csproj \
       --startup-project MiniTwit.Api.csproj \
       --self-contained -r linux-x64 -o ef-migrations-bundle
