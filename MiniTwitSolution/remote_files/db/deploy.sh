@@ -1,5 +1,7 @@
 #!/bin/bash
 set -ex  # prints every command and stops on error
+# get env vars
+source ~/.bashrc
 
 echo "====== DEPLOYMENT STARTED ======"
 echo "Running as user: $(whoami)"
