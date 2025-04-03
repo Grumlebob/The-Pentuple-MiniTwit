@@ -15,7 +15,10 @@ public class UserService(MiniTwitDbContext db, HybridCache hybridCache) : IUserS
         CancellationToken cancellationToken
     )
     {
-        var user = await db.Users.FirstOrDefaultAsync(u => u.Username == request.Username, cancellationToken);
+        var user = await db.Users.FirstOrDefaultAsync(
+            u => u.Username == request.Username,
+            cancellationToken
+        );
         if (user is null)
         {
             return Results.NotFound("User not found.");
@@ -66,10 +69,7 @@ public class UserService(MiniTwitDbContext db, HybridCache hybridCache) : IUserS
         return Results.NoContent();
     }
 
-    public async Task<IResult> LogoutUserAsync(
-        int latest,
-        CancellationToken cancellationToken
-    )
+    public async Task<IResult> LogoutUserAsync(int latest, CancellationToken cancellationToken)
     {
         var responseDto = new LogoutUserResponse(true, "Logged out successfully.");
 

@@ -6,10 +6,11 @@ public static class LatestEndpoints
 {
     public static IEndpointRouteBuilder MapLatestEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/latest", async (
-            ILatestService latestService,
-            CancellationToken cancellationToken
-        ) => await latestService.GetLatestAsync(cancellationToken));
+        endpoints.MapGet(
+            "/latest",
+            async (ILatestService latestService, CancellationToken cancellationToken) =>
+                await latestService.GetLatestAsync(cancellationToken)
+        );
 
         return endpoints;
     }

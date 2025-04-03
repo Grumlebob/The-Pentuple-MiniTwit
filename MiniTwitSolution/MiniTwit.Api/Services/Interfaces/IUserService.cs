@@ -17,8 +17,5 @@ public interface IUserService
         CancellationToken cancellationToken
     );
 
-    Task<IResult> LogoutUserAsync(
-        int latest,
-        CancellationToken cancellationToken
-    );
+    Task<IResult> LogoutUserAsync(int latest, CancellationToken cancellationToken);
 }

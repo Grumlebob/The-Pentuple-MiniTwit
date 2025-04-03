@@ -19,8 +19,8 @@ public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageS
             cacheKey,
             async ct =>
             {
-                var messages = await db.Messages
-                    .Where(m => m.Flagged == 0)
+                var messages = await db
+                    .Messages.Where(m => m.Flagged == 0)
                     .Include(m => m.Author)
                     .OrderByDescending(m => m.PubDate)
                     .Take(no)
@@ -68,8 +68,8 @@ public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageS
             cacheKey,
             async ct =>
             {
-                var messages = await db.Messages
-                    .Where(m => m.AuthorId == user.UserId && m.Flagged == 0)
+                var messages = await db
+                    .Messages.Where(m => m.AuthorId == user.UserId && m.Flagged == 0)
                     .OrderByDescending(m => m.PubDate)
                     .Take(no)
                     .ToListAsync(ct);
@@ -125,8 +125,8 @@ public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageS
         await cache.RemoveByTagAsync("publicTimeline", cancellationToken);
         await cache.RemoveByTagAsync($"userTimeline:{author.Username}", cancellationToken);
 
-        var followerIds = await db.Followers
-            .Where(f => f.WhomId == author.UserId)
+        var followerIds = await db
+            .Followers.Where(f => f.WhomId == author.UserId)
             .Select(f => f.WhoId)
             .ToListAsync(cancellationToken);
 

@@ -64,7 +64,9 @@ public class FollowerService(MiniTwitDbContext db, HybridCache cache) : IFollowe
             || (request.Follow is null && request.Unfollow is null)
         )
         {
-            return Results.BadRequest("You must provide either 'follow' or 'unfollow', but not both.");
+            return Results.BadRequest(
+                "You must provide either 'follow' or 'unfollow', but not both."
+            );
         }
 
         var targetUsername = request.Follow ?? request.Unfollow!;
@@ -91,11 +93,9 @@ public class FollowerService(MiniTwitDbContext db, HybridCache cache) : IFollowe
 
         if (!followAction && alreadyFollowing)
         {
-            db.Followers.Remove(new Follower
-            {
-                WhoId = currentUser.UserId,
-                WhomId = targetUser.UserId
-            });
+            db.Followers.Remove(
+                new Follower { WhoId = currentUser.UserId, WhomId = targetUser.UserId }
+            );
             await db.SaveChangesAsync(cancellationToken);
             await cache.RemoveByTagAsync($"followers:{username}", cancellationToken);
             await UpdateLatest.UpdateLatestStateAsync(latest, db, cache, cancellationToken);
@@ -107,11 +107,7 @@ public class FollowerService(MiniTwitDbContext db, HybridCache cache) : IFollowe
             return Results.Conflict("Already following this user.");
         }
 
-        db.Followers.Add(new Follower
-        {
-            WhoId = currentUser.UserId,
-            WhomId = targetUser.UserId
-        });
+        db.Followers.Add(new Follower { WhoId = currentUser.UserId, WhomId = targetUser.UserId });
         await db.SaveChangesAsync(cancellationToken);
         await cache.RemoveByTagAsync($"followers:{username}", cancellationToken);
         await UpdateLatest.UpdateLatestStateAsync(latest, db, cache, cancellationToken);
