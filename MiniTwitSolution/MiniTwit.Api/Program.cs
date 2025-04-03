@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Caching.Hybrid;
+using MiniTwit.Api.Endpoints;
 using MiniTwit.Api.Services;
 using MiniTwit.Api.Services.Interfaces;
 using MiniTwit.Api.Utility;
@@ -21,7 +22,6 @@ builder.Host.UseSerilog();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddControllers();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IFollowerService, FollowerService>();
@@ -154,9 +154,11 @@ app.UseSerilogRequestLogging(options =>
 
 app.UseCors("AllowBlazorClient");
 
-// Map controllers
-app.MapControllers();
+app.MapUserEndpoints();
+app.MapFollowerEndpoints();
+app.MapLatestEndpoints();
+app.MapMessageEndpoints();
 
 app.Run();
 
-public partial class Program { }
+public abstract partial class Program { }

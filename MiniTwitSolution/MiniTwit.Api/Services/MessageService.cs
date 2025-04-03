@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Hybrid;
+﻿using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.Services.Interfaces;
 using MiniTwit.Api.Utility;
 using MiniTwit.Shared.DTO.Messages;
@@ -8,7 +7,7 @@ namespace MiniTwit.Api.Services;
 
 public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageService
 {
-    public async Task<IActionResult> GetPublicMessagesAsync(
+    public async Task<IResult> GetPublicMessagesAsync(
         int no,
         int latest,
         CancellationToken cancellationToken
@@ -20,8 +19,8 @@ public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageS
             cacheKey,
             async ct =>
             {
-                var messages = await db
-                    .Messages.Where(m => m.Flagged == 0)
+                var messages = await db.Messages
+                    .Where(m => m.Flagged == 0)
                     .Include(m => m.Author)
                     .OrderByDescending(m => m.PubDate)
                     .Take(no)
@@ -37,16 +36,16 @@ public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageS
                     .ToList();
             },
             cancellationToken: cancellationToken,
-            tags: new[] { "publicTimeline" }
+            tags: ["publicTimeline"]
         );
 
         await UpdateLatest.UpdateLatestStateAsync(latest, db, cache, cancellationToken);
-        await cache.RemoveAsync("latestEvent");
+        await cache.RemoveAsync("latestEvent", cancellationToken);
 
-        return new OkObjectResult(response);
+        return Results.Ok(response);
     }
 
-    public async Task<IActionResult> GetUserMessagesAsync(
+    public async Task<IResult> GetUserMessagesAsync(
         string username,
         int no,
         int latest,
@@ -57,9 +56,10 @@ public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageS
             u => u.Username == username,
             cancellationToken
         );
+
         if (user == null)
         {
-            return new NotFoundObjectResult("User not found.");
+            return Results.NotFound("User not found.");
         }
 
         var cacheKey = $"userTimeline:{username}:{no}";
@@ -68,8 +68,8 @@ public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageS
             cacheKey,
             async ct =>
             {
-                var messages = await db
-                    .Messages.Where(m => m.AuthorId == user.UserId && m.Flagged == 0)
+                var messages = await db.Messages
+                    .Where(m => m.AuthorId == user.UserId && m.Flagged == 0)
                     .OrderByDescending(m => m.PubDate)
                     .Take(no)
                     .ToListAsync(ct);
@@ -84,20 +84,15 @@ public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageS
                     .ToList();
             },
             cancellationToken: cancellationToken,
-            tags: new[] { $"userTimeline:{username}" }
+            tags: [$"userTimeline:{username}"]
         );
 
         await UpdateLatest.UpdateLatestStateAsync(latest, db, cache, cancellationToken);
 
-        if (response.Count == 0)
-        {
-            return new NoContentResult();
-        }
-
-        return new OkObjectResult(response);
+        return response.Count == 0 ? Results.NoContent() : Results.Ok(response);
     }
 
-    public async Task<IActionResult> PostMessageAsync(
+    public async Task<IResult> PostMessageAsync(
         string username,
         PostMessageRequest request,
         int latest,
@@ -108,9 +103,10 @@ public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageS
             u => u.Username == username,
             cancellationToken
         );
+
         if (author == null)
         {
-            return new BadRequestObjectResult("Author not found.");
+            return Results.BadRequest("Author not found.");
         }
 
         var pubDate = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -129,8 +125,8 @@ public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageS
         await cache.RemoveByTagAsync("publicTimeline", cancellationToken);
         await cache.RemoveByTagAsync($"userTimeline:{author.Username}", cancellationToken);
 
-        var followerIds = await db
-            .Followers.Where(f => f.WhomId == author.UserId)
+        var followerIds = await db.Followers
+            .Where(f => f.WhomId == author.UserId)
             .Select(f => f.WhoId)
             .ToListAsync(cancellationToken);
 
@@ -141,6 +137,6 @@ public class MessageService(MiniTwitDbContext db, HybridCache cache) : IMessageS
 
         await UpdateLatest.UpdateLatestStateAsync(latest, db, cache, cancellationToken);
 
-        return new NoContentResult();
+        return Results.NoContent();
     }
 }

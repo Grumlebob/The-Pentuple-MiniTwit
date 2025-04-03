@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Hybrid;
+﻿using Microsoft.Extensions.Caching.Hybrid;
 using MiniTwit.Api.Services.Interfaces;
 using MiniTwit.Shared.DTO.Latest;
 
@@ -7,7 +6,7 @@ namespace MiniTwit.Api.Services;
 
 public class LatestService(MiniTwitDbContext db, HybridCache cache) : ILatestService
 {
-    public async Task<IActionResult> GetLatestAsync(CancellationToken cancellationToken)
+    public async Task<IResult> GetLatestAsync(CancellationToken cancellationToken)
     {
         const string cacheKey = "latestEvent";
 
@@ -16,7 +15,6 @@ public class LatestService(MiniTwitDbContext db, HybridCache cache) : ILatestSer
             async ct =>
             {
                 var latest = await db.Latests.AsNoTracking().Where(l => l.Id == 1).FirstAsync(ct);
-
                 return new GetLatestResponse(latest.LatestEventId);
             },
             new HybridCacheEntryOptions
@@ -25,9 +23,9 @@ public class LatestService(MiniTwitDbContext db, HybridCache cache) : ILatestSer
                 Expiration = TimeSpan.FromMinutes(5),
             },
             cancellationToken: cancellationToken,
-            tags: new[] { cacheKey }
+            tags: [cacheKey]
         );
 
-        return new OkObjectResult(response);
+        return Results.Ok(response);
     }
 }
