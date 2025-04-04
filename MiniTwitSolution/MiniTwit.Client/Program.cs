@@ -2,6 +2,8 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MiniTwit.Client;
+using MiniTwit.Client.Authentication;
+using MiniTwit.Client.MiniTwitTypedClient;
 using MiniTwit.Client.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

@@ -1,13 +1,8 @@
 using MiniTwit.Api.DependencyInjection;
-using MiniTwit.Api.Features.Followers.GetFollowers;
-using MiniTwit.Api.Features.Followers.PostFollowUser;
-using MiniTwit.Api.Features.Latest.GetLatest;
-using MiniTwit.Api.Features.Messages.GetMessages;
-using MiniTwit.Api.Features.Messages.GetUserMessages;
-using MiniTwit.Api.Features.Messages.PostMessage;
-using MiniTwit.Api.Features.Users.Authentication.LoginUser;
-using MiniTwit.Api.Features.Users.Authentication.LogoutUser;
-using MiniTwit.Api.Features.Users.Authentication.RegisterUser;
+using MiniTwit.Api.Endpoints;
+using MiniTwit.Api.Services;
+using MiniTwit.Api.Services.Interfaces;
+using MiniTwit.Api.Utility;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +18,28 @@ builder.Services
     .AddClientCors(builder.Configuration)
     .AddCaching();
 
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IFollowerService, FollowerService>();
+builder.Services.AddScoped<ILatestService, LatestService>();
+
+
+// Register basic caching services
+builder.Services.AddMemoryCache();
+
+// Register HybridCache (using the new .NET 9 API or a preview package)
+#pragma warning disable EXTEXP0018
+builder.Services.AddHybridCache(options =>
+{
+    options.DefaultEntryOptions = new HybridCacheEntryOptions()
+    {
+        LocalCacheExpiration = TimeSpan.FromMinutes(5),
+        Expiration = TimeSpan.FromMinutes(5),
+    };
+});
+#pragma warning restore EXTEXP0018
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -37,7 +54,7 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
-// Enable buffering for request bodies early in the pipeline.
+// Enable buffering for request bodies 
 app.Use(
     async (context, next) =>
     {
@@ -46,44 +63,52 @@ app.Use(
     }
 );
 
+// Enable buffering for response bodies
+app.Use(
+    async (context, next) =>
+    {
+        // Swap out the response stream with a memory stream to capture output
+        var originalBodyStream = context.Response.Body;
+        using var responseBody = new MemoryStream();
+        context.Response.Body = responseBody;
+
+        await next();
+
+        // Reset the response body position to read from the beginning
+        context.Response.Body.Seek(0, SeekOrigin.Begin);
+        var responseText = await new StreamReader(context.Response.Body).ReadToEndAsync();
+        context.Response.Body.Seek(0, SeekOrigin.Begin);
+
+        // Log the response text here
+        // e.g., diagnosticContext.Set("ResponseBody", responseText);
+
+        // Copy the content of the memory stream to the original stream
+        await responseBody.CopyToAsync(originalBodyStream);
+    }
+);
+
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate =
         "Handled {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
-    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    options.EnrichDiagnosticContext = async (diagnosticContext, httpContext) =>
     {
-        // Top-level properties for easy querying in Seq
+        // Info from user request
         diagnosticContext.Set("RequestMethod", httpContext.Request.Method);
         diagnosticContext.Set("RequestPath", httpContext.Request.Path);
-
-        // Composite property with additional HTTP request details
-        diagnosticContext.Set(
-            "HttpRequest",
-            new
-            {
-                Method = httpContext.Request.Method,
-                Path = httpContext.Request.Path,
-                QueryString = httpContext.Request.QueryString.ToString(),
-                Headers = httpContext.Request.Headers.ToDictionary(
-                    h => h.Key,
-                    h => h.Value.ToString()
-                ),
-            }
-        );
-
+        diagnosticContext.Set("RequestQuery", httpContext.Request.QueryString.ToString());
+        // request body if any
         // Log request content (if available)
-        if (httpContext.Request.ContentLength > 0 && httpContext.Request.Body.CanSeek)
-        {
-            httpContext.Request.Body.Position = 0; // Reset stream position
-            using var reader = new StreamReader(httpContext.Request.Body, leaveOpen: true);
-            var content = reader.ReadToEnd();
-            diagnosticContext.Set("Content", content);
-            httpContext.Request.Body.Position = 0; // Reset again for further processing
-        }
-        else
-        {
-            diagnosticContext.Set("Content", "Not Available");
-        }
+
+        var requestBody = await HttpHelper.GetHttpBodyAsStringAsync(httpContext.Request.Body);
+        diagnosticContext.Set("RequestBody", requestBody);
+
+        // Info from response
+        diagnosticContext.Set("StatusCode", httpContext.Response.StatusCode);
+        // Response body if any
+
+        var reponseBody = await HttpHelper.GetHttpBodyAsStringAsync(httpContext.Response.Body);
+        diagnosticContext.Set("ResponseBody", reponseBody);
     };
 });
 
@@ -91,25 +116,11 @@ app.UseSerilogRequestLogging(options =>
 
 app.UseCors("AllowBlazorClient");
 
-//Message endpoints
-app.MapPostMessageEndpoints(); // registers POST "/msgs/{username}" endpoint.
-app.MapGetMessagesEndpoints(); // registers GET "/msgs" endpoint.
-app.MapGetUserMessagesEndpoints(); // registers GET "/msgs/{username}" endpoint.
-
-// Map follow/unfollow endpoints.
-app.MapFollowUserEndpoints(); // registers POST "/fllws/{username}"
-app.MapGetFollowersEndpoints(); // registers GET "/fllws/{username}"
-
-// Map user endpoints.
-app.MapRegisterUserEndpoints(); // registers POST "/register"
-app.MapLoginUserEndpoints(); // registers POST "/login"
-app.MapLogoutUserEndpoints(); // registers POST "/logout"
-
-// Map latest endpoints.
-app.MapGetLatestEndpoint();
+app.MapUserEndpoints();
+app.MapFollowerEndpoints();
+app.MapLatestEndpoints();
+app.MapMessageEndpoints();
 
 app.Run();
 
-public partial class Program
-{
-}
+public abstract partial class Program { }
