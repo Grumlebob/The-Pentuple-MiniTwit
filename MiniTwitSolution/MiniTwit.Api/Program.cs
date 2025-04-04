@@ -1,13 +1,7 @@
 using Microsoft.Extensions.Caching.Hybrid;
-using MiniTwit.Api.Features.Followers.GetFollowers;
-using MiniTwit.Api.Features.Followers.PostFollowUser;
-using MiniTwit.Api.Features.Latest.GetLatest;
-using MiniTwit.Api.Features.Messages.GetMessages;
-using MiniTwit.Api.Features.Messages.GetUserMessages;
-using MiniTwit.Api.Features.Messages.PostMessage;
-using MiniTwit.Api.Features.Users.Authentication.LoginUser;
-using MiniTwit.Api.Features.Users.Authentication.LogoutUser;
-using MiniTwit.Api.Features.Users.Authentication.RegisterUser;
+using MiniTwit.Api.Endpoints;
+using MiniTwit.Api.Services;
+using MiniTwit.Api.Services.Interfaces;
 using MiniTwit.Api.Utility;
 using Serilog;
 using Serilog.Extensions;
@@ -27,6 +21,11 @@ builder.Host.UseSerilog();
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IFollowerService, FollowerService>();
+builder.Services.AddScoped<ILatestService, LatestService>();
 
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
@@ -155,23 +154,11 @@ app.UseSerilogRequestLogging(options =>
 
 app.UseCors("AllowBlazorClient");
 
-//Message endpoints
-app.MapPostMessageEndpoints(); // registers POST "/msgs/{username}" endpoint.
-app.MapGetMessagesEndpoints(); // registers GET "/msgs" endpoint.
-app.MapGetUserMessagesEndpoints(); // registers GET "/msgs/{username}" endpoint.
-
-// Map follow/unfollow endpoints.
-app.MapFollowUserEndpoints(); // registers POST "/fllws/{username}"
-app.MapGetFollowersEndpoints(); // registers GET "/fllws/{username}"
-
-// Map user endpoints.
-app.MapRegisterUserEndpoints(); // registers POST "/register"
-app.MapLoginUserEndpoints(); // registers POST "/login"
-app.MapLogoutUserEndpoints(); // registers POST "/logout"
-
-// Map latest endpoints.
-app.MapGetLatestEndpoint();
+app.MapUserEndpoints();
+app.MapFollowerEndpoints();
+app.MapLatestEndpoints();
+app.MapMessageEndpoints();
 
 app.Run();
 
-public partial class Program { }
+public abstract partial class Program { }
