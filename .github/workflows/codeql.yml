@@ -12,8 +12,8 @@ on:
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
-    # For C#, we can use 'ubuntu-latest'
-    runs-on: ubuntu-latest
+    # For C#, we can use 'ubuntu-24.04'
+    runs-on: ubuntu-24.04
     permissions:
       # Required for all workflows
       security-events: write

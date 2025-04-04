@@ -4,6 +4,8 @@
 
 ### Changed
 
+- New sexy program.cs
+
 - Our system has been deployed on different droplets:
   - db, seq and client each has their own droplet
   - api is run on a swarm of three droplets. One being the manager.
