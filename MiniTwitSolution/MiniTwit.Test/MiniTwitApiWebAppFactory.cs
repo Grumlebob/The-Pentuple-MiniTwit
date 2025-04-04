@@ -10,7 +10,7 @@ public class MiniTwitApiWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
     private const int MaxWaitTimeMinutes = 5;
 
     private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:latest")
+        .WithImage("postgres:17.4")
         .Build();
 
     //Default! cause we are not initializing it here, but in the InitializeAsync method
