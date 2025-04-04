@@ -2,7 +2,11 @@
 
 public static class ClientConfiguration
 {
-    public static IServiceCollection AddClientCors(this IServiceCollection services, IConfiguration configuration) {
+    public static IServiceCollection AddClientCors(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
+    {
         var clientBaseUrl = configuration["ClientBaseUrl"];
         if (string.IsNullOrEmpty(clientBaseUrl))
         {
