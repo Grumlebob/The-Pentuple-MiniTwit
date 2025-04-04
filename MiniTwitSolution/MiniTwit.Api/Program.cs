@@ -9,8 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddSerilog();
 
 // Add services to the container.
-builder.Services
-    .AddEndpointsApiExplorer()
+builder
+    .Services.AddEndpointsApiExplorer()
     .AddSwaggerGen()
     .AddDatabase(builder.Configuration)
     .AddClientCors(builder.Configuration)
@@ -37,11 +37,8 @@ using (var scope = app.Services.CreateScope())
 //app.UseHttpsRedirection();
 app.ConfigureSerilog();
 app.UseCors("AllowBlazorClient");
-    
-app.MapUserEndpoints()
-    .MapFollowerEndpoints()
-    .MapLatestEndpoints()
-    .MapMessageEndpoints();
+
+app.MapUserEndpoints().MapFollowerEndpoints().MapLatestEndpoints().MapMessageEndpoints();
 
 app.Run();
 

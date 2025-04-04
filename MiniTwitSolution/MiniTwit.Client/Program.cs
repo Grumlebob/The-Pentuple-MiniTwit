@@ -12,10 +12,11 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // Basic HttpClient that is used by our typed Client
 builder.Services.AddScoped(_ => new HttpClient
 {
-    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress),
 });
 
-builder.Services.AddTypedClient(builder.Configuration)
+builder
+    .Services.AddTypedClient(builder.Configuration)
     .AddBlazoredLocalStorage()
     .AddSingleton<UserSession>();
 

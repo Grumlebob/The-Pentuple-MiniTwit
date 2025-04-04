@@ -19,13 +19,16 @@ public static class LoggingConfiguration
         builder.Host.UseSerilog();
 
         builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
-        builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+        builder.Logging.AddFilter(
+            "Microsoft.EntityFrameworkCore.Database.Command",
+            LogLevel.Warning
+        );
         return builder;
     }
-    
+
     public static IApplicationBuilder ConfigureSerilog(this IApplicationBuilder app)
     {
-        // Enable buffering for request bodies 
+        // Enable buffering for request bodies
         app.Use(
             async (context, next) =>
             {
@@ -33,7 +36,7 @@ public static class LoggingConfiguration
                 await next();
             }
         );
-        
+
         // Save response body for logging
         app.Use(
             async (context, next) =>
@@ -52,7 +55,7 @@ public static class LoggingConfiguration
                 await responseBody.CopyToAsync(originalBodyStream);
             }
         );
-        
+
         app.UseSerilogRequestLogging(options =>
         {
             options.MessageTemplate =
@@ -64,13 +67,17 @@ public static class LoggingConfiguration
                 diagnosticContext.Set("RequestPath", httpContext.Request.Path);
                 diagnosticContext.Set("RequestQuery", httpContext.Request.QueryString.ToString());
 
-                var requestBody = await HttpHelper.GetHttpBodyAsStringAsync(httpContext.Request.Body);
+                var requestBody = await HttpHelper.GetHttpBodyAsStringAsync(
+                    httpContext.Request.Body
+                );
                 diagnosticContext.Set("RequestBody", requestBody);
 
                 // Info from response
                 diagnosticContext.Set("StatusCode", httpContext.Response.StatusCode);
 
-                var responseBody = await HttpHelper.GetHttpBodyAsStringAsync(httpContext.Response.Body);
+                var responseBody = await HttpHelper.GetHttpBodyAsStringAsync(
+                    httpContext.Response.Body
+                );
                 diagnosticContext.Set("ResponseBody", responseBody);
             };
         });

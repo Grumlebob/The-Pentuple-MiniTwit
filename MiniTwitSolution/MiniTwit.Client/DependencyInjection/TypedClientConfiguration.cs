@@ -5,7 +5,10 @@ namespace MiniTwit.Client.DependencyInjection;
 
 public static class TypedClientConfiguration
 {
-    public static IServiceCollection AddTypedClient(this IServiceCollection services, WebAssemblyHostConfiguration configuration)
+    public static IServiceCollection AddTypedClient(
+        this IServiceCollection services,
+        WebAssemblyHostConfiguration configuration
+    )
     {
         var apiBaseUrl = configuration["ApiBaseUrl"];
         if (string.IsNullOrEmpty(apiBaseUrl))
