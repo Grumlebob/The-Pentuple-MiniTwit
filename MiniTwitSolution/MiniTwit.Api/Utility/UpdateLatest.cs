@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.Extensions.Caching.Hybrid;
 
 namespace MiniTwit.Api.Utility;
