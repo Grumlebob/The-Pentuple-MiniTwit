@@ -20,9 +20,6 @@ public static class TypedClientConfiguration
             var httpClient = new HttpClient { BaseAddress = new Uri(apiBaseUrl) };
             return new MiniTwitClient(httpClient);
         });
-        services.AddScoped<IFollowerService>(sp => sp.GetRequiredService<MiniTwitClient>());
-        services.AddScoped<IUserServices>(sp => sp.GetRequiredService<MiniTwitClient>());
-        services.AddScoped<IMessageService>(sp => sp.GetRequiredService<MiniTwitClient>());
         return services;
     }
 }
