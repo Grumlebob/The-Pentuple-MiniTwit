@@ -86,21 +86,15 @@ This includes changes made by certBot when creating the certificate later in the
 
 Create settings file for adding support for HTTP requests to include headers (if does not exist by default, refer to code block below):
 
+```bash
+sudo nvim /etc/nginx/proxy_params
+```
+
 ```nginx location="/etc/nginx/proxy_params"
 proxy_set_header Host $http_host;
 proxy_set_header X-Real-IP $remote_addr;
 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 proxy_set_header X-Forwarded-Proto $scheme;
-```
-
-```bash
-sudo nvim /etc/nginx/proxy_params
-```
-
-Enable configuration file by creating a link (nginx reads from this at startup)
-
-```bash
-sudo ln -s /etc/nginx/sites-available/api.thepentupledo.engineer /etc/nginx/sites-enabled/
 ```
 
 Test whether your configuration file has syntax errors, and if no errors were detect apply all changes
@@ -119,6 +113,18 @@ sudo certbot --nginx -d api.thepentupledo.engineer -d www.api.thepentupledo.engi
 You will prompted to enter an email address, just skip this step by pressing `enter`.
 
 Adding a timer that automatically renews any certificate that's within thirty days of expiration (when adding a certificate they are valid for ninety days)
+
+Enable configuration file by creating a link (nginx reads from this at startup)
+
+```bash
+sudo ln -s /etc/nginx/sites-available/api.thepentupledo.engineer /etc/nginx/sites-enabled/
+```
+
+If you would like you can restart nginx like so:
+```bash
+sudo nginx -t
+sudo systemctl restart nginx
+```
 
 ```bash
 sudo systemctl status snap.certbot.renew.service
