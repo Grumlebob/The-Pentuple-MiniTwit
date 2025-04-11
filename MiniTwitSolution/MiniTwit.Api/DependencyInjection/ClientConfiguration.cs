@@ -7,8 +7,8 @@ public static class ClientConfiguration
         IConfiguration configuration
     )
     {
-        var clientBaseUrl = configuration["ClientBaseUrl"];
-        if (string.IsNullOrEmpty(clientBaseUrl))
+        var clientBaseUrl = configuration.GetSection("ClientBaseUrl").Get<string[]>();
+        if (clientBaseUrl is null || clientBaseUrl.Length == 0)
         {
             throw new Exception(
                 "Client base URL is not configured. Please set ClientBaseUrl in appsettings.json."
