@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.8
+
+### Changed
+
+- Added domain names for:
+  - client, api, seq
+- Added tls encryption and https support
+- Add sexy graphs to seq 
+
 ## v2.7
 
 ### Changed
