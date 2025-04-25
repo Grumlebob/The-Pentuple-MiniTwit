@@ -23,6 +23,11 @@ resource "digitalocean_droplet" "minitwit-swarm-leader" {
     source = "remote_files/api-swarm/docker-compose.yml"
     destination = "~/docker-compose.yml"
   }
+  
+  provisioner "file" {
+    source = "remote_files/api-swarm/deploy.sh"
+    destination = "~/deploy.sh"
+  }
 
   provisioner "remote-exec" {
     inline = [
@@ -38,7 +43,11 @@ resource "digitalocean_droplet" "minitwit-swarm-leader" {
       "ufw allow 22",
 
       # initialize docker swarm cluster
-      "docker swarm init --advertise-addr ${self.ipv4_address}"
+      "docker swarm init --advertise-addr ${self.ipv4_address}",
+      
+      # run deploy script to run the docker-compose file
+      "chmod +x ~/deploy.sh",
+      "~/deploy.sh"
     ]
   }
 }
@@ -59,7 +68,7 @@ resource "null_resource" "swarm-worker-token" {
 
 resource "null_resource" "swarm-manager-token" {
   depends_on = [digitalocean_droplet.minitwit-swarm-leader]
-  # save the manager join token
+  # save the manager join token for leader
   provisioner "local-exec" {
     command = <<EOS
       ssh -o 'StrictHostKeyChecking no' 
@@ -68,62 +77,6 @@ resource "null_resource" "swarm-manager-token" {
       EOS
   }
 }
-
-
-#  _ __ ___   __ _ _ __   __ _  __ _  ___ _ __
-# | '_ ` _ \ / _` | '_ \ / _` |/ _` |/ _ \ '__|
-# | | | | | | (_| | | | | (_| | (_| |  __/ |
-# |_| |_| |_|\__,_|_| |_|\__,_|\__, |\___|_|
-#                              |___/
-
-# create cloud vm
-resource "digitalocean_droplet" "minitwit-swarm-manager" {
-  # create managers after the leader
-  depends_on = [null_resource.swarm-manager-token]
-
-  # number of vms to create
-  count = 1
-
-  image = "docker-20-04"
-  name = "minitwit-swarm-manager-${count.index}"
-  region = var.region
-  size = "s-1vcpu-1gb"
-  # add public ssh key so we can access the machine
-  ssh_keys = [digitalocean_ssh_key.minitwit.fingerprint]
-
-  # specify a ssh connection
-  connection {
-    user = "root"
-    host = self.ipv4_address
-    type = "ssh"
-    private_key = file(var.pvt_key)
-    timeout = "2m"
-  }
-
-  provisioner "file" {
-    source = "temp/manager_token"
-    destination = "/root/manager_token"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      # allow ports for docker swarm
-      "ufw allow 2377/tcp",
-      "ufw allow 7946",
-      "ufw allow 4789/udp",
-      # ports for apps
-      "ufw allow 80",
-      "ufw allow 8080",
-      "ufw allow 8888",
-      # SSH
-      "ufw allow 22",
-
-      # join swarm cluster as managers
-      "docker swarm join --token $(cat manager_token) ${digitalocean_droplet.minitwit-swarm-leader.ipv4_address}"
-    ]
-  }
-}
-
 
 #                     _
 # __      _____  _ __| | _____ _ __
@@ -181,10 +134,6 @@ resource "digitalocean_droplet" "minitwit-swarm-worker" {
 
 output "minitwit-swarm-leader-ip-address" {
   value = digitalocean_droplet.minitwit-swarm-leader.ipv4_address
-}
-
-output "minitwit-swarm-manager-ip-address" {
-  value = digitalocean_droplet.minitwit-swarm-manager.*.ipv4_address
 }
 
 output "minitwit-swarm-worker-ip-address" {
