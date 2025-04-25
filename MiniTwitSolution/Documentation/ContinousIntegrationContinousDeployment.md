@@ -57,5 +57,27 @@ pushes the changes, so we don't have to remember to do it.
 This means it happens behind the scenes, and we assume it does not do
 something crazy that we wouldn't want on our main branch.
 
+## 25.04.2025
+
+### Terraform
+
+We started on the terraform setup using this guide:
+https://github.com/itu-devops/itu-minitwit-docker-swarm-teraform?tab=readme-ov-file
+We did it on our own repository.
+
+Instead of 1 leader 2 managers and 3 workers 
+we use 1 leader/manager and 2 workers.
+
+The leader droplet is the one calling ```docker swarm init```.
+The leader then calls ```docker swarm join-token worker``` 
+which creates a token that worker droplets can call ```docker swarm join``` with.
+To add more managers to the swarm the leader can make a manager token
+```docker swarm join-token worker``` but since we use the leader as manager 
+we haven't used this.
+
+there is a script for the droplet swarm (minitwit-api-swarm.tf), 
+one for terraform vars (minitwit.auto.tfvars)
+and a provider file (provider.tf) where variables are published.
+
 
 
