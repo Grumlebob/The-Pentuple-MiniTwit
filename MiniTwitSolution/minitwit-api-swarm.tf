@@ -29,6 +29,17 @@ resource "digitalocean_droplet" "minitwit-swarm-leader" {
     source = "remote_files/api-swarm/deploy.sh"
     destination = "~/minitwit/deploy.sh"
   }
+  
+  # the leader node is also responsible for doing migrations
+  provisioner "file" {
+    source = "remote_files/migrator/docker-compose.yml"
+    destination = "~/migrator/docker-compose.yml"
+  }
+  
+  provisioner "file" {
+    source = "remote_files/migrator/doMigration.sh"
+    destination = "~/migrator/doMigration.sh"
+  }
 
   provisioner "remote-exec" {
     inline = [
@@ -119,9 +130,7 @@ resource "digitalocean_droplet" "minitwit-swarm-worker" {
 
 resource "null_resource" "swarm-deploy" {
   # force this to wait for all workers
-  depends_on = [
-    digitalocean_droplet.minitwit-swarm-worker
-  ]
+  depends_on = [digitalocean_droplet.minitwit-swarm-worker, digitalocean_droplet.db-droplet]
   
   # this trigger will re-run this if you we change the count/addresses of workers
   triggers = {
@@ -139,6 +148,12 @@ resource "null_resource" "swarm-deploy" {
 
   provisioner "remote-exec" {
     inline = [
+      # run migration
+      "cd ~/migrator",
+      "chmod +x doMigration.sh",
+      "bash -x doMigration.sh",
+      
+      # run api swarm
       "cd ~/minitwit",
       "chmod +x deploy.sh",
       "bash -x deploy.sh"
