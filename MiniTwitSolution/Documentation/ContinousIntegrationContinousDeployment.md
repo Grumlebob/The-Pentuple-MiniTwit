@@ -78,6 +78,10 @@ we haven't used this.
 there is a script for the droplet swarm (minitwit-api-swarm.tf), 
 one for terraform vars (minitwit.auto.tfvars)
 and a provider file (provider.tf) where variables are published.
+Then there's separate files for the client, database and seq.
+When running terraform commands it compiles all files together, 
+as if it was all in the same file.
 
-
+We managed to get terraform to create droplet.
+Whether it actually works will be tested another day
 

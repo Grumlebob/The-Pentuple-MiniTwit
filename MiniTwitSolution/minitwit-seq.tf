@@ -1,15 +1,13 @@
 ﻿# credit: https://github.com/itu-devops/itu-minitwit-docker-swarm-teraform
-resource "digitalocean_ssh_key" "minitwit" {
-  name = "minitwit"
-  public_key = file(var.pub_key)
-}
 
 resource "digitalocean_droplet" "seq-droplet" {
   image = "docker-20-04" // ubuntu-22-04-x64
   name = "seq"
   region = var.region
   size = "s-1vcpu-1gb"
-  ssh_keys = [digitalocean_ssh_key.minitwit.fingerprint]
+  ssh_keys = [
+    for key in data.digitalocean_ssh_key.team : key.fingerprint
+  ]
 
   # specify a ssh connection
   connection {
@@ -20,14 +18,20 @@ resource "digitalocean_droplet" "seq-droplet" {
     timeout = "2m"
   }
 
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /root/minitwit",
+    ]
+  }
+
   provisioner "file" {
     source = "remote_files/seq/docker-compose.yml"
-    destination = "~/minitwit/docker-compose.yml"
+    destination = "/root/minitwit/docker-compose.yml"
   }
   
   provisioner "file" {
     source = "remote_files/seq/deploy.sh"
-    destination = "~/minitwit/deploy.sh"
+    destination = "/root/minitwit/deploy.sh"
   }
 
   provisioner "remote-exec" {
@@ -41,7 +45,7 @@ resource "digitalocean_droplet" "seq-droplet" {
       "ufw allow 22",
 
       # deploy seq application
-      "cd ~/minitwit",
+      "cd /root/minitwit",
       "chmod +x deploy.sh",
       "bash -x deploy.sh",
     ]

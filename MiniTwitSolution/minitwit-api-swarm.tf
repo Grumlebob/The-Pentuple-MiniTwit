@@ -1,15 +1,12 @@
 ﻿# credit: https://github.com/itu-devops/itu-minitwit-docker-swarm-teraform
-resource "digitalocean_ssh_key" "minitwit" {
-  name = "minitwit"
-  public_key = file(var.pub_key)
-}
-
 resource "digitalocean_droplet" "minitwit-swarm-leader" {
   image = "docker-20-04" // ubuntu-22-04-x64
   name = "api-swarm-leader"
   region = var.region
   size = "s-1vcpu-1gb"
-  ssh_keys = [digitalocean_ssh_key.minitwit.fingerprint]
+  ssh_keys = [
+    for key in data.digitalocean_ssh_key.team : key.fingerprint
+  ]
 
   # specify a ssh connection
   connection {
@@ -20,25 +17,32 @@ resource "digitalocean_droplet" "minitwit-swarm-leader" {
     timeout = "2m"
   }
 
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /root/minitwit",
+      "mkdir -p /root/migrator",
+    ]
+  }
+
   provisioner "file" {
     source = "remote_files/api-swarm/docker-compose.yml"
-    destination = "~/minitwit/docker-compose.yml"
+    destination = "/root/minitwit/docker-compose.yml"
   }
   
   provisioner "file" {
     source = "remote_files/api-swarm/deploy.sh"
-    destination = "~/minitwit/deploy.sh"
+    destination = "/root/minitwit/deploy.sh"
   }
   
   # the leader node is also responsible for doing migrations
   provisioner "file" {
     source = "remote_files/migrator/docker-compose.yml"
-    destination = "~/migrator/docker-compose.yml"
+    destination = "/root/migrator/docker-compose.yml"
   }
   
   provisioner "file" {
     source = "remote_files/migrator/doMigration.sh"
-    destination = "~/migrator/doMigration.sh"
+    destination = "/root/migrator/doMigration.sh"
   }
 
   provisioner "remote-exec" {
@@ -65,12 +69,12 @@ resource "null_resource" "swarm-worker-token" {
 
   # save the worker join token
   provisioner "local-exec" {
-    #command = <<EOS
-     # ssh -o 'StrictHostKeyChecking no' 
-      #  root@${digitalocean_droplet.minitwit-swarm-leader.ipv4_address} 
-       # -i ${var.pvt_key} 
-        #'docker swarm join-token worker -q' > temp/worker_token
-      #EOS
+    command = <<EOS
+      ssh -o 'StrictHostKeyChecking no' 
+        root@${digitalocean_droplet.minitwit-swarm-leader.ipv4_address} 
+        -i ${var.pvt_key} 
+        'docker swarm join-token worker -q' > temp/worker_token
+      EOS
   }
 }
 
@@ -93,7 +97,9 @@ resource "digitalocean_droplet" "minitwit-swarm-worker" {
   region = var.region
   size = "s-1vcpu-1gb"
   # add public ssh key so we can access the machine
-  ssh_keys = [digitalocean_ssh_key.minitwit.fingerprint]
+  ssh_keys = [
+    for key in data.digitalocean_ssh_key.team : key.fingerprint
+  ]
 
   # specify a ssh connection
   connection {
@@ -149,12 +155,12 @@ resource "null_resource" "swarm-deploy" {
   provisioner "remote-exec" {
     inline = [
       # run migration
-      "cd ~/migrator",
+      "cd /root/migrator",
       "chmod +x doMigration.sh",
       "bash -x doMigration.sh",
       
       # run api swarm
-      "cd ~/minitwit",
+      "cd /root/minitwit",
       "chmod +x deploy.sh",
       "bash -x deploy.sh"
     ]
