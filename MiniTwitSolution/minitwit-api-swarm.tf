@@ -1,11 +1,12 @@
-﻿resource "digitalocean_ssh_key" "minitwit" {
+﻿# credit: https://github.com/itu-devops/itu-minitwit-docker-swarm-teraform
+resource "digitalocean_ssh_key" "minitwit" {
   name = "minitwit"
   public_key = file(var.pub_key)
 }
 
 resource "digitalocean_droplet" "minitwit-swarm-leader" {
   image = "docker-20-04" // ubuntu-22-04-x64
-  name = "minitwit-swarm-leader"
+  name = "api-swarm-leader"
   region = var.region
   size = "s-1vcpu-1gb"
   ssh_keys = [digitalocean_ssh_key.minitwit.fingerprint]
@@ -21,12 +22,12 @@ resource "digitalocean_droplet" "minitwit-swarm-leader" {
 
   provisioner "file" {
     source = "remote_files/api-swarm/docker-compose.yml"
-    destination = "~/docker-compose.yml"
+    destination = "~/minitwit/docker-compose.yml"
   }
   
   provisioner "file" {
     source = "remote_files/api-swarm/deploy.sh"
-    destination = "~/deploy.sh"
+    destination = "~/minitwit/deploy.sh"
   }
 
   provisioner "remote-exec" {
@@ -44,10 +45,6 @@ resource "digitalocean_droplet" "minitwit-swarm-leader" {
 
       # initialize docker swarm cluster
       "docker swarm init --advertise-addr ${self.ipv4_address}",
-      
-      # run deploy script to run the docker-compose file
-      "chmod +x ~/deploy.sh",
-      "~/deploy.sh"
     ]
   }
 }
@@ -57,12 +54,12 @@ resource "null_resource" "swarm-worker-token" {
 
   # save the worker join token
   provisioner "local-exec" {
-    command = <<EOS
-      ssh -o 'StrictHostKeyChecking no' 
-        root@${digitalocean_droplet.minitwit-swarm-leader.ipv4_address} 
-        -i ${var.pvt_key} 
-        'docker swarm join-token worker -q' > temp/worker_token
-      EOS 
+    #command = <<EOS
+     # ssh -o 'StrictHostKeyChecking no' 
+      #  root@${digitalocean_droplet.minitwit-swarm-leader.ipv4_address} 
+       # -i ${var.pvt_key} 
+        #'docker swarm join-token worker -q' > temp/worker_token
+      #EOS
   }
 }
 
@@ -81,7 +78,7 @@ resource "digitalocean_droplet" "minitwit-swarm-worker" {
   count = 2
 
   image = "docker-20-04"
-  name = "minitwit-swarm-worker-${count.index}"
+  name = "api-swarm-worker-${count.index}"
   region = var.region
   size = "s-1vcpu-1gb"
   # add public ssh key so we can access the machine
@@ -119,6 +116,36 @@ resource "digitalocean_droplet" "minitwit-swarm-worker" {
     ]
   }
 }
+
+resource "null_resource" "swarm-deploy" {
+  # force this to wait for all workers
+  depends_on = [
+    digitalocean_droplet.minitwit-swarm-worker
+  ]
+  
+  # this trigger will re-run this if you we change the count/addresses of workers
+  triggers = {
+    worker_ips = join(",", digitalocean_droplet.minitwit-swarm-worker.*.ipv4_address)
+  }
+
+  # SSH into swarm leader
+  connection {
+    type        = "ssh"
+    user        = "root"
+    host        = digitalocean_droplet.minitwit-swarm-leader.ipv4_address
+    private_key = file(var.pvt_key)
+    timeout     = "2m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "cd ~/minitwit",
+      "chmod +x deploy.sh",
+      "bash -x deploy.sh"
+    ]
+  }
+}
+
 
 output "minitwit-swarm-leader-ip-address" {
   value = digitalocean_droplet.minitwit-swarm-leader.ipv4_address
