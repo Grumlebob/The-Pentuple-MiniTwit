@@ -66,18 +66,6 @@ resource "null_resource" "swarm-worker-token" {
   }
 }
 
-resource "null_resource" "swarm-manager-token" {
-  depends_on = [digitalocean_droplet.minitwit-swarm-leader]
-  # save the manager join token for leader
-  provisioner "local-exec" {
-    command = <<EOS
-      ssh -o 'StrictHostKeyChecking no' 
-        root@${digitalocean_droplet.minitwit-swarm-leader.ipv4_address} 
-        -i ${var.pvt_key} 'docker swarm join-token manager -q' > temp/manager_token
-      EOS
-  }
-}
-
 #                     _
 # __      _____  _ __| | _____ _ __
 # \ \ /\ / / _ \| '__| |/ / _ \ '__|
