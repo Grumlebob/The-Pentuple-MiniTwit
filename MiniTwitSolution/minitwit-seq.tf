@@ -23,14 +23,6 @@ resource "digitalocean_droplet" "seq-droplet" {
     create = "10m"
   }
 
-  provisioner "file" {
-    content = <<-EOT
-      export DOCKER_USERNAME=${var.docker_username}
-    EOT
-
-    destination = "/root/.bash_profile"
-  }
-
   provisioner "remote-exec" {
     inline = [
       "mkdir -p /root/minitwit",

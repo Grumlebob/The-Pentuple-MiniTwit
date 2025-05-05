@@ -24,7 +24,7 @@ resource "digitalocean_droplet" "client-droplet" {
 
   provisioner "file" {
     content = <<-EOT
-      export DOCKER_USERNAME=${var.docker_username}
+      export DOCKER_USERNAME="${var.docker_username}"
     EOT
 
     destination = "/root/.bash_profile"

@@ -24,9 +24,8 @@ resource "digitalocean_droplet" "db-droplet" {
 
   provisioner "file" {
     content = <<-EOT
-      export DOCKER_USERNAME=${var.docker_username}
-      export MINITWIT_DB_USER=${var.minitwit_db_user}
-      export MINITWIT_DB_PASSWORD=${var.minitwit_db_password}
+      export MINITWIT_DB_USER="${var.minitwit_db_user}"
+      export MINITWIT_DB_PASSWORD="${var.minitwit_db_password}"
     EOT
 
     destination = "/root/.bash_profile"
