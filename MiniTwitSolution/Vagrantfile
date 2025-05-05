@@ -24,7 +24,6 @@ Vagrant.configure("2") do |config|
     # Append environment variable definitions only if they don't exist already
     {
       "DOCKER_USERNAME"     => ENV["DOCKER_USERNAME"],
-      "DOCKER_PASSWORD"     => ENV["DOCKER_PASSWORD"],
       "MINITWIT_DB_USER"    => ENV["MINITWIT_DB_USER"],
       "MINITWIT_DB_PASSWORD"=> ENV["MINITWIT_DB_PASSWORD"]
     }.each do |var, val|

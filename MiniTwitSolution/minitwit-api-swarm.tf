@@ -17,6 +17,16 @@ resource "digitalocean_droplet" "minitwit-swarm-leader" {
     timeout = "2m"
   }
 
+  provisioner "file" {
+    content = <<-EOT
+      export DOCKER_USERNAME=${var.docker_username}
+      export MINITWIT_DB_USER=${var.minitwit_db_user}
+      export MINITWIT_DB_PASSWORD=${var.minitwit_db_password}
+    EOT
+
+    destination = "/root/.bash_profile"
+  }
+
   provisioner "remote-exec" {
     inline = [
       "mkdir -p /root/minitwit",

@@ -10,15 +10,20 @@ variable "region" {}
 variable "pub_key" {}
 variable "pvt_key" {}
 
+# other variables that the droplets need
+variable "docker_username" { }
+variable "minitwit_db_user" { }
+variable "minitwit_db_password" { }
+
 # setup the provider
 terraform {
   required_providers {
     digitalocean = {
-      source = "digitalocean/digitalocean"
+      source  = "digitalocean/digitalocean"
       version = "~> 2.37.1"
     }
     null = {
-      source = "hashicorp/null"
+      source  = "hashicorp/null"
       version = "3.1.0"
     }
   }
