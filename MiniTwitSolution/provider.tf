@@ -1,5 +1,4 @@
 ﻿# api token
-# here it is exported in the environment like
 # export TF_VAR_do_token=xxx
 variable "do_token" {}
 

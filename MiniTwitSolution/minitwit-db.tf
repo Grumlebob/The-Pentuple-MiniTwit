@@ -14,7 +14,12 @@ resource "digitalocean_droplet" "db-droplet" {
     host = self.ipv4_address
     type = "ssh"
     private_key = file(var.pvt_key)
-    timeout = "2m"
+    timeout = "5m"
+  }
+
+  # ensure Terraform waits long enough for the droplet to be "created"
+  timeouts {
+    create = "10m"
   }
 
   provisioner "file" {
@@ -47,6 +52,10 @@ resource "digitalocean_droplet" "db-droplet" {
     inline = [
       # SSH
       "ufw allow 22",
+
+      # strip any CRLF that snuck in on the way
+      "apt-get update && apt-get install -y dos2unix",
+      "dos2unix /root/minitwit/deploy.sh",
 
       # deploy db application
       "cd /root/minitwit",

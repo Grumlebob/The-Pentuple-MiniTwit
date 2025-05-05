@@ -14,7 +14,12 @@ resource "digitalocean_droplet" "minitwit-swarm-leader" {
     host = self.ipv4_address
     type = "ssh"
     private_key = file(var.pvt_key)
-    timeout = "2m"
+    timeout = "5m"
+  }
+
+  # ensure Terraform waits long enough for the droplet to be "created"
+  timeouts {
+    create = "10m"
   }
 
   provisioner "file" {
@@ -117,7 +122,12 @@ resource "digitalocean_droplet" "minitwit-swarm-worker" {
     host = self.ipv4_address
     type = "ssh"
     private_key = file(var.pvt_key)
-    timeout = "2m"
+    timeout = "5m"
+  }
+
+  # ensure Terraform waits long enough for the droplet to be "created"
+  timeouts {
+    create = "10m"
   }
 
   provisioner "file" {
@@ -144,26 +154,34 @@ resource "digitalocean_droplet" "minitwit-swarm-worker" {
   }
 }
 
+# Deploy swarm application after droplets are created
+
 resource "null_resource" "swarm-deploy" {
-  # force this to wait for all workers
-  depends_on = [digitalocean_droplet.minitwit-swarm-worker, digitalocean_droplet.db-droplet]
+  # wait for leader, workers and db to be created
+  depends_on = [digitalocean_droplet.minitwit-swarm-leader, 
+  digitalocean_droplet.minitwit-swarm-worker, 
+  digitalocean_droplet.db-droplet]
   
-  # this trigger will re-run this if you we change the count/addresses of workers
+  # this trigger will re-run this if you we change the count/addresses of workers (gpt credit)
   triggers = {
     worker_ips = join(",", digitalocean_droplet.minitwit-swarm-worker.*.ipv4_address)
   }
 
-  # SSH into swarm leader
   connection {
     type        = "ssh"
     user        = "root"
     host        = digitalocean_droplet.minitwit-swarm-leader.ipv4_address
     private_key = file(var.pvt_key)
-    timeout     = "2m"
+    timeout     = "5m"
   }
 
   provisioner "remote-exec" {
     inline = [
+      # strip any CRLF that snuck in on the way
+      "apt-get update && apt-get install -y dos2unix",
+      "dos2unix /root/migrator/doMigration.sh",
+      "dos2unix /root/minitwit/deploy.sh",
+
       # run migration
       "cd /root/migrator",
       "chmod +x doMigration.sh",
