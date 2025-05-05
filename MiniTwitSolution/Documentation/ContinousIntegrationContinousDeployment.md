@@ -57,7 +57,7 @@ pushes the changes, so we don't have to remember to do it.
 This means it happens behind the scenes, and we assume it does not do
 something crazy that we wouldn't want on our main branch.
 
-## 25.04.2025
+## 05.05.2025
 
 ### Terraform
 
@@ -65,23 +65,35 @@ We started on the terraform setup using this guide:
 https://github.com/itu-devops/itu-minitwit-docker-swarm-teraform?tab=readme-ov-file
 We did it on our own repository.
 
-Instead of 1 leader 2 managers and 3 workers 
+Instead of 1 leader 2 managers and 3 workers
 we use 1 leader/manager and 2 workers.
 
 The leader droplet is the one calling ```docker swarm init```.
-The leader then calls ```docker swarm join-token worker``` 
+The leader then calls ```docker swarm join-token worker```
 which creates a token that worker droplets can call ```docker swarm join``` with.
 To add more managers to the swarm the leader can make a manager token
-```docker swarm join-token worker``` but since we use the leader as manager 
+```docker swarm join-token worker``` but since we use the leader as manager
 we haven't used this.
 
-there is a script for the droplet swarm (minitwit-api-swarm.tf), 
+there is a script for the droplet swarm (minitwit-api-swarm.tf),
 one for terraform vars (minitwit.auto.tfvars)
 and a provider file (provider.tf) where variables are published.
 Then there's separate files for the client, database and seq.
-When running terraform commands it compiles all files together, 
+When running terraform commands it compiles all files together,
 as if it was all in the same file.
 
-We managed to get terraform to create droplet.
-Whether it actually works will be tested another day
+Remember to have a ```secrets``` file with the contents found in discord resources chat.
 
+There was some line ending trouble. Before it worked the following files were changed from CRLF to LF:
+
+- ```secrets```
+- ```bootstrap.sh```
+- ```all .tf files```
+
+The ```bootstrap.sh``` file, which is in the same folder,
+sets up terraform using all the aforementioned files.
+
+Note: it currently does not automatically assign reserved IP's in case we destroy and recreate droplets.
+It also does not currently give digital ocean user permission. So we cannot open a console from digital ocean. You need to ssh from your own console.
+
+After the application was deployed with terraform the database was reset.

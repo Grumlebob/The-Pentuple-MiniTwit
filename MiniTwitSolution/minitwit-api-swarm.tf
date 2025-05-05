@@ -84,12 +84,7 @@ resource "null_resource" "swarm-worker-token" {
 
   # save the worker join token
   provisioner "local-exec" {
-    command = <<EOS
-      ssh -o 'StrictHostKeyChecking no' 
-        root@${digitalocean_droplet.minitwit-swarm-leader.ipv4_address} 
-        -i ${var.pvt_key} 
-        'docker swarm join-token worker -q' > temp/worker_token
-      EOS
+    command = "ssh -o 'StrictHostKeyChecking no' root@${digitalocean_droplet.minitwit-swarm-leader.ipv4_address} -i ${var.pvt_key} 'docker swarm join-token worker -q' > temp/worker_token      "
   }
 }
 
@@ -149,7 +144,7 @@ resource "digitalocean_droplet" "minitwit-swarm-worker" {
       "ufw allow 22",
 
       # join swarm cluster as workers
-      "docker swarm join --token $(cat worker_token) ${digitalocean_droplet.minitwit-swarm-leader.ipv4_address}"
+      "docker swarm join --token $(cat /root/worker_token) ${digitalocean_droplet.minitwit-swarm-leader.ipv4_address}"
     ]
   }
 }
