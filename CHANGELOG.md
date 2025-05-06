@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.0
+
+### Changed
+
+- Add terraform support to automatically set up/tear down droplets
+
 ## v2.8
 
 ### Changed
@@ -7,7 +13,7 @@
 - Added domain names for:
   - client, api, seq
 - Added tls encryption and https support
-- Add sexy graphs to seq 
+- Add sexy graphs to seq
 
 ## v2.7
 

@@ -37,9 +37,9 @@ jobs:
       - name: Format C# code with Csharpier
         if: matrix.language == 'csharp'
         run: |
-          dotnet tool install -g csharpier || true
+          dotnet tool install -g csharpier --version 1.0.1
           export PATH="$PATH:~/.dotnet/tools"
-          dotnet-csharpier .
+          csharpier format .
 
       - name: Commit and push formatted code
         if: github.event_name == 'pull_request' && matrix.language == 'csharp'
