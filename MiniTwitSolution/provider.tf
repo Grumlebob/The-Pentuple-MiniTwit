@@ -14,6 +14,11 @@ variable "docker_username" { }
 variable "minitwit_db_user" { }
 variable "minitwit_db_password" { }
 
+variable "client_reserved_ip" { }
+variable "api_reserved_ip" { }
+variable "db_reserved_ip" { }
+variable "seq_reserved_ip" { }
+
 # setup the provider
 terraform {
   required_providers {

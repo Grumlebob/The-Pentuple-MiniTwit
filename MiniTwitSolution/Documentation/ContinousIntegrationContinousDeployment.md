@@ -93,7 +93,7 @@ There was some line ending trouble. Before it worked the following files were ch
 The ```bootstrap.sh``` file, which is in the same folder,
 sets up terraform using all the aforementioned files.
 
-Note: it currently does not automatically assign reserved IP's in case we destroy and recreate droplets.
-It also does not currently give digital ocean user permission. So we cannot open a console from digital ocean. You need to ssh from your own console.
+Note: ~~it currently does not automatically assign reserved IP's in case we destroy and recreate droplets.~~ (fixed 06.05.2025)
+It also does not currently give digital ocean user permission. So we cannot open a console from digital ocean. You need to ssh from your own console. After a bit of research and asking ChatGpt it seems one must do it manually on digital ocean.
 
 After the application was deployed with terraform the database was reset.

@@ -88,6 +88,12 @@ resource "null_resource" "swarm-worker-token" {
   }
 }
 
+# Assign the reserved IP to the droplet
+resource "digitalocean_reserved_ip_assignment" "api_ip" {
+  ip_address = var.api_reserved_ip
+  droplet_id = digitalocean_droplet.minitwit-swarm-leader.id
+}
+
 #                     _
 # __      _____  _ __| | _____ _ __
 # \ \ /\ / / _ \| '__| |/ / _ \ '__|

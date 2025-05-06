@@ -64,6 +64,12 @@ resource "digitalocean_droplet" "db-droplet" {
   }
 }
 
+# Assign the reserved IP to the droplet
+resource "digitalocean_reserved_ip_assignment" "db_ip" {
+  ip_address = var.db_reserved_ip
+  droplet_id = digitalocean_droplet.db-droplet.id
+}
+
 output "minitwit-db-ip-address" {
   value = digitalocean_droplet.db-droplet.ipv4_address
 }

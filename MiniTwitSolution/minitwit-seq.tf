@@ -61,6 +61,12 @@ resource "digitalocean_droplet" "seq-droplet" {
   }
 }
 
+# Assign the reserved IP to the droplet
+resource "digitalocean_reserved_ip_assignment" "seq_ip" {
+  ip_address = var.seq_reserved_ip
+  droplet_id = digitalocean_droplet.seq-droplet.id
+}
+
 output "minitwit-seq-ip-address" {
   value = digitalocean_droplet.seq-droplet.ipv4_address
 }
