@@ -1,0 +1,33 @@
+% DO NOT Change this is the required setting A4 page, 11pt, onside print, book style
+\documentclass[a4paper,11pt]{article} 
+\input{.preamble}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\quickcharcount{.main}
+\quickwordcount{.main}
+%%TC:ignore
+\input{frontpage}
+%%TC:endignore
+\newpage
+
+%%TC:ignore
+\tableofcontents
+\newpage
+%TC:endignore
+
+\input{chapters/01_System_perspective}
+\input{chapters/02_Process_perspective}   
+\input{chapters/03_Reflection_perspective}
+\newpage
+
+%%TC:ignore
+\bibliography{references}
+\newpage
+
+\part*{Appendix}
+\begin{appendices}
+   \input{chapters/appendix_A.tex}
+   \input{chapters/appendix_B.tex}
+\end{appendices}
+%%TC:endignore
+\end{document}
