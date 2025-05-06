@@ -4,11 +4,29 @@
 \subsection{Modules}
 insert module view
 
-\subsubsection{The load balancer}
+\subsubsection{Api load balancer}
 
 Api uses docker swarm with one leader giving tasks 
 to the workers. The leader is the load balancer 
 and the workers are the servers. 
 
+.Net minimal api because its nice.
 
+\subsubsection{Client}
+
+Blazor because it is nice and webassembly etc.
+
+\subsubsection{Seq monitor}
+
+Seq\cite{seq} because it is specialized for .NET
+
+\subsubsection{Database}
+
+Postgres because we like it
+
+
+\subsection{Sequence diagram}
+
+Diagram of user posting msg on client or simulator making api call. 
+Calls api, uses logging, database, logging again. Reponse back to client/simulator.
 
