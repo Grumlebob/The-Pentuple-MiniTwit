@@ -1,0 +1,21 @@
+name: Generate Report PDF
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-report:
+    runs-on: ubuntu-latest-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # Compile LaTeX to report/main.pdf
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: report/.main.tex
+
+      - name: Move PDF into build folder
+        run: mv report/main.pdf report/build/MSc_group_j.pdf
