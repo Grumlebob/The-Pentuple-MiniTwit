@@ -1,4 +1,24 @@
-\input{preamble}
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{graphicx}
+\usepackage{appendix}
+\usepackage{float}
+\usepackage{url}
+\usepackage{pdfpages}
+\usepackage{hyperref}
+\usepackage{comment}
+\usepackage{verbatim}
+
+\bibliographystyle{abbrv} 
+
+\newcommand{\quickwordcount}[1]{%
+  \immediate\write18{texcount -1 -sum -merge #1.tex > #1-words.sum}%
+  \openin\tmp=#1-words.sum%
+  \read\tmp to \theword%
+  \closein\tmp%
+}
+
+% end preamble
 
 \begin{document}
 %\quickwordcount{main}
