@@ -893,7 +893,6 @@ Temporary Items
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -1220,9 +1219,6 @@ MiniTwitSolution/temp/*
 # *.eps
 # *.pdf
 
-## Generated if empty string is given at "Please type another file name for output:"
-.pdf
-
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
 *.bcf
@@ -1507,7 +1503,6 @@ TSWLatexianTemp*
 *.glstex
 
 ### Perl ###
-!Build/
 .last_cover_stats
 /META.yml
 /META.json
@@ -1522,12 +1517,7 @@ cover_db/
 # Devel::NYTProf
 nytprof.out
 
-# Dist::Zilla
-/.build/
-
 # Module::Build
-_build/
-Build
 Build.bat
 
 # Module::Install

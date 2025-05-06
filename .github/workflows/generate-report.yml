@@ -15,7 +15,7 @@ jobs:
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: report/.main.tex
+          root_file: report/main.tex
 
       - name: Move PDF into build folder
         run: mv report/main.pdf report/build/MSc_group_j.pdf
