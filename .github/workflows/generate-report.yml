@@ -31,7 +31,7 @@ jobs:
           git add report/build/MSc_group_j.pdf
           # if changes were made
           if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Apply code formatting with Csharpier"
+            git commit -m "Generate report in build folder"
             # Pull the remote changes and rebase to integrate any new commits
             git pull --rebase origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
