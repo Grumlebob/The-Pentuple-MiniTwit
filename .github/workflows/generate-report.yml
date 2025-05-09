@@ -8,6 +8,9 @@ on:
 jobs:
   build-report:
     runs-on: ubuntu-24.04
+    permissions:
+      # allow it to push the generated report
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
