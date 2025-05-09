@@ -1192,6 +1192,7 @@ terraform.rc
 
 MiniTwitSolution/temp/*
 
+
 # Created by https://www.toptal.com/developers/gitignore/api/latex,perl,tex
 # Edit at https://www.toptal.com/developers/gitignore?templates=latex,perl,tex
 
@@ -1682,6 +1683,7 @@ local/
 # glossaries
 
 # End of https://www.toptal.com/developers/gitignore/api/latex,perl,tex
+
 
 # End of https://www.toptal.com/developers/gitignore/api/terraform
 
