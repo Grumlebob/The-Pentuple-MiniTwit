@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-report:
-    runs-on: ubuntu-latest-24.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -25,9 +25,12 @@ jobs:
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
           git add report/build/MSc_group_j.pdf
-          # continue only if changes are made
-          git diff --cached --quiet || (
-            git commit -m "Generate report"
+          # if changes were made
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Apply code formatting with Csharpier"
+            # Pull the remote changes and rebase to integrate any new commits
             git pull --rebase origin ${{ github.head_ref }}
             git push origin HEAD:${{ github.head_ref }}
-          )
+          else
+            echo "No changes to commit."
+          fi
