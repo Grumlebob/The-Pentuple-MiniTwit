@@ -1,7 +1,7 @@
 name: Generate Report PDF
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
@@ -19,3 +19,15 @@ jobs:
 
       - name: Move PDF into build folder
         run: mv report/main.pdf report/build/MSc_group_j.pdf
+
+      - name: Commit and push
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add report/build/MSc_group_j.pdf
+          # continue only if changes are made
+          git diff --cached --quiet || (
+            git commit -m "Generate report"
+            git pull --rebase origin ${{ github.head_ref }}
+            git push origin HEAD:${{ github.head_ref }}
+          )
