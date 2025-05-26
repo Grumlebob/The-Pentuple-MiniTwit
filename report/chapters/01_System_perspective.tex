@@ -1,8 +1,14 @@
 \section{System's Perspective}
 \label{ch:sys_persp} % used to ref this chapter
 
-\subsection{Modules}
-insert module view
+\subsection{Module view}
+
+\begin{figure}[H]
+    \centering
+    %\includegraphics[width=\linewidth]{images/modules.svg}
+    \caption{Modules in the system.}
+    \label{fig:modules}
+\end{figure}
 
 \subsubsection{Api load balancer}
 
@@ -14,7 +20,7 @@ and the workers are the servers.
 
 \subsubsection{Client}
 
-Blazor because it is nice and webassembly etc.
+The client module is a Blazor webassembly app.
 
 \subsubsection{Seq monitor}
 
@@ -30,3 +36,9 @@ Postgres because we like it
 Diagram of user posting msg on client or simulator making api call. 
 Calls api, uses logging, database, logging again. Reponse back to client/simulator.
 
+\begin{figure}[H]
+    \centering
+    %\includegraphics[width=\linewidth]{images/modules.svg}
+    \caption{}
+    \label{fig:sequence_diagram}
+\end{figure}
