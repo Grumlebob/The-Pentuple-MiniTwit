@@ -19,6 +19,7 @@ jobs:
         uses: xu-cheng/latex-action@v3
         with:
           root_file: report/main.tex
+          extra_system_packages: "inkscape" # for SVG support
           work_in_root_file_dir: true
 
       - name: Move PDF into build folder
