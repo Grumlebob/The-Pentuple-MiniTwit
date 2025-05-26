@@ -2,22 +2,35 @@
 \label{ch:sys_persp} % used to ref this chapter
 
 This section covers the main modules of the system with their  
-respective technologies and dependencies.
+respective technologies and dependencies, as well as how they
+were deployed.
 
 \subsection{Module view}
-
-
 
 \begin{figure}[H]
     \centering
     \includesvg[width=\linewidth]{images/modules.drawio}
-    \caption{Modules in the system.}
+    \caption{Diagram showing the modules that make up the system with
+    their dependencies and main technologies.}
     \label{fig:modules}
 \end{figure}
 
-\subsubsection{Api load balancer}
+\subsection{Deployment view}
 
-Api uses docker swarm with one leader giving tasks 
+\begin{figure}[H]
+      \centering
+      \includesvg[width=\textwidth]{images/deployment_diagram.drawio}
+      \caption{Diagram showing how the modules were deployed.}
+      \label{fig:deployment_diagram}
+\end{figure}
+
+We used Digital Ocean to deploy our system.
+The modules were deployed to ``droplets'' running Ubuntu 22.04.
+We create docker images 
+
+\subsubsection{API load balancer}
+
+Our API module uses docker swarm with one leader giving tasks 
 to the workers. The leader is the load balancer 
 and the workers are the servers. 
 
@@ -46,10 +59,3 @@ Postgres because we like it
 
 Diagram of user posting msg on client or simulator making api call. 
 Calls api, uses logging, database, logging again. Reponse back to client/simulator.
-
-\begin{figure}[H]
-    \centering
-    %\includegraphics[width=\linewidth]{images/modules.svg}
-    \caption{}
-    \label{fig:sequence_diagram}
-\end{figure}
