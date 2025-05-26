@@ -18,7 +18,7 @@ were deployed.
 Users interact with the system through the Client module,
 which send requests to the API module. The API has a database 
 connection and writes logs which are read by the Monitor module.
-The Integration tests use services from the APi and its own instances
+The Integration tests use services from the API and its own instances
 of the database to test the API module.
 This is illustrated in Figure \ref{fig:modules}.
 
@@ -26,7 +26,8 @@ This is illustrated in Figure \ref{fig:modules}.
 
 \begin{figure}[H]
       \centering
-      \includesvg[width=\textwidth]{images/deployment_diagram.drawio}
+      \makebox[\linewidth]{
+      \includesvg[width=1.4\textwidth]{images/deployment_diagram.drawio}}
       \caption{Deployment diagram showing how the modules were deployed.}
       \label{fig:deployment_diagram}
 \end{figure}
@@ -79,7 +80,8 @@ posted messages, and followers.
 
 \begin{figure}[H]
     \centering
-    \includesvg[width=1\textwidth]{images/sequence_diagram.drawio}
+    \makebox[\linewidth]{
+    \includesvg[width=1.4\textwidth]{images/sequence_diagram.drawio}}
     \caption{Sequence diagram showing how the system acts upon 
     a user posting a message.}
     \label{fig:seq_diagram}
