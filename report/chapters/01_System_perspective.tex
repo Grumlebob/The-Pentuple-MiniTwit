@@ -15,47 +15,75 @@ were deployed.
     \label{fig:modules}
 \end{figure}
 
+Users interact with the system through the Client module,
+which send requests to the API module. The API has a database 
+connection and writes logs which are read by the Monitor module.
+The Integration tests use services from the APi and its own instances
+of the database to test the API module.
+This is illustrated in Figure \ref{fig:modules}.
+
 \subsection{Deployment view}
 
 \begin{figure}[H]
       \centering
       \includesvg[width=\textwidth]{images/deployment_diagram.drawio}
-      \caption{Diagram showing how the modules were deployed.}
+      \caption{Deployment diagram showing how the modules were deployed.}
       \label{fig:deployment_diagram}
 \end{figure}
 
 We used Digital Ocean to deploy our system.
 The modules were deployed to ``droplets'' running Ubuntu 22.04.
-We create docker images 
+This is illustrated in Figure \ref{fig:deployment_diagram}.
+It worked by creating and pushing docker images that the 
+droplets pulled and ran.
 
-\subsubsection{API load balancer}
+\subsection{API}
 
-Our API module uses docker swarm with one leader giving tasks 
-to the workers. The leader is the load balancer 
-and the workers are the servers. 
+The API functions as a backend for the MiniTwit application.
+It is deployed as three separate units. 
+It uses docker swarm with one leader/manager 
+giving tasks to two workers. Thus, the leader functions as a 
+load balancer using the workers as servers. 
 
-.Net minimal api because its nice.
+The API project is implemented in .NET using minimal API.
+The database communication is done using Entity Framework Core.
+It logs using Serilog\cite{serilog}, 
+which is configured to write to Seq\cite{seq}.
 
-\subsubsection{Client}
+\subsection{Client}
 
-The client module is a Blazor webassembly app.
+The Client is the frontend for the MiniTwit application.
+It is implemented as a Blazor webassembly app.
+This means the load is distributed to the users' browsers 
+rather than a server.
+It sends requests to and receives responses from the API module.
 
-\subsubsection{Seq monitor}
+\subsection{Monitor}
 
-Seq\cite{seq} because it is specialized for .NET
+Our Monitor uses the tool, Seq\cite{seq}.
+It handles logs and displays custom graphs based on 
+the log information. 
+It is deployed on its own Digital Ocean droplet 
+using an image provided by datalust\cite{seq}.
 
-\subsubsection{Database}
+\subsection{Database}
 
-Postgres because we like it
-
+The database is a PostgreSQL\cite{postgres} database.
+It contains information about registered users,
+posted messages, and followers.
 
 \subsection{Sequence diagram}
+
 \begin{figure}[H]
     \centering
     \includesvg[width=1\textwidth]{images/sequence_diagram.drawio}
-    \caption{Sequence diagram of user posting a message}
+    \caption{Sequence diagram showing how the system acts upon 
+    a user posting a message.}
     \label{fig:seq_diagram}
 \end{figure}
 
-Diagram of user posting msg on client or simulator making api call. 
-Calls api, uses logging, database, logging again. Reponse back to client/simulator.
+In summary, users uses the Client to for instance post a message.
+The Client sends a request to the API, which logs the request 
+information, saves the message to the database, 
+logs the reponse information and sends a response back to the 
+Client. The Client then updates the UI for the user.
