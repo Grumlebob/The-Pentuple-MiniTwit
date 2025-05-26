@@ -67,6 +67,18 @@ We can use Terraform to automatically setup droplets.
 The state file is stored in a remote bucket on Digital Ocean Spaces.
 
 \subsection{Logging and monitoring}
+We use Serilog for logging API requests, responses, and errors.
+Together with Seq, we can view the logs in a web interface to monitor 
+applciation activity, and display graphs containing application performance 
+for developers, and business statistics for stakeholders to use.
+In Seq, we have three dashboards: Overview, Endpoint Overview, and Business.
+The Overview dashboard contains a general view of the application 
+errors/exceptions, and the total number of events.
+The Endpoint Overview dashboard contains a view of the API endpoints,
+showing the number of requests, and average response times.
+Lastly, the Business dashboard contains a view of user activity,
+showing when and how often users posts tweets, and the total number of tweets over time.
+
 
 \subsection{Security assessment}
 
