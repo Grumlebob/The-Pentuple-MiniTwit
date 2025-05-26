@@ -11,44 +11,54 @@
 \end{figure}
 
 The CI/CD pipeline is implmented using GitHub actions to automate 
-building, testing, analyse code quality, releasing, and deployment
+building, testing, analysing code quality, releasing, and deployment
 of the MiniTwit application.
-The pipline consists of multiple workflows: build-test.yml, codeql.yml, auto-merge-dependabot.yml, auto-release.yml, and deploy.yml. 
+The pipeline consists of multiple workflows: build-test.yml, codeql.yml, auto-merge-dependabot.yml, auto-release.yml, and deploy.yml. 
 Workflows are located at \textit{.github/workflows} in the repository. 
+
 \subsubsection{Build and Test Workflow}
-This workflow is triggered on every push to the \textit{main} branch and on pull requests (PR) to \textit{main}.
+This workflow is triggered on every push and pull requests (PR) to \textit{main}.
 The purpose of this is to build the application, run unit tests, and generate/upload a code coverage report.
+Passing this workflow is a requirement for merging PR's into \textit{main}.
+
 \subsubsection{Code Quality Workflow}
 This workflow makes use of GitHub's \texttt{CodeQL} to perform static code analysis of C\# code only.
-This workflow also uses the same triggers as the build and test workflow, however, it is also triggered on a schedule, 
+This workflow uses the same triggers as the build and test workflow, however, it is also triggered on a schedule, 
 which is set to run every Thuesday via CRON.
 Before performing the analysis, it formats the C\# code using \texttt{csharpier} to 
 ensure consistency and automatically commits and pushes formatting changes.
 It then performs a sematics code analysis to find security vulnerabilities and automatically uploads the results to GitHub, 
-which is displayed on PRs.
-This became very relavant when it once discovered that we leaked a third party API key in our code, which we then removed.
+which is displayed on PR's.
+This became very relavant when it once discovered that we leaked a third party API key in our code, which we then removed and updated.
+
 \subsubsection{Auto Merge Dependabot Workflow}
 Our project uses \texttt{dependabot} to automatically update dependencies in the project.
-This workflow is triggered when a PR is created by dependabot, and automaticaly merges the PR into \textit{main} if the build and test workflow passes.
+We have a GitHub action that detects PR's created by dependabot, and automaticaly merges 
+them into \textit{main} if the build and test workflow passes.
 This was done to ensure that we always have the latest dependencies,
-and to avoid having to manually merge dependabot PRs.
+and to avoid having to manually merge dependabot PR's.
+
 \subsubsection{Auto Release Workflow}
-This workflow was inspired by a GitHub actions auto release template \cite{auto-release}.
+This workflow was inspired by a GitHub actions auto release template\cite{auto-release}.
 It is triggered on every push to the \textit{main} branch, and automatically creates a new release on GitHub.
-It requires a commit containing a tag in the format \texttt{Release: x.y}, where x and y are the major and minor version numbers, respectively.
+It requires a commit containing a message in the format \texttt{Release: x.y}, where x and y are the major and minor version numbers, respectively.
 To add title and release note information, this is added to the file \textit{CHANGELOG.md}.
 The purpose of this is to automate the release process, to replace the process of manually create a release on GitHub every time 
 we want to release a new version of the application.
+
 \subsubsection{Deployment Workflow}
-This workflow is triggered on succesful complestion of the build and test workflow.
+This workflow is triggered on succesful completion of the build and test workflow after push to main.
 It is responsible for building docker images, uploading, and deploying them to Digital Ocean droplets.
 To deploy, it uses Docker Hub to authenticate and push the built images.
-It uses \texttt{scp} and \texttt{ssh} to copy two remote files \texttt{deploy.sh} and \texttt{docker-compose.yml} to the droplet,
+It uses \texttt{scp} and \texttt{ssh} to copy two remote files \texttt{deploy.sh} and \texttt{docker-compose.yml} to the relevant droplet,
 which are then executed to deploy the application.
 For deployment safeguards; SSH keys, IP addresses, and creditials are stored in GitHub secrets,
 which are then used in the workflows to access the Digital Ocean droplets and to authenticate with Docker Hub.
 
 \subsection{Terraform}
+
+We can use Terraform to automatically setup droplets.
+The state file is stored in a remote bucket on Digital Ocean Spaces.
 
 \subsection{Logging and monitoring}
 
