@@ -3,7 +3,11 @@
 
 \subsection{CI/CD pipeline using GitHub actions}
 %A complete description of stages and tools included in the CI/CD chains, including deployment and release of your systems.
-\begin{figure}
+Our CI/CD pipeline is shown in Figure \ref{fig:activity_diagram}, which illustrates the process 
+of creating a ticket about a feature or an issue,
+developing the feature or fixing the issue, creaating a pull request (PR),
+reviewing the PR, merging it into the main branch, and finally realeasing and deploying the application.
+\begin{figure}[h]
       \centering
       \makebox[\linewidth]{
       \includesvg[width=1.4\textwidth]{images/activity_diagram.drawio}}
@@ -11,14 +15,15 @@
       \label{fig:activity_diagram}
 \end{figure}
 
-The CI/CD pipeline is implmented using GitHub actions to automate 
-building, testing, analysing code quality, releasing, and deployment
+We use GitHub issues to create tickets for new features and issues.
+The CI/CD pipeline is implmented using GitHub actions to automate the
+building, testing, analysis of code quality, releasing, and deployment
 of the MiniTwit application.
 The pipeline consists of multiple workflows: build-test.yml, codeql.yml, auto-merge-dependabot.yml, auto-release.yml, and deploy.yml. 
 Workflows are located at \textit{.github/workflows} in the repository. 
 
 \subsubsection{Build and Test Workflow}
-This workflow is triggered on every push and pull requests (PR) to \textit{main}.
+This workflow is triggered on every PR to \textit{main}.
 The purpose of this is to build the application, run unit tests, and generate/upload a code coverage report.
 Passing this workflow is a requirement for merging PR's into \textit{main}.
 
