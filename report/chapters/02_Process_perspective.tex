@@ -37,6 +37,14 @@ It then performs a sematics code analysis to find security vulnerabilities and a
 which is displayed on PR's.
 This became very relavant when it once discovered that we leaked a third party API key in our code, which we then removed and updated.
 
+Addtionally, we use SonarQube, CodeFactor, and OpenSSF to perform code analysis 
+such as code coverage, duplication, security risks, and other best practices.
+SonarQube's analysis is done by using the \texttt{sonarcloud-github-action} 
+GitHub action, which uploads the results to SonarCloud, and is displayed on the PR.
+CodeFactor and OpenSSF have read access to our repository, and automatically 
+perform code analysis whenever our repository is updated.
+The updated results are displayed on the front page of the repository on GitHub as batches.
+
 \subsubsection{Auto Merge Dependabot Workflow}
 Our project uses \texttt{dependabot} to automatically update dependencies in the project.
 We have a GitHub action that detects PR's created by dependabot, and automaticaly merges 
@@ -61,13 +69,23 @@ which are then executed to deploy the application.
 For deployment safeguards; SSH keys, IP addresses, and creditials are stored in GitHub secrets,
 which are then used in the workflows to access the Digital Ocean droplets and to authenticate with Docker Hub.
 
-\subsection{Terraform}
 
-We can use Terraform to automatically setup droplets.
-The state file is stored in a remote bucket on Digital Ocean Spaces.
+\subsection{Terraform}
+Terraform is used to provision and manage our infrastructure as code, 
+to automatically setup droplets in Digital Ocean, which is illustrated 
+in Figure \ref{fig:deployment_diagram}.
+Terraform creates a client droplet, which is connected to a docker swarm cluster.
+Terraform configures the docker swarm cluster to have one leader/manager droplet 
+which manages two worker droplets that executes the API.
+Addtionally, it creates a Database droplet, which runs a Postgres database,
+and a Monitor droplet, which runs Seq for logging and monitoring.
+
+To maintain infrastructure consistency and avoid creating duplicate droplets, 
+the Terraform state file is stored in a remote Digital Ocean Spaces when
+existing droplets are running.
 
 \subsection{Logging and monitoring}
-We use Serilog for logging API requests, responses, and errors.
+Serilog is used for logging API requests, responses, and errors.
 Together with Seq, we can view the logs in a web interface to monitor 
 applciation activity, and display graphs containing application performance 
 for developers, and business statistics for stakeholders to use.
@@ -81,8 +99,15 @@ showing when and how often users posts tweets, and the total number of tweets ov
 
 
 \subsection{Security assessment}
-CodeQL.
-Docker Scout (Check documentation).
+To analyse security risks in our code, we use tools like GitHub's CodeQL\cite{codeql} that 
+integrated with our CI/CD pipeline.
+This provides a display of security vulnerabilities in our code,
+which is shown on the PR's.
+
+To analyse security risks of the droplets, Docker Scout have been used to get
+quick overviews of security risks from our docker images.
+It scores the images in four levels: low, medium, high, and critical.
+Addtionally, it provides recommendations on how to fix the issues.
 
 \subsection{Scaling}
 
