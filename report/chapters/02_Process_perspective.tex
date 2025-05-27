@@ -48,7 +48,7 @@ The updated results are displayed on the front page of the repository on GitHub 
 \subsubsection{Auto Merge Dependabot Workflow}
 Our project uses \texttt{dependabot} to automatically update dependencies in the project.
 We have a GitHub action that detects PR's created by dependabot, and automaticaly merges 
-them into \textit{main} if the build and test workflow passes.
+them into \textit{main} if all workflows pass.
 This was done to ensure that we always have the latest dependencies,
 and to avoid having to manually merge dependabot PR's.
 
@@ -80,7 +80,7 @@ which manages two worker droplets that executes the API.
 Addtionally, it creates a Database droplet, which runs a Postgres database,
 and a Monitor droplet, which runs Seq for logging and monitoring.
 
-To maintain infrastructure consistency and avoid creating duplicate droplets, 
+To maintain infrastructure consistency and avoid creating duplicate droplets,
 the Terraform state file is stored in a remote Digital Ocean Spaces when
 existing droplets are running.
 
