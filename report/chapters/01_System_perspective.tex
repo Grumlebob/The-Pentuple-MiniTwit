@@ -15,12 +15,13 @@ were deployed.
     \label{fig:modules}
 \end{figure}
 
-Users interact with the system through the Client module,
-which send requests to the API module. The API has a database 
-connection and writes logs which are read by the Monitor module.
-The Integration tests use services from the API and its own instances
-of the database to test the API module.
-This is illustrated in Figure \ref{fig:modules}.
+Figure \ref{fig:modules} provides an overview of how the main modules are connected, specifically:
+\begin{itemize}
+    \item Users interact with the \texttt{Client} module
+    \item The \texttt{Client} module sends requests to the \texttt{API} module which contains a \texttt{Postgres} database connection
+    \item The \texttt{Monitor} module reads logs written by the \texttt{API}
+    \item The \texttt{Integration tests} module uses services from the \texttt{API} and its own database instance to test the \texttt{API}
+\end{itemize}
 
 \subsection{Deployment view}
 
@@ -32,15 +33,11 @@ This is illustrated in Figure \ref{fig:modules}.
       \label{fig:deployment_diagram}
 \end{figure}
 
-We used Digital Ocean to deploy our system.
-The modules were deployed to ``droplets'' running Ubuntu 22.04.
-This is illustrated in Figure \ref{fig:deployment_diagram}.
-It worked by creating and pushing docker images that the 
-droplets pulled and ran.
+We use \texttt{Digital Ocean} to deploy the respective modules to \texttt{droplets} running \texttt{Ubuntu 22.04} as illustrated in Figure \ref{fig:deployment_diagram}. It works by creating and pushing docker images which each droplet can pull and run.
 
 \subsection{API}
 
-The API functions as a backend for the MiniTwit application.
+The API functions as the backend for our MiniTwit application.
 It is deployed as three separate units. 
 It uses docker swarm with one leader/manager 
 giving tasks to two workers. Thus, the leader functions as a 
@@ -50,28 +47,24 @@ because we wanted to function optimally as a load balancer.
 We were not sure, how it would be affected by being another worker.
 Instead we can use it to run other side tasks, like databse migrations.
 
-The API project is implemented in .NET using minimal API.
+The API project is implemented in \texttt{.NET} using \texttt{minimal API}\cite{minimalApi}.
 The database communication is done using Entity Framework Core.
 It logs using Serilog\cite{serilog}, 
 which is configured to write to Seq\cite{seq}.
 
 \subsection{Client}
 
-The Client is the frontend for the MiniTwit application.
-It is implemented as a Blazor webassembly app.
-This means the load is distributed to the users' browsers 
-rather than a server.
-It sends requests to and receives responses from the API module.
+The \texttt{Client} is the frontend for the MiniTwit application implemented as a \texttt{Blazor} webassembly app. This way the workload is distributed to the users' browsers rather than a server. It is responsible for sending requests and receiving response from the \texttt{API} module.
 
 \subsection{Monitor}
 
-Our Monitor uses the tool, Seq\cite{seq}.
+Our \texttt{Monitor} uses the tool Seq\cite{seq}.
 It handles logs and displays custom graphs based on 
 the log information. We have both developer relevant 
-graphs such as API response times and errors,
+graphs such as \texttt{API} response times and errors,
 as well as business relevant graphs such as number 
 of newly registered users and messages posted.
-It is deployed on its own Digital Ocean droplet 
+It is deployed on its own \texttt{Digital Ocean} droplet 
 using an image provided by datalust\cite{seq}.
 
 \subsection{Database}
