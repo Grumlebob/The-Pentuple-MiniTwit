@@ -87,13 +87,14 @@ posted messages, and followers.
     \makebox[\linewidth]{
     \includegraphics[width=1.4\textwidth]{images/sequence_diagram.drawio.pdf}}
     \caption{Sequence diagram showing how the system acts upon 
-    a user posting a message.}
+    a user successfully posting a message.}
     \label{fig:seq_diagram}
 \end{figure}
 
-In summary, users uses the Client to for instance post a message.
-The Client sends a request to the API, which logs the request 
-information, saves the message to the database, 
-logs the reponse information and sends a response back to the 
-Client. The Client then updates the UI for the user.
+In summary, users post messages from the Client.
+The Client sends requests to the API, which logs the request 
+information, saves the messages to the database, 
+logs the reponse information and sends responses back to the 
+Client. Logs are used for monitoring in Seq. 
+The Client then updates the UI for the users.
 This is illustrated in Figure \ref{fig:seq_diagram}.
