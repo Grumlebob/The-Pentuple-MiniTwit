@@ -126,9 +126,11 @@ These are split of into; probability (unlikely, possible, likely) and impact (ne
 For details about each risk scenario see appendix \ref{appn:B}.
 
 \subsection{Scaling}
-
 Client is scalable since it is client side rendered.
-Api is scalable as it is stateless and uses docker swarm.
+API is scalable as it is stateless and uses docker swarm, allowing horitzontal scalling.
+Database is not scalable, as it is a single instance of PostgreSQL.
+While caching is used to reduce database load through hybrid caching, it is only client sided. Introducing Redis for server-side caching, could improve scalability by reducing database load, enabling faster response times. 
+
 
 \subsection{AI-assistants}
 
