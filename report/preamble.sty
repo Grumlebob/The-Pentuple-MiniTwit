@@ -1,0 +1,31 @@
+\ProvidesPackage{preamble}
+
+\usepackage{graphicx}
+\usepackage{appendix}
+\usepackage{float}
+\usepackage{url}
+\usepackage{pdfpages}
+\usepackage{hyperref}
+\usepackage{comment}
+\usepackage{verbatim}
+\usepackage{svg}
+
+\bibliographystyle{abbrv} 
+
+\newcommand{\quickwordcount}[1]{%
+  \immediate\write18{texcount -1 -sum -merge #1.tex > #1-words.sum}%
+  \openin\tmp=#1-words.sum%
+  \read\tmp to \theword%
+  \closein\tmp%
+}
+
+% ----------------------
+% Header and Footer
+% ----------------------
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\setlength{\headheight}{25.2842pt}
+\fancyhf{} % Clear all header and footer fields
+\fancyhead[L]{The Pentuple MiniTwit \\ }
+\fancyfoot[C]{\thepage\ of \pageref{LastPage}} % Page number centered in the footer

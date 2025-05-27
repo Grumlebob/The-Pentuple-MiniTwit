@@ -1,6 +1,28 @@
 \documentclass[a4paper,11pt]{article}
 
+<<<<<<< HEAD
 \usepackage{preamble}
+=======
+\usepackage{graphicx}
+\usepackage{appendix}
+\usepackage{float}
+\usepackage{url}
+\usepackage{pdfpages}
+\usepackage{hyperref}
+\usepackage{comment}
+\usepackage{verbatim}
+
+\bibliographystyle{abbrv} 
+
+\newcommand{\quickwordcount}[1]{%
+  \immediate\write18{texcount -1 -sum -merge #1.tex > #1-words.sum}%
+  \openin\tmp=#1-words.sum%
+  \read\tmp to \theword%
+  \closein\tmp%
+}
+
+% -------end preamble--------
+>>>>>>> 8a61b767da808608ec196b3c8bebb5c351dacf76
 
 \begin{document}
 %\quickwordcount{main} % cannot get it to work in latex vscode

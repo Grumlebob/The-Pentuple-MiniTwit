@@ -9,7 +9,7 @@ were deployed.
 
 \begin{figure}[H]
     \centering
-    \includesvg[width=\linewidth]{images/modules.drawio}
+    \includegraphics[width=\linewidth]{images/modules.drawio.pdf}
     \caption{Diagram showing the modules that make up the system with
     their dependencies and main technologies.}
     \label{fig:modules}
@@ -28,7 +28,7 @@ Figure \ref{fig:modules} provides an overview of how the main modules are connec
 \begin{figure}[H]
       \centering
       \makebox[\linewidth]{
-      \includesvg[width=1.4\textwidth]{images/deployment_diagram.drawio}}
+      \includegraphics[width=1.4\textwidth]{images/deployment_diagram.drawio.pdf}}
       \caption{Deployment diagram showing how the modules were deployed.}
       \label{fig:deployment_diagram}
 \end{figure}
@@ -78,15 +78,16 @@ posted messages, and followers.
 \begin{figure}[H]
     \centering
     \makebox[\linewidth]{
-    \includesvg[width=1.4\textwidth]{images/sequence_diagram.drawio}}
+    \includegraphics[width=1.4\textwidth]{images/sequence_diagram.drawio.pdf}}
     \caption{Sequence diagram showing how the system acts upon 
-    a user posting a message.}
+    a user successfully posting a message.}
     \label{fig:seq_diagram}
 \end{figure}
 
-In summary, users uses the Client to for instance post a message.
-The Client sends a request to the API, which logs the request 
-information, saves the message to the database, 
-logs the reponse information and sends a response back to the 
-Client. The Client then updates the UI for the user.
+In summary, users post messages from the Client.
+The Client sends requests to the API, which logs the request 
+information, saves the messages to the database, 
+logs the reponse information and sends responses back to the 
+Client. Logs are used for monitoring in Seq. 
+The Client then updates the UI for the users.
 This is illustrated in Figure \ref{fig:seq_diagram}.
