@@ -44,7 +44,11 @@ The API functions as a backend for the MiniTwit application.
 It is deployed as three separate units. 
 It uses docker swarm with one leader/manager 
 giving tasks to two workers. Thus, the leader functions as a 
-load balancer using the workers as servers. 
+load balancer using the workers as servers.
+We decided that the leader should not be a worker,
+because we wanted to function optimally as a load balancer.
+We were not sure, how it would be affected by being another worker.
+Instead we can use it to run other side tasks, like databse migrations.
 
 The API project is implemented in .NET using minimal API.
 The database communication is done using Entity Framework Core.

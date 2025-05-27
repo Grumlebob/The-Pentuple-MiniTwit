@@ -2,18 +2,112 @@
 
 \subsection{Biggest issues}
 
-How we solved them, bruteforce until it works.
+These are some of the problems we spent the most time solving.
+
+\subsubsection{Migrations and Docker compose}
+
+In the beginning of the project after we had refactored MiniTwit to .NET,
+we ran the program with \texttt{dotnet run}. 
+When the API started up it would also perform a database migration,
+in case the model had changed. This is a part of EF core
+that makes it easy to evolve the database schema.
+However, when we started using Docker compose, it would not run the migration.
+We spent a lot of time trying to make it work.
+Additionally, we did not have much experience with Docker,
+resulting in us spending over 30 hours total on the ticket
+``Dockerize application''.
+
+As a solution we ended up creating a separate Dockerfile for the migration.
+The sole purpose of this file was to use the API code project to run the migration.
+Later on as we implemented the CI/CD pipeline, 
+the migration was made part of the deployment process.
+
+\subsubsection{Docker swarm}
+
+Before we implemented docker swarm, we had a single droplet 
+and a single docker compose file that defined all the MiniTwit modules.
+This made it quite the challenge to change to several droplets with 
+seperate docker compose files for each module.
+With a single compose file it was easy to have health checks and
+dependencies between the modules. 
+Fortunately, the only crucial dependency was the database migration.
+The migration cannot happen before the database is up and running.
+However, with the database continuously running on its own droplet,
+it is no longer an issue.
+
+Another related issue was where to run the migration.
+Since the API module is the one communicating with the database,
+we initially included it in the API docker compose file.
+However, this was an issue now that the API was running on several 
+worker droplets as part of a docker swarm. Workers are designed
+to be able to crash and start up again, 
+meaning it is unpredictable when they run their given services.
+We want to only run the migration once, when we deploy.
+Otherwise, multiple concurrent migrations could cause 
+race conditions or similar issues on the database.
+This was solved by separating the migration into its own docker compose file.
+This is run once on the leader node, when we deploy.
+Getting docker swarm to work properly took over 14 hours 
+as seen on our ticket called ``Set up docker swarm''.
 
 \subsection{Lesssons learned}
 
 Automation is worth it.
+Clickops is time consuming and error prone.
 
 with regards to
 evolution and refactoring
 operation, and
 maintenance
 
+\subsection{Unresolved issues}
+
+There are some issues that we have still not managed to solve.
+
+\subsubsection{Domain url has long load time}
+
+For some reason when going to the client with the https domain name, 
+it loads for several seconds before the page is shown.
+
+\subsubsection{A hidden dependency}
+
+The API must allow the client to access it by 
+setting the CORS (Cross-Origin Resource Sharing) policy.
+We do this in the appsettings. The problem is that it is done manually.
+When the client changes IP-address, we must include 
+that IP in the CORS policy of the API.
+We could allow all origins to avoid this issue, 
+but optimally we would have liked to dynamically 
+inject it somewhere in the workflow.
+
+\subsubsection{Seq limitations}
+
+Adding monitoring with Seq was easy, since it is made specifically for .NET.
+However, it has some limitations, regarding graphs.
+It has a specific format for the SQL queries you can make graphs from.
+Specifically, it can only contain the following operations.
+\texttt{select, where, group by, having, order by, limit}.
+We wanted to make a business relevant graph testing the 1\% rule\cite{1_perc_rule}.
+In short, group users based on how many posts they have made.
+In order to combine this data, we only found ways that involve 
+\texttt{join} operations, which Seq does not support.
+
+Furthormore, we have not found a way to save the graphs we make.
+This means, if we tear down the droplet running Seq,
+we lose all the custom graphs we have made.
+To avoid starting completely over, we have saved the queries,
+so they can be manually pasted back in, when we run Seq again.
+
+\subsubsection{File structure}
+
+Terraform was one of the last things we added to the project.
+Currently, the terraform files are placed in the ``MiniTwitSoultion'' 
+folder next to ``remote_files'' which are the files copied to the droplets.
+If the project were to continue, we would move these things to a deployment folder.
+
 \subsection{The DevOps difference}
+
+Continuous deployment. 
 
 Which parts were devopsy and different than other projects
 
