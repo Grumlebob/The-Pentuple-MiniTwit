@@ -38,14 +38,14 @@ We use \texttt{Digital Ocean} to deploy the respective modules to \texttt{drople
 \subsection{API}
 
 The API functions as the backend for our MiniTwit application.
-It is deployed as three separate units. 
-It uses docker swarm with one leader/manager 
-giving tasks to two workers. Thus, the leader functions as a 
-load balancer using the workers as servers.
+It is deployed as three separate units, to make a docker swarm. 
+One is the leader/manager giving tasks to 
+the two others, who act as workers. 
+Thus, the leader functions as a load balancer using the workers as servers.
 We decided that the leader should not be a worker,
 because we wanted to function optimally as a load balancer.
 We were not sure, how it would be affected by being another worker.
-Instead we can use it to run other side tasks, like databse migrations.
+Instead we can use it to run other side tasks, like database migrations.
 
 The API project is implemented in \texttt{.NET} using \texttt{minimal API}\cite{minimalApi}.
 The database communication is done using Entity Framework Core.
