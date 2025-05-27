@@ -1,7 +1,10 @@
 \section{Security assessment expanded}
 \label{appn:B}
 
-\subsubsection{Access to Seq (negligible, likely)}
+This section gives a more detailed description of the security risks
+of our MiniTwit application.
+
+\subsection{Access to Seq (negligible, likely)}
 
 In the case of resetting/failure of the Seq droplet, the logs 
 are lost. Morever, the Seq password is reset everytime, meaning we 
@@ -12,14 +15,14 @@ and does not contain any sensitive information. However, only one user
 (stakeholder or developer) can access Seq at a time, 
 which can be abused to deny availability to legitimate users.
 
-\subsubsection{Login credentials leaked (moderate, likely)}
+\subsection{Login credentials leaked (moderate, likely)}
 
 Usernames and passwords are stored in plaintext in our 
 database (no encrpytion or hashing applied). If an attack 
 agains read access to the users table, all credentials are 
 immediately comprised, leading to unathorized account takeover. 
 
-\subsubsection{Overloading the API with requests (moderate, possible)}
+\subsection{Overloading the API with requests (moderate, possible)}
 
 A DDoS (distributed denial of service) attack can flood our API with 
 excessive traffic, rendering it unavailable to legitimate users. 
@@ -28,14 +31,14 @@ safe guard against DDoS attacks. Neither do we enfornce CAPTCHA or
 rate-limiting on critical endpoints. 
 The impact is limited to service unavailablity. 
 
-\subsubsection{Access to the database (catastrophic, unlikely)}
+\subsection{Access to the database (catastrophic, unlikely)}
 
 If an attack obtains direct database credentials or exploits a 
 vulnerability to gain read/write access. They could delete or modify 
 critical data, or have access to all user data, including usernames 
 and passwords.
 
-\subsubsection{Leak of secrets and API keys (catastrophic, possible)}
+\subsection{Leak of secrets and API keys (catastrophic, possible)}
 
 Some of the project secrets are shared informally (e.g., via Discord). 
 Thus if the wrong person is invited, these keys could be exposed. 
@@ -44,7 +47,7 @@ or cause damage. The probability is possible until stricter
 secret-management policies are enforced, 
 such as using a secret manager or vault.
 
-\subsubsection{Droplet failure (catastrophic, possible)}
+\subsection{Droplet failure (catastrophic, possible)}
 
 Any droplet could fail due to software or hardware issues. We currently have 
 no database backups. If the database droplet dies, we lose all data. 
