@@ -51,13 +51,27 @@ We ended up spending over 14 hours on the ticket ``Set up docker swarm''.
 
 \subsection{Lesssons learned}
 
-Automation is worth it.
-Clickops is time consuming and error prone.
+\subsubsection{``It works on my computer''}
 
-with regards to
-evolution and refactoring
-operation, and
-maintenance
+We learned the importance of having an environment that is 
+selfcontained, so it can run across platforms.
+The computers used in the group were a mix of Mac and Windows,
+and the droplets were running Ubuntu. 
+Using docker environments made it easy to run the same program
+on different machines without too much trouble.
+
+\subsubsection{DevOps vs ClickOps}
+
+Automation was a big focus in this project.
+There were numerous things in this project that 
+would have been bottlenecks, if we had to do them manually every time.
+Especially the deployment process, required a lot of steps
+of copying files and SSH'ing into droplets to run commands.
+Not only is this time consuming, it is also prone to errors.
+Forgetting a single step would cause most of the program to not work.
+An example of this, was when we manually created a droplet and forgot to add the 
+group SSH keys. We were then unable to access the droplet and had to 
+tear it down and create a new one.
 
 \subsection{Unresolved issues}
 
@@ -65,8 +79,10 @@ There are some issues that we have still not managed to solve.
 
 \subsubsection{Domain url has long load time}
 
-For some reason when going to the client with the https domain name, 
+For some unknown reason when going to the client with the https domain name, 
 it loads for several seconds before the page is shown.
+We did spend some time trying to find the cause,
+but we could not find anything.
 
 \subsubsection{A hidden dependency}
 
@@ -127,7 +143,16 @@ we will definitely include it in future projects.
 It was super useful for detecting errors, unexpected behavior,
 and slow response times, as well as general traffic to see 
 what kind of requests the program receives.
-
+This helps us make systematic optimizations. For instance,
+we considered optmizing our caching to speed up the API response times.
+However, the monitor revealed that the number of writes were
+greater than expected compared to the number of reads,
+meaning there would be too much cache invalidation for it to be worth it.
+At one point we also accidentally created a droplet on with an American server.
+We could immediately tell from the monitor that the response 
+times were much higher because of this.
+We quickly changed it back to the European server 
+that the other droplets were running with.
 
 \subsection{Reasons for tool choices}
 
