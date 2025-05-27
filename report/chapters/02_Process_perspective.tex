@@ -158,9 +158,9 @@ An attacker with a valid API key could impersonate our services,
 or cause damage. The probability is possible until stricter 
 secret-amangement policies are enforced, such as using a secret manager or vault.
 
-\subsubsection{Failure of the Digital Ocean droplets (catastrophic, possible)}
-Any droplet could fail due to software or hardwaere issues. We currently have 
-no automated database backups; if the database droplet dies, we lose all data. 
+\subsubsection{Droplet failure (catastrophic, possible)}
+Any droplet could fail due to software or hardware issues. We currently have 
+no database backups. If the database droplet dies, we lose all data. 
 The impact is catastrophic as we could lose all data (including user accounts 
 and tweets) and the application would be unavailable until the droplet is 
 restored or replaced.
