@@ -47,8 +47,7 @@ Otherwise, multiple concurrent migrations could cause
 race conditions or similar issues on the database.
 This was solved by separating the migration into its own docker compose file.
 This is run once on the leader node, when we deploy.
-Getting docker swarm to work properly took over 14 hours 
-as seen on our ticket called ``Set up docker swarm''.
+We ended up spending over 14 hours on the ticket ``Set up docker swarm''.
 
 \subsection{Lesssons learned}
 
@@ -102,14 +101,33 @@ so they can be manually pasted back in, when we run Seq again.
 
 Terraform was one of the last things we added to the project.
 Currently, the terraform files are placed in the ``MiniTwitSoultion'' 
-folder next to ``remote_files'' which are the files copied to the droplets.
+folder next to ``remote\_files'' which are the files copied to the droplets.
 If the project were to continue, we would move these things to a deployment folder.
 
 \subsection{The DevOps difference}
 
-Continuous deployment. 
+These are the things that made this project different and more devopsy
+than other projects we have worked on.
 
-Which parts were devopsy and different than other projects
+\subsubsection{Continuous integration/deployment}
+
+Deployment was a big focus in this project, 
+which is something we are not very used to.
+The issues we spent the most time on were often related to deployment.
+However, once the workflow was in place, it was
+an awesome advantage to be able to push some code,
+whereafter it was automatically available for everyone on the url, 
+meaning there was no need to run the program locally to see the results.
+
+\subsubsection{Monitoring}
+
+Monitoring is also something we haven't used much in previous projects.
+But given how easy it was to add, and the advantages it gave,
+we will definitely include it in future projects.
+It was super useful for detecting errors, unexpected behavior,
+and slow response times, as well as general traffic to see 
+what kind of requests the program receives.
+
 
 \subsection{Reasons for tool choices}
 
@@ -130,3 +148,9 @@ SonarQube
 Postgres
 
 dependabot
+
+coveralls
+
+testcontainers
+
+github actions
