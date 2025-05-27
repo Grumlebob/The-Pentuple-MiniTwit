@@ -18,7 +18,7 @@ were deployed.
 Figure \ref{fig:modules} provides an overview of how the main modules are connected, specifically:
 \begin{itemize}
     \item Users interact with the \texttt{Client} module
-    \item The \texttt{Client} module sends requests to the \texttt{API} module which contains a \texttt{Postgres} database connection
+    \item The \texttt{Client} module sends requests to the \texttt{API} module which contains a \texttt{PostgreSQL} database connection
     \item The \texttt{Monitor} module reads logs written by the \texttt{API}
     \item The \texttt{Integration tests} module uses services from the \texttt{API} and its own database instance to test the \texttt{API}
 \end{itemize}
