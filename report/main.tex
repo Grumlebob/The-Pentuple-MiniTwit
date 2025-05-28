@@ -11,8 +11,12 @@
 \newpage
 
 %TC:ignore
+\cleardoublepage
+\pagestyle{empty}         % Disable headers/footers globally for this page
 \tableofcontents
-\newpage
+\thispagestyle{empty}     % Ensure the current page uses 'empty' style
+\cleardoublepage
+\pagestyle{fancy}         % Restore your custom headers/footers
 %TC:endignore
 
 \input{chapters/00_introduction.tex}

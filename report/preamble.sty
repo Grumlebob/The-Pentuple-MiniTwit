@@ -27,5 +27,6 @@
 \pagestyle{fancy}
 \setlength{\headheight}{25.2842pt}
 \fancyhf{} % Clear all header and footer fields
-\fancyhead[L]{The Pentuple MiniTwit \\ }
+\renewcommand{\sectionmark}[1]{\markboth{\thesection.\ #1}{}}
+\fancyhead[L]{\shortstack[l]{The Pentuple MiniTwit \\ \leftmark}}
 \fancyfoot[C]{\thepage\ of \pageref{LastPage}} % Page number centered in the footer
