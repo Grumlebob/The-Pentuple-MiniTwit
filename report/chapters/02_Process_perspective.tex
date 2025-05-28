@@ -124,11 +124,32 @@ These are split into: probability (\texttt{unlikely}, \texttt{possible}, \texttt
 For details about each risk scenario see Appendix \ref{appn:B}.
 
 \subsection{Scaling}
-Client is scalable since it is client-side rendered.
-\texttt{API} is scalable as it is stateless and uses \texttt{Docker Swarm}, allowing horizontal scaling.
-\texttt{Database} is not scalable, as it is a single instance of \texttt{PostgreSQL}.
-While caching is used to reduce \texttt{Database} load through hybrid caching, it is only client-sided.
-Introducing \texttt{Redis} for server-side caching could improve scalability by reducing \texttt{Database} load, enabling faster response times.
+The \texttt{Client} uses Blazor WebAssembly (\texttt{WASM}) for client-side redering, avoiding server-side 
+HTML rendering.
+Instead the application logic is executed in the browser, and only lightweight 
+\texttt{JSON} requests are made to the \texttt{API} to fetch data.
+This results in a heavly initial load, as the entire application is downloaded 
+locally, however afterwards, 
+this setup offers high responsiveness and scalability by addtionally using 
+a \texttt{Hybrid Cache}.
+To overcome the browser caching limitations (e.g. 16 GB and frequently disks 
+reads), we could introduce a \texttt{Redis} cache to potentially support 
+infinite and more efficient caching.
+
+The \texttt{API} is scalable as it is stateless and uses \texttt{Docker Swarm}, 
+allowing horizontal scaling of both manager and worker nodes.
+With more managers we can distribute the load of incoming requests,
+and with more workers we can distibute the load of processing requests.
+\texttt{Database} is not currently not optimized in terms of scalability, 
+as it is a single instance of \texttt{PostgreSQL}.
+The Database is the bottleneck of the system, as it is the only shared 
+resource between the \texttt{API}.
+To fix this, we could use sharding to distribute the load of the \texttt{Database} 
+across multiple instances.
+By splitting the \texttt{Database} into multiple shards, we can distribute 
+the load of the \texttt{API} across multiple \texttt{PostgreSQL} instances.
+This could introduce some complexity and overhead, as it would be harder 
+to manage and query the data.
 
 \subsection{AI-assistants}
 
