@@ -1,0 +1,76 @@
+\section{Reasons for tool choices}
+\label{appn:C}
+It is important to state, that our group agreed that 
+job prospects and learning within \texttt{.NET} enviroment was a goal.
+As such, one main motivator was, what is commonly used in 
+the \texttt{.NET} industry.
+As such, choices such as using \texttt{.NET Minimal API},
+was quite obvious.
+
+\subsection{Infrastructure as code}
+
+We debated using \texttt{Pulumi}\cite{pulumi} vs \texttt{Terraform}.
+\texttt{Pulumi} is a newer tool, with a \texttt{.NET} SDK, 
+making the language more native to what we are used to.
+But none of us could find any job postings that used \texttt{Pulumi}.
+So we decided to use \texttt{Terraform}, which is more widely used 
+in the industry.
+
+
+\subsection{Blazor vs MVC}
+We wanted to send smaller \texttt{JSON} data instead of full \texttt{HTML} pages. 
+\texttt{Blazor} is newer and higher performance. By using \texttt{Blazor WASM}, 
+the client loads the code upon initial visit,
+and uses \texttt{JSON} data sent by our \texttt{Minimal API}, to render the \texttt{HTML} pages.
+This is an alternative to using \texttt{ASP.NET MVC}, which would require the server
+to render full \texttt{HTML} pages on site requests.
+
+\subsection{GitHub and GitHub actions}
+Everyone had experience, and found no learning to be 
+gained from switching to example \texttt{gitlab} and \texttt{Jenkins}.
+
+\subsection{Hybrid cache}
+We noticed the simulator made several reads sequentially without a write, 
+making caching quite benificial. \texttt{Hybrid cache} supports both local 
+and distributed caching for example through \texttt{Redis}\cite{redis}. 
+We planned to do \texttt{Redis}, but it is still in the backlog.
+
+\subsection{Testcontainers and respawn}
+As we are refactoring code, testing is insanely 
+useful, so we do not regress. 
+We wanted to do integration testing, to avoid mocking. 
+\texttt{Testcointainers} is also directly supported in \texttt{Github Actions}, 
+and as such makes contionuous integration a breeze.
+
+\subsection{Minimal API vs controllers}
+We had both at some point. \texttt{Minimal API} is newer, more performant, 
+and easy to read and write. 
+Therefore we refactored the code, to only have \texttt{Minimal API} endpoints.
+
+\subsection{PostgreSQL}
+\texttt{PostgreSQL} is free, and was part of the database course we all
+took. 
+We found learning about a different databases to be 
+out of scope for this course. 
+As well as going from \texttt{sqlite}
+being a relationship based database, we did not want to 
+switch to for example a document based DB.
+
+\subsection{Seq}
+We wanted to use a log server, and \texttt{Seq} is made for \texttt{.NET}.
+It is easy to set up, has a nice UI, and is widely used 
+in the industry.
+
+\subsection{Docker Swarm}
+We had a hard time following the course alongside the other 
+courses at the moment this part of the project was ongoing.
+Therefore we did not debate any alternatives, and followed 
+the course guide. 
+We only heard \texttt{Kubernetes} mentioned in 
+the course, but as being ``highly advised against using''.
+
+\subsection{DigitalOcean}
+We are poor students, using 7 taped together calculatores 
+as a computer. 
+Digital Ocean was free with the GitHub student 
+credits, this made it an easy choice.

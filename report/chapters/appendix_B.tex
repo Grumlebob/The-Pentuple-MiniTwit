@@ -1,0 +1,55 @@
+\section{Security assessment expanded}
+\label{appn:B}
+
+This section gives a more detailed description of the security risks
+of our \texttt{MiniTwit} application.
+
+\subsection{Access to Seq (negligible, likely)}
+
+In the case of resetting/failure of the \texttt{Seq} \texttt{droplet}, the logs 
+are lost. Moreover, the \texttt{Seq} password is reset every time, meaning we 
+do not have a fail-safe default. This gives malicious users temporary 
+access to our \texttt{Seq} dashboards, until we reset the password. However, 
+this is not a big issue, as \texttt{Seq} is only used for monitoring and logging, 
+and does not contain any sensitive information. However, only one user 
+(stakeholder or developer) can access \texttt{Seq} at a time, 
+which can be abused to deny availability to legitimate users.
+
+\subsection{Login credentials leaked (moderate, likely)}
+
+Usernames and passwords are stored in plain text in our 
+database (no encryption or hashing applied). If an attack 
+gains read access to the users table, all credentials are 
+immediately comprised, leading to unauthorized account takeover. 
+
+\subsection{Overloading the API with requests (moderate, possible)}
+
+A \texttt{DDoS} (distributed denial of service) attack can flood our \texttt{API} with 
+excessive traffic, rendering it unavailable to legitimate users. 
+We do have load-balancing and basic firewalls, but there is no 
+further safeguard against \texttt{DDoS} attacks. Neither do we enforce \texttt{CAPTCHA} or 
+rate-limiting on critical endpoints. 
+The impact is limited to service unavailability. 
+
+\subsection{Access to the database (catastrophic, unlikely)}
+
+If an attack obtains direct database credentials or exploits a 
+vulnerability to gain read/write access. They could delete or modify 
+critical data, or have access to all user data, including usernames 
+and passwords.
+
+\subsection{Leak of secrets (catastrophic, possible)}
+
+Some of the project secrets are shared informally (e.g., via \texttt{Discord}). 
+Thus, if the wrong person is invited, these keys could be exposed. 
+An attacker with a valid key could impersonate our services, 
+or cause damage. The probability is possible until stricter 
+secret-management policies are enforced, 
+such as using a secret manager or vault.
+
+\subsection{Droplet failure (catastrophic, possible)}
+Any \texttt{droplet} could fail due to software or hardware issues. We currently have 
+no database backups. If the database \texttt{droplet} dies, we lose all data. 
+The impact is catastrophic as we could lose all data (including user accounts 
+and tweets), and the application would be unavailable until the \texttt{droplet} is 
+restored or replaced.

@@ -1,0 +1,42 @@
+name: Generate Report PDF
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-report:
+    runs-on: ubuntu-24.04
+    permissions:
+      # allow it to push the generated report
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      # Compile LaTeX to report/main.pdf
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: report/main.tex
+          extra_system_packages: "inkscape" # for SVG support
+          latexmk_shell_escape: true        #
+          work_in_root_file_dir: true
+
+      - name: Move PDF into build folder
+        run: mv report/main.pdf report/build/MSc_group_j.pdf
+
+      - name: Commit and push
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add report/build/MSc_group_j.pdf
+          # if changes were made
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Generate report in build folder"
+            # Pull the remote changes and rebase to integrate any new commits
+            git pull --rebase origin ${{ github.head_ref }}
+            git push origin HEAD:${{ github.head_ref }}
+          else
+            echo "No changes to commit."
+          fi

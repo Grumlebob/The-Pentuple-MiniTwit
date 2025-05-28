@@ -25,6 +25,6 @@ docker stack deploy -c docker-compose.yml minitwit || {
 
 echo "====== DEPLOYMENT COMPLETED SUCCESSFULLY ======"
 
-docker service scale minitwit_api=2
+docker service scale minitwit_api=2 # specify number of workers
 
 echo "====== Created 2 replicas ======"

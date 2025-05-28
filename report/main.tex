@@ -1,0 +1,42 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{preamble}
+
+
+\begin{document}
+%\quickwordcount{main} % cannot get it to work in latex vscode
+% TC:ignore excludes it from word count
+%TC:ignore
+\input{frontpage}
+%TC:endignore
+\newpage
+
+%TC:ignore
+\cleardoublepage
+\pagestyle{empty}         % Disable headers/footers globally for this page
+\tableofcontents
+\thispagestyle{empty}     % Ensure the current page uses 'empty' style
+\cleardoublepage
+\pagestyle{fancy}         % Restore your custom headers/footers
+%TC:endignore
+
+\input{chapters/00_introduction.tex}
+\newpage
+\input{chapters/01_System_perspective}
+\newpage
+\input{chapters/02_Process_perspective}
+\newpage   
+\input{chapters/03_Reflection_perspective}
+\newpage
+
+%TC:ignore
+\bibliography{references}
+\newpage
+
+\part*{Appendix}
+\begin{appendices}
+   \input{chapters/appendix_A.tex}
+   \input{chapters/appendix_B.tex}
+   \input{chapters/appendix_C.tex}
+\end{appendices}
+%TC:endignore
+\end{document}

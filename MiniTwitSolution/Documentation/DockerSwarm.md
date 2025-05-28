@@ -64,3 +64,11 @@ bash -x deploy.sh
 
 
 (we plan to automate this for ci/cd)
+
+## 09.05
+
+### Why does swarm leader not run api but only the workers?
+
+We only want one node to run database migrations. This happens on the leader node.
+To avoid mixing responsibilities the leader does not also handle api calls.
+This is distributed to the workers.
