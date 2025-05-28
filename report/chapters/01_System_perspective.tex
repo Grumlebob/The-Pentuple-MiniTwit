@@ -6,7 +6,7 @@ respective technologies and dependencies, as well as how they
 were deployed.
 
 \subsection{Module view}
-
+%TC:ignore
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{images/modules.drawio.pdf}
@@ -14,7 +14,7 @@ were deployed.
     their dependencies and main technologies.}
     \label{fig:modules}
 \end{figure}
-
+%TC:endignore
 Figure \ref{fig:modules} provides an overview of how the main modules are connected, specifically:
 \begin{itemize}
     \item Users interact with the \texttt{Client} module
@@ -24,7 +24,7 @@ Figure \ref{fig:modules} provides an overview of how the main modules are connec
 \end{itemize}
 
 \subsection{Deployment view}
-
+%TC:ignore
 \begin{figure}[H]
       \centering
       \makebox[\linewidth]{
@@ -32,7 +32,7 @@ Figure \ref{fig:modules} provides an overview of how the main modules are connec
       \caption{Deployment diagram showing how the modules were deployed.}
       \label{fig:deployment_diagram}
 \end{figure}
-
+%TC:endignore
 We use \texttt{Digital Ocean} to deploy the respective modules to \texttt{droplets} running \texttt{Ubuntu 22.04} as illustrated in Figure \ref{fig:deployment_diagram}. 
 It works by creating and pushing \texttt{Docker} images which each \texttt{droplet} can pull and run.
 

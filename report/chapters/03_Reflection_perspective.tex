@@ -6,32 +6,33 @@ These are some of the problems we spent the most time solving.
 
 \subsubsection{Migrations and \texttt{Docker Compose}}
 
-In the beginning of the project after we had refactored \texttt{MiniTwit} to \texttt{.NET},
+Initially, after we had refactored \texttt{MiniTwit} to \texttt{.NET},
 we ran the program with \texttt{dotnet run}. 
 When the \texttt{API} started up it would also perform a database migration,
 in case the model had changed. This is a part of \texttt{EF Core}
 that makes it easy to evolve the database schema.
-However, when we started using \texttt{Docker Compose}, it would not run the migration.
+However, when we started using \texttt{Docker Compose}, 
+it would not run the migration.
 We spent a lot of time trying to make it work.
 Additionally, we did not have much experience with \texttt{Docker},
 resulting in us spending over 30 hours total on the ticket
 ``Dockerize application''.
 
-As a solution we ended up creating a separate \texttt{Dockerfile} for the migration.
-The sole purpose of this file was to use the \texttt{API} code project to run the migration.
-Later on as we implemented the \texttt{CI/CD} pipeline, 
-the migration was made part of the deployment process.
+The solution was to create a separate \texttt{Dockerfile} 
+to run the migration.
+When we later implemented the \texttt{CI/CD} pipeline, 
+the migration became part of the deployment process.
 
 \subsubsection{\texttt{Docker Swarm}}
 
 Before we implemented \texttt{Docker Swarm}, we had a single droplet 
-and a single \texttt{Docker Compose} file that defined all the MiniTwit modules.
-This made it quite the challenge to change to several droplets with 
+with a single \texttt{Docker Compose} file.
+It was a challenge to change to several droplets with 
 seperate \texttt{Docker Compose} files for each module.
 With a single \texttt{compose} file it was easy to have health checks and
 dependencies between the modules. 
 Fortunately, the only crucial dependency was the database migration.
-The migration cannot happen before the database is up and running.
+The migration cannot happen before the database is running.
 However, with the database continuously running on its own droplet,
 it is no longer an issue.
 
@@ -42,9 +43,8 @@ However, this was an issue now that the API was running on several
 worker droplets as part of a \texttt{Docker Swarm}. Workers are designed
 to be able to crash and start up again, 
 meaning it is unpredictable when they run their given services.
-We want to only run the migration once, when we deploy.
-Otherwise, multiple concurrent migrations could cause 
-race conditions or similar issues on the database.
+We want to only run the migration once, when we deploy, to
+prevent race conditions or similar issues on the database.
 This was solved by separating the migration into its own docker compose file.
 This is run once on the leader node, when we deploy.
 We ended up spending over 14 hours on the ticket ``Set up \texttt{Docker Swarm}''.
@@ -54,7 +54,7 @@ We ended up spending over 14 hours on the ticket ``Set up \texttt{Docker Swarm}'
 \subsubsection{``It works on my computer''}
 
 We learned the importance of having an environment that is 
-self-contained, so it can run across platforms.
+self-contained, so it can run across different platforms.
 The computers used in the group were a mix of \texttt{Mac} and \texttt{Windows},
 and the \texttt{droplets} were running \texttt{Ubuntu}. 
 Using \texttt{Docker} environments made it easy to run the same program
@@ -62,7 +62,7 @@ on different machines without too much trouble.
 
 \subsubsection{DevOps vs ClickOps}
 
-\texttt{Automation} was a big focus in this project.
+Automation was a big focus in this project.
 There were numerous things in this project that 
 would have been bottlenecks if we had to do them manually every time.
 Especially the \texttt{deployment process} required a lot of steps
@@ -99,15 +99,14 @@ inject it somewhere in the workflow.
 
 Adding monitoring with \texttt{Seq} was easy, since it is made specifically for \texttt{.NET}.
 However, it has some limitations regarding graphs.
-It has a specific format for the \texttt{SQL} queries you can make graphs from.
-Specifically, it can only contain the following operations:
+Specifically, it can only use SQL operations that contain the following operations:
 \texttt{select, where, group by, having, order by, limit}.
 We wanted to make a business-relevant \texttt{graph} testing the 1\% rule\cite{1_perc_rule}.
 In short, group users based on how many posts they have made.
 In order to combine this data, we only found ways that involve 
 \texttt{join} operations, which \texttt{Seq} does not support.
 
-Furthermore, we have not found a way to save the graphs we make.
+Furthermore, we have not found a way to save the graphs that we make.
 This means, if we tear down the \texttt{droplet} running \texttt{Seq},
 we lose all the custom graphs we have made.
 To avoid starting completely over, we have saved the \texttt{queries},
@@ -150,28 +149,45 @@ greater than expected compared to the number of reads,
 meaning there would be too much cache invalidation for it to be worth it.
 At one point we also accidentally created a droplet on with an American server.
 We could immediately tell from the monitor that the response 
-times were much higher because of this.
+times were much longer because of this.
 We quickly changed it back to the European server 
 that the other droplets were running with.
 
 \subsection{Reasons for tool choices}
 
-Infrastructure as code:
-https://www.pulumi.com/docs/iac/languages-sdks/dotnet/
+Infrastructure as code: https://www.pulumi.com/docs/iac/languages-sdks/dotnet/
 Vs
 Terraform.
 
-Blazor vs mvc:
-We wanted to send smaller json data instead of full HTML pages. Newer and higher performance. Client loads code and json data to render full HTML pages.
+\subsubsection{Blazor vs mvc}
+We wanted to send smaller json data instead of full HTML pages. 
+Newer and higher performance. Client loads code and json data 
+to render full HTML pages.
 
-Github and github actions: everyone had experience, and found no learning to be gained from switching to example gitlab and Jenkins.
+\subsubsection{GitHub and GitHub actions}
+Everyone had experience, 
+and found no learning to be gained from switching to example 
+gitlab and Jenkins.
 
-Hybrid cache: several reads in a row without a write, made caching benificial. Hybrid cache supports both local caching and distributed for example through redis. We planned to do redis, but it is still in the backlog.
+\subsubsection{Hybrid cache}
+Several reads in a row without a write, 
+made caching benificial. Hybrid cache supports both local 
+caching and distributed for example through redis. 
+We planned to do redis, but it is still in the backlog.
 
-Testcontainers and respawn: code without testing is legacy code. And as we are refactoring code, testing is insanely useful, so we don't regress. 
+\subsubsection{Testcontainers and respawn}
+Code without testing is legacy code. 
+And as we are refactoring code, testing is insanely 
+useful, so we don't regress. 
 We wanted to do integration testing, to avoid mocking.
 
-Minimal api vs controllers:
-We had both at some point. Minimal api is more performant, and easy to read and write. 
+\subsubsection{Minimal API vs controllers}
+We had both at some point. Minimal api is more performant, 
+and easy to read and write. 
 
-Postgresql: free, and part of the database course we all took. We found learning about a different database to be out of scope for this course. Aswell as going from sqllite being a relationship based database, we did not want to go for for example a document based on.
+\subsubsection{PostgreSQL}
+It is free, and was part of the database course we all
+took. We found learning about a different databases to be 
+out of scope for this course. Aswell as going from sqlite 
+being a relationship based database, we did not want to 
+switch to for example a document based on.

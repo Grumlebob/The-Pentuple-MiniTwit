@@ -17,7 +17,7 @@ which can be abused to deny availability to legitimate users.
 
 \subsection{Login credentials leaked (moderate, likely)}
 
-Usernames and passwords are stored in plaintext in our 
+Usernames and passwords are stored in plain text in our 
 database (no encrpytion or hashing applied). If an attack 
 agains read access to the users table, all credentials are 
 immediately comprised, leading to unathorized account takeover. 
@@ -27,7 +27,7 @@ immediately comprised, leading to unathorized account takeover.
 A \texttt{DDoS} (distributed denial of service) attack can flood our \texttt{API} with 
 excessive traffic, rendering it unavailable to legitimate users. 
 We do have load-balancing and basic firewalls, but there is no 
-safeguard against \texttt{DDoS} attacks. Neither do we enforce \texttt{CAPTCHA} or 
+further safeguard against \texttt{DDoS} attacks. Neither do we enforce \texttt{CAPTCHA} or 
 rate-limiting on critical endpoints. 
 The impact is limited to service unavailability. 
 
@@ -42,14 +42,14 @@ and passwords.
 
 Some of the project secrets are shared informally (e.g., via \texttt{Discord}). 
 Thus, if the wrong person is invited, these keys could be exposed. 
-An attacker with a valid \texttt{API} key could impersonate our services, 
+An attacker with a valid key could impersonate our services, 
 or cause damage. The probability is possible until stricter 
 secret-management policies are enforced, 
 such as using a secret manager or vault.
 
 \subsection{\texttt{Droplet} failure (catastrophic, possible)}
 Any \texttt{droplet} could fail due to software or hardware issues. We currently have 
-no \texttt{database} backups. If the database \texttt{droplet} dies, we lose all data. 
+no database backups. If the database \texttt{droplet} dies, we lose all data. 
 The impact is catastrophic as we could lose all data (including user accounts 
 and tweets), and the application would be unavailable until the \texttt{droplet} is 
 restored or replaced.
