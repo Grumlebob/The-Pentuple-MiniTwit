@@ -4,31 +4,31 @@
 
 These are some of the problems we spent the most time solving.
 
-\subsubsection{Migrations and Docker compose}
+\subsubsection{Migrations and \texttt{Docker Compose}}
 
-In the beginning of the project after we had refactored MiniTwit to .NET,
+In the beginning of the project after we had refactored \texttt{MiniTwit} to \texttt{.NET},
 we ran the program with \texttt{dotnet run}. 
-When the API started up it would also perform a database migration,
-in case the model had changed. This is a part of EF core
+When the \texttt{API} started up it would also perform a database migration,
+in case the model had changed. This is a part of \texttt{EF Core}
 that makes it easy to evolve the database schema.
-However, when we started using Docker compose, it would not run the migration.
+However, when we started using \texttt{Docker Compose}, it would not run the migration.
 We spent a lot of time trying to make it work.
-Additionally, we did not have much experience with Docker,
+Additionally, we did not have much experience with \texttt{Docker},
 resulting in us spending over 30 hours total on the ticket
 ``Dockerize application''.
 
-As a solution we ended up creating a separate Dockerfile for the migration.
-The sole purpose of this file was to use the API code project to run the migration.
-Later on as we implemented the CI/CD pipeline, 
+As a solution we ended up creating a separate \texttt{Dockerfile} for the migration.
+The sole purpose of this file was to use the \texttt{API} code project to run the migration.
+Later on as we implemented the \texttt{CI/CD} pipeline, 
 the migration was made part of the deployment process.
 
-\subsubsection{Docker swarm}
+\subsubsection{\texttt{Docker Swarm}}
 
-Before we implemented docker swarm, we had a single droplet 
-and a single docker compose file that defined all the MiniTwit modules.
+Before we implemented \texttt{Docker Swarm}, we had a single droplet 
+and a single \texttt{Docker Compose} file that defined all the MiniTwit modules.
 This made it quite the challenge to change to several droplets with 
-seperate docker compose files for each module.
-With a single compose file it was easy to have health checks and
+seperate \texttt{Docker Compose} files for each module.
+With a single \texttt{compose} file it was easy to have health checks and
 dependencies between the modules. 
 Fortunately, the only crucial dependency was the database migration.
 The migration cannot happen before the database is up and running.
@@ -36,10 +36,10 @@ However, with the database continuously running on its own droplet,
 it is no longer an issue.
 
 Another related issue was where to run the migration.
-Since the API module is the one communicating with the database,
-we initially included it in the API docker compose file.
+Since the \texttt{API} module is the one communicating with the database,
+we initially included it in the \texttt{API Docker Compose} file.
 However, this was an issue now that the API was running on several 
-worker droplets as part of a docker swarm. Workers are designed
+worker droplets as part of a \texttt{Docker Swarm}. Workers are designed
 to be able to crash and start up again, 
 meaning it is unpredictable when they run their given services.
 We want to only run the migration once, when we deploy.
@@ -47,50 +47,50 @@ Otherwise, multiple concurrent migrations could cause
 race conditions or similar issues on the database.
 This was solved by separating the migration into its own docker compose file.
 This is run once on the leader node, when we deploy.
-We ended up spending over 14 hours on the ticket ``Set up docker swarm''.
+We ended up spending over 14 hours on the ticket ``Set up \texttt{Docker Swarm}''.
 
 \subsection{Lesssons learned}
 
 \subsubsection{``It works on my computer''}
 
 We learned the importance of having an environment that is 
-selfcontained, so it can run across platforms.
-The computers used in the group were a mix of Mac and Windows,
-and the droplets were running Ubuntu. 
-Using docker environments made it easy to run the same program
+self-contained, so it can run across platforms.
+The computers used in the group were a mix of \texttt{Mac} and \texttt{Windows},
+and the \texttt{droplets} were running \texttt{Ubuntu}. 
+Using \texttt{Docker} environments made it easy to run the same program
 on different machines without too much trouble.
 
 \subsubsection{DevOps vs ClickOps}
 
-Automation was a big focus in this project.
+\texttt{Automation} was a big focus in this project.
 There were numerous things in this project that 
-would have been bottlenecks, if we had to do them manually every time.
-Especially the deployment process, required a lot of steps
-of copying files and SSH'ing into droplets to run commands.
+would have been bottlenecks if we had to do them manually every time.
+Especially the \texttt{deployment process} required a lot of steps
+of copying files and \texttt{SSH}'ing into \texttt{droplets} to run commands.
 Not only is this time consuming, it is also prone to errors.
 Forgetting a single step would cause most of the program to not work.
-An example of this, was when we manually created a droplet and forgot to add the 
-group SSH keys. We were then unable to access the droplet and had to 
+An example of this was when we manually created a \texttt{droplet} and forgot to add the 
+group \texttt{SSH keys}. We were then unable to access the \texttt{droplet} and had to 
 tear it down and create a new one.
 
 \subsection{Unresolved issues}
 
 There are some issues that we have still not managed to solve.
 
-\subsubsection{Domain url has long load time}
+\subsubsection{Domain \texttt{URL} has long load time}
 
-For some unknown reason when going to the client with the https domain name, 
+For some unknown reason, when going to the \texttt{Client} with the \texttt{HTTPS} domain name, 
 it loads for several seconds before the page is shown.
 We did spend some time trying to find the cause,
 but we could not find anything.
 
 \subsubsection{A hidden dependency}
 
-The API must allow the client to access it by 
-setting the CORS (Cross-Origin Resource Sharing) policy.
-We do this in the appsettings. The problem is that it is done manually.
-When the client changes IP-address, we must include 
-that IP in the CORS policy of the API.
+The \texttt{API} must allow the \texttt{Client} to access it by 
+setting the \texttt{CORS} (Cross-Origin Resource Sharing) policy.
+We do this in the \texttt{appsettings}. The problem is that it is done manually.
+When the \texttt{Client} changes \texttt{IP-address}, we must include 
+that \texttt{IP} in the \texttt{CORS} policy of the \texttt{API}.
 We could allow all origins to avoid this issue, 
 but optimally we would have liked to dynamically 
 inject it somewhere in the workflow.

@@ -2,17 +2,17 @@
 \label{appn:B}
 
 This section gives a more detailed description of the security risks
-of our MiniTwit application.
+of our \texttt{MiniTwit} application.
 
-\subsection{Access to Seq (negligible, likely)}
+\subsection{Access to \texttt{Seq} (negligible, likely)}
 
-In the case of resetting/failure of the Seq droplet, the logs 
-are lost. Morever, the Seq password is reset everytime, meaning we 
-do not have a fail safe default. This gives malicious users temporary 
-access to our Seq dashboards, until we reset the password. However, 
-this is not a big issue, as Seq is only used for monitoring and logging, 
+In the case of resetting/failure of the \texttt{Seq} \texttt{droplet}, the logs 
+are lost. Moreover, the \texttt{Seq} password is reset every time, meaning we 
+do not have a fail-safe default. This gives malicious users temporary 
+access to our \texttt{Seq} dashboards, until we reset the password. However, 
+this is not a big issue, as \texttt{Seq} is only used for monitoring and logging, 
 and does not contain any sensitive information. However, only one user 
-(stakeholder or developer) can access Seq at a time, 
+(stakeholder or developer) can access \texttt{Seq} at a time, 
 which can be abused to deny availability to legitimate users.
 
 \subsection{Login credentials leaked (moderate, likely)}
@@ -22,14 +22,14 @@ database (no encrpytion or hashing applied). If an attack
 agains read access to the users table, all credentials are 
 immediately comprised, leading to unathorized account takeover. 
 
-\subsection{Overloading the API with requests (moderate, possible)}
+\subsection{Overloading the \texttt{API} with requests (moderate, possible)}
 
-A DDoS (distributed denial of service) attack can flood our API with 
+A \texttt{DDoS} (distributed denial of service) attack can flood our \texttt{API} with 
 excessive traffic, rendering it unavailable to legitimate users. 
-We do have load-balancing and uncomplicated firewalls, but there is no 
-safe guard against DDoS attacks. Neither do we enfornce CAPTCHA or 
+We do have load-balancing and basic firewalls, but there is no 
+safeguard against \texttt{DDoS} attacks. Neither do we enforce \texttt{CAPTCHA} or 
 rate-limiting on critical endpoints. 
-The impact is limited to service unavailablity. 
+The impact is limited to service unavailability. 
 
 \subsection{Access to the database (catastrophic, unlikely)}
 
@@ -38,19 +38,18 @@ vulnerability to gain read/write access. They could delete or modify
 critical data, or have access to all user data, including usernames 
 and passwords.
 
-\subsection{Leak of secrets and API keys (catastrophic, possible)}
+\subsection{Leak of secrets and \texttt{API} keys (catastrophic, possible)}
 
-Some of the project secrets are shared informally (e.g., via Discord). 
-Thus if the wrong person is invited, these keys could be exposed. 
-An attacker with a valid API key could impersonate our services, 
+Some of the project secrets are shared informally (e.g., via \texttt{Discord}). 
+Thus, if the wrong person is invited, these keys could be exposed. 
+An attacker with a valid \texttt{API} key could impersonate our services, 
 or cause damage. The probability is possible until stricter 
 secret-management policies are enforced, 
 such as using a secret manager or vault.
 
-\subsection{Droplet failure (catastrophic, possible)}
-
-Any droplet could fail due to software or hardware issues. We currently have 
-no database backups. If the database droplet dies, we lose all data. 
+\subsection{\texttt{Droplet} failure (catastrophic, possible)}
+Any \texttt{droplet} could fail due to software or hardware issues. We currently have 
+no \texttt{database} backups. If the database \texttt{droplet} dies, we lose all data. 
 The impact is catastrophic as we could lose all data (including user accounts 
-and tweets) and the application would be unavailable until the droplet is 
+and tweets), and the application would be unavailable until the \texttt{droplet} is 
 restored or replaced.

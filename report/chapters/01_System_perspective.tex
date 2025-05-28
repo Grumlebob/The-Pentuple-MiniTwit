@@ -33,43 +33,46 @@ Figure \ref{fig:modules} provides an overview of how the main modules are connec
       \label{fig:deployment_diagram}
 \end{figure}
 
-We use \texttt{Digital Ocean} to deploy the respective modules to \texttt{droplets} running \texttt{Ubuntu 22.04} as illustrated in Figure \ref{fig:deployment_diagram}. It works by creating and pushing docker images which each droplet can pull and run.
+We use \texttt{Digital Ocean} to deploy the respective modules to \texttt{droplets} running \texttt{Ubuntu 22.04} as illustrated in Figure \ref{fig:deployment_diagram}. 
+It works by creating and pushing \texttt{Docker} images which each \texttt{droplet} can pull and run.
 
-\subsection{API}
+\subsection{\texttt{API}}
 
-The API functions as the backend for our MiniTwit application.
-It is deployed as three separate units, to make a docker swarm. 
-One is the leader/manager giving tasks to 
-the two others, who act as workers. 
-Thus, the leader functions as a load balancer using the workers as servers.
-We decided that the leader should not be a worker,
-because we wanted to function optimally as a load balancer.
-We were not sure, how it would be affected by being another worker.
-Instead we can use it to run other side tasks, like database migrations.
+The \texttt{API} functions as the backend for our \texttt{MiniTwit} application.
+It is deployed as three separate units to form a \texttt{Docker Swarm}. 
+One is the \texttt{leader/manager} giving tasks to 
+the two others, who act as \texttt{workers}. 
+Thus, the \texttt{leader} functions as a \texttt{load balancer} using the \texttt{workers} as servers.
+We decided that the \texttt{leader} should not be a \texttt{worker},
+because we wanted it to function optimally as a \texttt{load balancer}.
+We were not sure how it would be affected by also acting as a \texttt{worker}.
+Instead, we can use it to run other side tasks, like \texttt{database migrations}.
 
-The API project is implemented in \texttt{.NET} using \texttt{minimal API}\cite{minimalApi}.
-The database communication is done using Entity Framework Core.
-It logs using Serilog\cite{serilog}, 
-which is configured to write to Seq\cite{seq}.
+The \texttt{API} project is implemented in \texttt{.NET} using \texttt{Minimal API}\cite{minimalApi}.
+The \texttt{database} communication is done using \texttt{Entity Framework Core}.
+It logs using \texttt{Serilog}\cite{serilog}, 
+which is configured to write to \texttt{Seq}\cite{seq}.
 
-\subsection{Client}
+\subsection{\texttt{Client}}
 
-The \texttt{Client} is the frontend for the MiniTwit application implemented as a \texttt{Blazor} webassembly app. This way the workload is distributed to the users' browsers rather than a server. It is responsible for sending requests and receiving response from the \texttt{API} module.
+The \texttt{Client} is the frontend for the \texttt{MiniTwit} application implemented as a \texttt{Blazor WebAssembly} app. 
+This way the workload is distributed to the users' browsers rather than a server. It is responsible for sending requests and 
+receiving responses from the \texttt{API} module.
 
 \subsection{Monitor}
 
-Our \texttt{Monitor} uses the tool Seq\cite{seq}.
+Our \texttt{Monitor} uses the tool \texttt{Seq}\cite{seq}.
 It handles logs and displays custom graphs based on 
-the log information. We have both developer relevant 
+the log information. We have both developer-relevant 
 graphs such as \texttt{API} response times and errors,
-as well as business relevant graphs such as number 
+as well as business-relevant graphs such as number 
 of newly registered users and messages posted.
-It is deployed on its own \texttt{Digital Ocean} droplet 
-using an image provided by datalust\cite{seq}.
+It is deployed on its own \texttt{Digital Ocean} \texttt{droplet} 
+using an image provided by \texttt{Datalust}\cite{seq}.
 
 \subsection{Database}
 
-The database is a PostgreSQL\cite{postgres} database.
+The \texttt{database} is a \texttt{PostgreSQL}\cite{postgres} database.
 It contains information about registered users,
 posted messages, and followers.
 
@@ -84,10 +87,10 @@ posted messages, and followers.
     \label{fig:seq_diagram}
 \end{figure}
 
-In summary, users post messages from the Client.
-The Client sends requests to the API, which logs the request 
+In summary, users post messages from the \texttt{Client}.
+The \texttt{Client} sends requests to the \texttt{API}, which logs the request 
 information, saves the messages to the database, 
-logs the reponse information and sends responses back to the 
-Client. Logs are used for monitoring in Seq. 
-The Client then updates the UI for the users.
+logs the response information, and sends responses back to the 
+\texttt{Client}. Logs are used for monitoring in \texttt{Seq}. 
+The \texttt{Client} then updates the \texttt{UI} for the users.
 This is illustrated in Figure \ref{fig:seq_diagram}.
