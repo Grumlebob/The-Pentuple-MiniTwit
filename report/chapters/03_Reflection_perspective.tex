@@ -156,26 +156,22 @@ that the other droplets were running with.
 
 \subsection{Reasons for tool choices}
 
-.NET, minimal api, Blazor,
+Infrastructure as code:
+https://www.pulumi.com/docs/iac/languages-sdks/dotnet/
+Vs
+Terraform.
 
-Docker
+Blazor vs mvc:
+We wanted to send smaller json data instead of full HTML pages. Newer and higher performance. Client loads code and json data to render full HTML pages.
 
-Digital ocean.
+Github and github actions: everyone had experience, and found no learning to be gained from switching to example gitlab and Jenkins.
 
-Seq, serilog
+Hybrid cache: several reads in a row without a write, made caching benificial. Hybrid cache supports both local caching and distributed for example through redis. We planned to do redis, but it is still in the backlog.
 
-Terraform
+Testcontainers and respawn: code without testing is legacy code. And as we are refactoring code, testing is insanely useful, so we don't regress. 
+We wanted to do integration testing, to avoid mocking.
 
-Csharpier
+Minimal api vs controllers:
+We had both at some point. Minimal api is more performant, and easy to read and write. 
 
-SonarQube
-
-Postgres
-
-dependabot
-
-coveralls
-
-testcontainers
-
-github actions
+Postgresql: free, and part of the database course we all took. We found learning about a different database to be out of scope for this course. Aswell as going from sqllite being a relationship based database, we did not want to go for for example a document based on.
