@@ -1,7 +1,7 @@
 \section{Process' Perspective}
 \label{ch:background} 
 
-\subsection{\texttt{CI/CD} pipeline using GitHub actions}
+\subsection{CI/CD pipeline using GitHub actions}
 %A complete description of stages and tools included in the CI/CD chains, including deployment and release of your systems.
 Our overall workflow is shown in Figure \ref{fig:activity_diagram}.
 %TC:ignore
@@ -14,7 +14,7 @@ Our overall workflow is shown in Figure \ref{fig:activity_diagram}.
 \end{figure}
 %TC:endignore
 
-We use \texttt{GitHub} issues to create tickets.
+We use \texttt{GitHub Issues} to create tickets.
 The \texttt{CI/CD} pipeline is implemented using \texttt{GitHub Actions} 
 to automate building, testing, code quality analysis, releasing, 
 and deployment of the \texttt{MiniTwit} application.
@@ -60,42 +60,41 @@ This workflow is triggered on every push to the
 creates a new release on \texttt{GitHub} if it has
 a commit message in the format \texttt{Release: x.y}. 
 Here \texttt{x} and \texttt{y} are the major and minor version numbers, respectively.
-To add title and release note information, 
-this is added to the file \texttt{CHANGELOG.md}.
+Release information such as title and updates, should be added to the file \texttt{CHANGELOG.md}.
 
 \subsubsection{Deployment Workflow}
 This workflow is triggered on a push to \texttt{main}.
-It is responsible for building \texttt{Docker} images, 
+It is responsible for building \texttt{Docker images}, 
 uploading, and deploying them to \texttt{Digital Ocean} droplets.
 It uses \texttt{Docker Hub} to push the built images.
 Then it uses \texttt{scp} and \texttt{ssh} to copy remote files 
 to the relevant droplets, which are then executed to 
 deploy the application. For deployment safeguards,
 \texttt{SSH} keys, \texttt{IP} addresses, and credentials are stored in \texttt{GitHub Secrets},
-which are then used in the workflows to access the \texttt{DigitalOcean} droplets and to 
+which are then used in the workflows to access the \texttt{Digital Ocean} droplets and to 
 authenticate with \texttt{Docker Hub}.
 
 
 \subsection{Terraform}
 \texttt{Terraform} is used to provision and manage our infrastructure as code, 
-to automatically set up droplets in \texttt{DigitalOcean}. 
+to automatically set up droplets in \texttt{Digital Ocean}. 
 The result of the \texttt{Terraform} setup is illustrated 
 in Figure \ref{fig:deployment_diagram}.
 \texttt{Terraform} creates all droplets with \texttt{SSH} keys and files.
 It also configures the \texttt{Docker Swarm} for the \texttt{API}.
 It then calls the deploy scripts on each droplet.
 Finally, it assigns the reserved \texttt{IP}'s.
-The \texttt{Terraform} state file is shared in a remote \texttt{DigitalOcean Spaces}.
+The \texttt{Terraform} state file is shared in the remote \texttt{Digital Ocean Spaces}.
 
 \subsection{Security assessment}
 To analyse security risks in our code, 
 we use tools like \texttt{GitHub}'s \texttt{CodeQL}\cite{codeql} that 
-integrate with our \texttt{CI/CD} pipeline.
+integrates with our \texttt{CI/CD} pipeline.
 This provides a display of security vulnerabilities in our code,
 which is shown on the \texttt{PR}'s.
 
-To analyse security risks of \texttt{docker} images, \texttt{Docker Scout} has been used to get
-quick overviews of security risks from our \texttt{Docker} images.
+To analyse security risks of \texttt{Docker images}, \texttt{Docker Scout} has been used to get
+quick overviews of security risks from our \texttt{Docker images}.
 It scores the images in four levels: \texttt{low}, \texttt{medium}, \texttt{high}, and \texttt{critical}.
 Additionally, it provides recommendations on how to fix the issues.
 
@@ -105,6 +104,9 @@ and impact (\texttt{negligible}, \texttt{moderate}, and \texttt{catastrophic}).
 The result is shown in Table \ref{tab:risk_matrix}.
 %TC:ignore
 \begin{table}[H]
+\caption{Risk assessment matrix}
+\vspace{0.3cm}
+\label{tab:risk_matrix}
 \begin{tabular}{ll|lll|}
 \cline{3-5}
     &      & \multicolumn{3}{c|}{\cellcolor[HTML]{BBBBBB}Possibility of risk} \\ \cline{2-5} 
@@ -113,8 +115,6 @@ The result is shown in Table \ref{tab:risk_matrix}.
 \multicolumn{1}{|l|}{\cellcolor[HTML]{BBBBBB}}  & Moderate & \multicolumn{1}{l|}{\cellcolor[HTML]{70D080}}    & \multicolumn{1}{l|}{\cellcolor[HTML]{E0D050}\begin{tabular}[c]{@{}l@{}}Overloading the \\API with requests\end{tabular}} &\cellcolor[HTML]{E07070}\begin{tabular}[c]{@{}l@{}}Login credentials\\leaked\end{tabular} \\ \cline{2-5} 
 \multicolumn{1}{|l|}{\multirow{-3}{*}{\cellcolor[HTML]{BBBBBB}\begin{tabular}[c]{@{}l@{}}Impact\\ of risk\end{tabular}}}            & Negligible & \multicolumn{1}{l|}{\cellcolor[HTML]{70D080}}    & \multicolumn{1}{l|}{\cellcolor[HTML]{70D080}}  & \cellcolor[HTML]{E0D050}Access to Seq     \\ \hline
 \end{tabular}
-\label{tab:risk_matrix}
-\caption{Risk assessment matrix}
 \end{table}
 %TC:endignore
 
@@ -135,7 +135,7 @@ infinite and more efficient caching.
 
 The \texttt{API} is scalable as it is stateless and uses \texttt{Docker Swarm}, 
 allowing horizontal scaling of both manager and worker nodes.
-The \texttt{database} is not currently not optimized in terms of scalability, 
+The \texttt{database} is not currently optimized in terms of scalability, 
 as it is a single instance of \texttt{PostgreSQL}.
 The database is the potential bottleneck of the system, as it is the only shared 
 resource between the \texttt{API} nodes.
@@ -148,13 +148,13 @@ to manage and query the data.
 
 \subsection{AI-assistants}
 
-In general we use co-pilot to autocomplete code.
-We used chat GPT and other chat bots to help
+In general we use \texttt{CoPilot} to autocomplete code.
+We used \texttt{ChatGPT} and other chat bots to help
 with especially bash script files and converting 
-the \texttt{python} application to \texttt{C\#}.
+the \texttt{Python} application to \texttt{C\#}.
 
 When we were setting up \texttt{Vagrant} 
 (which was later replaced by \texttt{Terraform}),
-we used chat GPT to try and debug an error we had with 
+we used \texttt{ChatGPT} to try and debug an error we had with 
 the database migration. However, we could not get it 
 to detect what was wrong, and we ended up solving it ourselves.

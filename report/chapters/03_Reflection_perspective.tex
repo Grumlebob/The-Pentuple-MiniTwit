@@ -4,7 +4,7 @@
 
 These are some of the problems we spent the most time solving.
 
-\subsubsection{Migrations and \texttt{Docker Compose}}
+\subsubsection{Migrations and Docker Compose}
 
 Initially, after we had refactored \texttt{MiniTwit} to \texttt{.NET},
 we ran the program with \texttt{dotnet run}. 
@@ -23,7 +23,7 @@ to run the migration.
 When we later implemented the \texttt{CI/CD} pipeline, 
 the migration became part of the deployment process.
 
-\subsubsection{\texttt{Docker Swarm}}
+\subsubsection{Docker Swarm}
 
 Before we implemented \texttt{Docker Swarm}, we had a single droplet 
 with a single \texttt{Docker Compose} file.
@@ -55,7 +55,7 @@ We ended up spending over 14 hours on the ticket ``Set up \texttt{Docker Swarm}'
 
 We learned the importance of having an environment that is 
 self-contained, so it can run across different platforms.
-The computers used in the group were a mix of \texttt{Mac} and \texttt{Windows},
+The computers used in the group were a mix of \texttt{Mac}, \texttt{Linux}, and \texttt{Windows},
 and the \texttt{droplets} were running \texttt{Ubuntu}. 
 Using \texttt{Docker} environments made it easy to run the same program
 on different machines without too much trouble.
@@ -64,7 +64,7 @@ on different machines without too much trouble.
 
 Automation was a big focus in this project.
 There were numerous things in this project that 
-would have been bottlenecks if we had to do them manually every time.
+would have been bottlenecks, if we had to do them manually every time.
 Especially the \texttt{deployment process} required a lot of steps
 of copying files and \texttt{SSH}'ing into \texttt{droplets} to run commands.
 Not only is this time consuming, it is also prone to errors.
@@ -77,7 +77,7 @@ tear it down and create a new one.
 
 There are some issues that we have still not managed to solve.
 
-\subsubsection{Domain \texttt{URL} has long load time}
+\subsubsection{Domain URL has long load time}
 
 For some unknown reason, when going to the \texttt{Client} with the \texttt{HTTPS} domain name, 
 it loads for several seconds before the page is shown.
@@ -95,7 +95,7 @@ We could allow all origins to avoid this issue,
 but optimally we would have liked to dynamically 
 inject it somewhere in the workflow.
 
-\subsubsection{\texttt{Seq} limitations}
+\subsubsection{Seq limitations}
 
 Adding monitoring with \texttt{Seq} was easy, since it is made specifically for \texttt{.NET}.
 However, it has some limitations regarding graphs.
