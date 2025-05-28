@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.1
+
+### Changed
+
+- Add report
+
 ## v3.0
 
 ### Changed
