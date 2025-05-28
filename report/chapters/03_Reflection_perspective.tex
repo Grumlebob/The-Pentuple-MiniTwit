@@ -95,34 +95,34 @@ We could allow all origins to avoid this issue,
 but optimally we would have liked to dynamically 
 inject it somewhere in the workflow.
 
-\subsubsection{Seq limitations}
+\subsubsection{\texttt{Seq} limitations}
 
-Adding monitoring with Seq was easy, since it is made specifically for .NET.
-However, it has some limitations, regarding graphs.
-It has a specific format for the SQL queries you can make graphs from.
-Specifically, it can only contain the following operations.
+Adding monitoring with \texttt{Seq} was easy, since it is made specifically for \texttt{.NET}.
+However, it has some limitations regarding graphs.
+It has a specific format for the \texttt{SQL} queries you can make graphs from.
+Specifically, it can only contain the following operations:
 \texttt{select, where, group by, having, order by, limit}.
-We wanted to make a business relevant graph testing the 1\% rule\cite{1_perc_rule}.
+We wanted to make a business-relevant \texttt{graph} testing the 1\% rule\cite{1_perc_rule}.
 In short, group users based on how many posts they have made.
 In order to combine this data, we only found ways that involve 
-\texttt{join} operations, which Seq does not support.
+\texttt{join} operations, which \texttt{Seq} does not support.
 
-Furthormore, we have not found a way to save the graphs we make.
-This means, if we tear down the droplet running Seq,
+Furthermore, we have not found a way to save the graphs we make.
+This means, if we tear down the \texttt{droplet} running \texttt{Seq},
 we lose all the custom graphs we have made.
-To avoid starting completely over, we have saved the queries,
-so they can be manually pasted back in, when we run Seq again.
+To avoid starting completely over, we have saved the \texttt{queries},
+so they can be manually pasted back in when we run \texttt{Seq} again.
 
 \subsubsection{File structure}
 
-Terraform was one of the last things we added to the project.
-Currently, the terraform files are placed in the ``MiniTwitSoultion'' 
-folder next to ``remote\_files'' which are the files copied to the droplets.
+\texttt{Terraform} was one of the last things we added to the project.
+Currently, the \texttt{Terraform} files are placed in the ``\texttt{MiniTwitSolution}'' 
+folder next to ``\texttt{remote\_files}'' which are the files copied to the \texttt{droplets}.
 If the project were to continue, we would move these things to a deployment folder.
 
 \subsection{The DevOps difference}
 
-These are the things that made this project different and more devopsy
+These are the things that made this project different and more DevOps-y
 than other projects we have worked on.
 
 \subsubsection{Continuous integration/deployment}
@@ -132,7 +132,7 @@ which is something we are not very used to.
 The issues we spent the most time on were often related to deployment.
 However, once the workflow was in place, it was
 an awesome advantage to be able to push some code,
-whereafter it was automatically available for everyone on the url, 
+whereafter it was automatically available for everyone on the \texttt{URL}, 
 meaning there was no need to run the program locally to see the results.
 
 \subsubsection{Monitoring}
@@ -144,7 +144,7 @@ It was super useful for detecting errors, unexpected behavior,
 and slow response times, as well as general traffic to see 
 what kind of requests the program receives.
 This helps us make systematic optimizations. For instance,
-we considered optmizing our caching to speed up the API response times.
+we considered optmizing our caching to speed up the \texttt{API} response times.
 However, the monitor revealed that the number of writes were
 greater than expected compared to the number of reads,
 meaning there would be too much cache invalidation for it to be worth it.
