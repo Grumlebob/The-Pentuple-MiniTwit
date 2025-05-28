@@ -33,8 +33,9 @@ Figure \ref{fig:modules} provides an overview of how the main modules are connec
       \label{fig:deployment_diagram}
 \end{figure}
 %TC:endignore
-We use \texttt{Digital Ocean} to deploy the respective modules to \texttt{droplets} running \texttt{Ubuntu 22.04} as illustrated in Figure \ref{fig:deployment_diagram}. 
-It works by creating and pushing \texttt{Docker} images which each \texttt{droplet} can pull and run.
+We use \texttt{Digital Ocean} to deploy the modules to 
+\texttt{droplets} running \texttt{Ubuntu 22.04} as 
+illustrated in Figure \ref{fig:deployment_diagram}. 
 
 \subsection{\texttt{API}}
 
@@ -42,33 +43,34 @@ The \texttt{API} functions as the backend for our \texttt{MiniTwit} application.
 It is deployed as three separate units to form a \texttt{Docker Swarm}. 
 One is the \texttt{leader/manager} giving tasks to 
 the two others, who act as \texttt{workers}. 
-Thus, the \texttt{leader} functions as a \texttt{load balancer} using the \texttt{workers} as servers.
+Thus, the \texttt{leader} functions as a \texttt{load balancer} 
+using the \texttt{workers} as servers.
 We decided that the \texttt{leader} should not be a \texttt{worker},
 because we wanted it to function optimally as a \texttt{load balancer}.
 We were not sure how it would be affected by also acting as a \texttt{worker}.
 Instead, we can use it to run other side tasks, like \texttt{database migrations}.
 
-The \texttt{API} project is implemented in \texttt{.NET} using \texttt{Minimal API}\cite{minimalApi}.
+The \texttt{API} project is implemented in \texttt{.NET} using 
+\texttt{Minimal API}\cite{minimalApi}.
 The \texttt{database} communication is done using \texttt{Entity Framework Core}.
 It logs using \texttt{Serilog}\cite{serilog}, 
 which is configured to write to \texttt{Seq}\cite{seq}.
 
 \subsection{\texttt{Client}}
 
-The \texttt{Client} is the frontend for the \texttt{MiniTwit} application implemented as a \texttt{Blazor WebAssembly} app. 
-This way the workload is distributed to the users' browsers rather than a server. It is responsible for sending requests and 
+The \texttt{Client} is the frontend for the \texttt{MiniTwit} 
+application implemented as a \texttt{Blazor WebAssembly} app. 
+It is responsible for sending requests and 
 receiving responses from the \texttt{API} module.
 
 \subsection{Monitor}
 
 Our \texttt{Monitor} uses the tool \texttt{Seq}\cite{seq}.
-It handles logs and displays custom graphs based on 
-the log information. We have both developer-relevant 
+It displays custom graphs based on log information. 
+We have both developer-relevant 
 graphs such as \texttt{API} response times and errors,
 as well as business-relevant graphs such as number 
 of newly registered users and messages posted.
-It is deployed on its own \texttt{Digital Ocean} \texttt{droplet} 
-using an image provided by \texttt{Datalust}\cite{seq}.
 
 \subsection{Database}
 
@@ -77,7 +79,7 @@ It contains information about registered users,
 posted messages, and followers.
 
 \subsection{Sequence diagram}
-
+%TC:ignore
 \begin{figure}[H]
     \centering
     \makebox[\linewidth]{
@@ -86,11 +88,12 @@ posted messages, and followers.
     a user successfully posting a message.}
     \label{fig:seq_diagram}
 \end{figure}
-
+%TC:endignore
 In summary, users post messages from the \texttt{Client}.
-The \texttt{Client} sends requests to the \texttt{API}, which logs the request 
-information, saves the messages to the database, 
-logs the response information, and sends responses back to the 
-\texttt{Client}. Logs are used for monitoring in \texttt{Seq}. 
-The \texttt{Client} then updates the \texttt{UI} for the users.
-This is illustrated in Figure \ref{fig:seq_diagram}.
+The \texttt{Client} sends requests to the \texttt{API}, 
+which logs the request information, saves the messages to the 
+database, logs the response information, and sends responses 
+back to the \texttt{Client}. Logs are used for monitoring in 
+\texttt{Seq}. The \texttt{Client} then updates the 
+\texttt{UI} for the users. This is illustrated in 
+Figure \ref{fig:seq_diagram}.

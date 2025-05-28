@@ -3,9 +3,7 @@
 
 \subsection{\texttt{CI/CD} pipeline using GitHub actions}
 %A complete description of stages and tools included in the CI/CD chains, including deployment and release of your systems.
-Our \texttt{CI/CD} pipeline is shown in Figure \ref{fig:activity_diagram}, 
-which illustrates the process from a ticket is created 
-to releasing and deploying the application.
+Our overall workflow is shown in Figure \ref{fig:activity_diagram}.
 %TC:ignore
 \begin{figure}[h]
       \centering
@@ -16,63 +14,64 @@ to releasing and deploying the application.
 \end{figure}
 %TC:endignore
 
-We use \texttt{GitHub} issues to create tickets for new features and issues.
+We use \texttt{GitHub} issues to create tickets.
 The \texttt{CI/CD} pipeline is implemented using \texttt{GitHub Actions} 
-to automate building, testing, analysis of code quality, releasing, 
+to automate building, testing, code quality analysis, releasing, 
 and deployment of the \texttt{MiniTwit} application.
 
 \subsubsection{Build and Test Workflow}
 This workflow is triggered on every pull request (\texttt{PR}) to \texttt{main}.
-The purpose of this is to build the application, run unit tests, 
-and generate/upload a code coverage report.
-Passing this workflow is a requirement for merging \texttt{PR}'s into \texttt{main}.
+The purpose of this is to build the application, run tests, 
+and generate a code coverage report.
+Passing this workflow is a requirement for merging 
+\texttt{PR}'s into \texttt{main}.
 
 \subsubsection{Code Quality Workflow}
 This workflow makes use of \texttt{GitHub}'s \texttt{CodeQL}\cite{codeql} 
-to perform static code analysis of \texttt{C\#} code only.
-This workflow uses the same triggers as the build and test workflow. However, 
-it is also triggered on a schedule, which is set to run every \texttt{Tuesday} via a \texttt{CRON} job.
-Before performing the analysis, it formats the \texttt{C\#} code using \texttt{csharpier}\cite{csharpier} to 
-ensure consistency and automatically commits and pushes formatting changes.
-It then performs a semantic code analysis to find security vulnerabilities and 
-automatically uploads the results to \texttt{GitHub}, which are displayed on \texttt{PR}'s.
-This became very relevant when it once discovered that we leaked a third-party 
-\texttt{API} key in our code, which we then removed and updated.
+to perform static code analysis of \texttt{C\#} code.
+It uses the same triggers as the build and test workflow.
+Before performing the analysis, it formats the \texttt{C\#} code using 
+\texttt{csharpier}\cite{csharpier}.
+It then performs a semantic code analysis to find security 
+vulnerabilities and displays the results on the \texttt{PR}'s.
+It once discovered that we leaked a third-party secret 
+in our code, which we then removed and updated.
 
-Additionally, we use \texttt{SonarQube}\cite{sonarqube}, \texttt{CodeFactor}\cite{codefactor}, and \texttt{OpenSSF}\cite{Openssf} 
+Additionally, we use \texttt{SonarQube}\cite{sonarqube}, 
+\texttt{CodeFactor}\cite{codefactor}, and \texttt{OpenSSF}\cite{Openssf} 
 to perform code analysis such as code coverage, duplication, 
 security risks, and other good practices.
-\texttt{SonarQube}'s analysis is done by using \texttt{sonarcloud-github-action}, which 
-uploads the results to \texttt{SonarCloud}, and is displayed on the \texttt{PR}.
-\texttt{CodeFactor} and \texttt{OpenSSF} have read access to our repository and automatically 
-perform code analysis whenever our repository is updated.
-The updated results are displayed on the front page of the repository on \texttt{GitHub} as badges.
+The results are displayed on the front page of the repository 
+on \texttt{GitHub} as badges.
 
 \subsubsection{Auto Merge Dependabot Workflow}
-Our project uses \texttt{dependabot} to automatically update dependencies in the project.
-We have a \texttt{GitHub Action} that detects \texttt{PR}'s created by \texttt{dependabot}, and automatically merges 
+Our project uses \texttt{dependabot} to automatically update
+dependencies in the project.
+We have a \texttt{GitHub Action} that detects \texttt{PR}'s 
+created by \texttt{dependabot}, and automatically merges 
 them into \texttt{main} if all workflows pass.
-This was done to ensure that we always have the latest dependencies,
-and to avoid having to manually merge \texttt{dependabot} \texttt{PR}'s.
+This ensures that we have the latest dependencies,
+and we avoid having to manually merge \texttt{dependabot} 
+\texttt{PR}'s.
 
 \subsubsection{Auto Release Workflow}
-This workflow is based on a \texttt{GitHub Actions} auto release template\cite{auto-release}.
-It is triggered on every push to the \texttt{main} branch, and automatically 
-creates a new release on \texttt{GitHub}.
-It requires a commit containing a message in the format \texttt{Release: x.y}, 
-where \texttt{x} and \texttt{y} are the major and minor version numbers, respectively.
-To add title and release note information, this is added to the file \texttt{CHANGELOG.md}.
+This workflow is triggered on every push to the 
+\texttt{main} branch, and automatically 
+creates a new release on \texttt{GitHub} if it has
+a commit message in the format \texttt{Release: x.y}. 
+\texttt{x} and \texttt{y} are the major and minor version numbers, respectively.
+To add title and release note information, 
+this is added to the file \texttt{CHANGELOG.md}.
 
 \subsubsection{Deployment Workflow}
-This workflow is triggered on successful completion of the build and test workflow 
-after a push to \texttt{main}.
-It is responsible for building \texttt{Docker} images, uploading, and deploying them to 
-\texttt{DigitalOcean} droplets.
-It uses \texttt{Docker Hub} to authenticate and push the built images.
-Then it uses \texttt{scp} and \texttt{ssh} to copy two remote files \texttt{deploy.sh} 
-and \texttt{docker-compose.yml} to the relevant droplets,
-which are then executed to deploy the application.
-For deployment safeguards; \texttt{SSH} keys, \texttt{IP} addresses, and credentials are stored in \texttt{GitHub Secrets},
+This workflow is triggered on a push to \texttt{main}.
+It is responsible for building \texttt{Docker} images, 
+uploading, and deploying them to \texttt{Digital Ocean} droplets.
+It uses \texttt{Docker Hub} to push the built images.
+Then it uses \texttt{scp} and \texttt{ssh} to copy remote files 
+to the relevant droplets, which are then executed to 
+deploy the application. For deployment safeguards,
+\texttt{SSH} keys, \texttt{IP} addresses, and credentials are stored in \texttt{GitHub Secrets},
 which are then used in the workflows to access the \texttt{DigitalOcean} droplets and to 
 authenticate with \texttt{Docker Hub}.
 
