@@ -15,6 +15,9 @@
 [![GitHub last commit](https://img.shields.io/github/last-commit/Grumlebob/The-Pentuple-MiniTwit.svg)](https://github.com/Grumlebob/The-Pentuple-MiniTwit/commits/main)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Grumlebob/The-Pentuple-MiniTwit)
 
+**SonarQube**
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=Grumlebob_The-Pentuple-MiniTwit)](https://sonarcloud.io/summary/new_code?id=Grumlebob_The-Pentuple-MiniTwit)
+
 ## Application:
 
 (When it is running)
