@@ -135,6 +135,6 @@ sudo certbot renew --dry-run
 
 Login to the appropriate `name.com` account. Go under `My Domains`, top right part of the website. Click on three dots on right of the domain name `thepentupledo.engineer`, and click `Manage DNS Records`. 
 
-Add a type `A`, if u leave the host blank the domain wil be `thepentupledo.engineer`, but if you set the host to be `api`, the resulting domain name will be `api.thepentupledo.engineer`. THe answer is the IP address for the specific droplet. So for our API droplet that will be `157.245.26.8`. Then click `Add Record`.
+Add a type `A`, if u leave the host blank the domain wil be `thepentupledo.engineer`, but if you set the host to be `api`, the resulting domain name will be `api.thepentupledo.engineer`. The answer is the IP address for the specific droplet. So for our API droplet that will be `157.245.26.8`. Then click `Add Record`.
 
 Make sure that the nginx.conf file has the correct host name, under `server_name`.

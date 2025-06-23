@@ -42,14 +42,3 @@ This will serve as a reminder for the person, to make sure that their own test i
 While not implemented. We discussed a way, to generate random but valid data for our tests.
 This library can do such a thing, and will most likely be implemented later.
 
-### Using python tests on C# code, during refactoring.
-
-skal stå noget om hvordan vi også brugte html siderne, til at ramme vores nye endpoints
-
-
-
-
-
-## ny.dato.2025
-
-### Ny interessant ting

@@ -94,6 +94,17 @@ The ```bootstrap.sh``` file, which is in the same folder,
 sets up terraform using all the aforementioned files.
 
 Note: ~~it currently does not automatically assign reserved IP's in case we destroy and recreate droplets.~~ (fixed 06.05.2025)
-It also does not currently give digital ocean user permission. So we cannot open a console from digital ocean. You need to ssh from your own console. After a bit of research and asking ChatGpt it seems one must do it manually on digital ocean.
+It also does not currently give digital ocean user permission. 
+So we cannot open a console from digital ocean. You need to ssh from your own console. 
+After a bit of research and asking ChatGpt it seems one must do it manually on digital ocean.
 
 After the application was deployed with terraform the database was reset.
+
+When using terraform init it makes a state file ```terraform.tfstate```.
+First time it also download neccesary plugins, and therefore must be run by everyone at least once.
+Terraform maintains a .tfstate file that contains the current state of your infrastructure (Ip of droplets, etc.),
+This local file is shared in Digital Ocean "Spaces".
+This file should be shared with any group member so it can be used for terrform apply, 
+so everyone works with the same droplets. The file should be located with the other terraform files.
+Currently it is in MiniTwitSolution/
+
