@@ -15,7 +15,7 @@ resource "digitalocean_droplet" "seq-droplet" {
     host = self.ipv4_address
     type = "ssh"
     private_key = file(var.pvt_key)
-    timeout = "5m"
+    timeout = "20m"
   }
 
   # ensure Terraform waits long enough for the droplet to be "created"

@@ -19,6 +19,10 @@ variable "api_reserved_ip" { }
 variable "db_reserved_ip" { }
 variable "seq_reserved_ip" { }
 
+# AWS
+variable "do_access_key_id" {}
+variable "do_secret_access_key" {}
+
 # setup the provider
 terraform {
   required_providers {
@@ -35,4 +39,20 @@ terraform {
 
 provider "digitalocean" {
   token = var.do_token
+}
+
+# thanks to gemini and gemini for this one
+
+provider "aws" {
+  access_key                  = var.do_access_key_id
+  secret_key                  = var.do_secret_access_key
+  region                      = var.region
+  skip_requesting_account_id  = true
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true     
+  s3_force_path_style         = true
+
+  endpoints {
+    s3 = "https://fra1.digitaloceanspaces.com"
+  }
 }

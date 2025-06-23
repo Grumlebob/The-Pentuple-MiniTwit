@@ -14,7 +14,7 @@ resource "digitalocean_droplet" "minitwit-swarm-leader" {
     host = self.ipv4_address
     type = "ssh"
     private_key = file(var.pvt_key)
-    timeout = "5m"
+    timeout = "20m"
   }
 
   # ensure Terraform waits long enough for the droplet to be "created"
@@ -123,7 +123,7 @@ resource "digitalocean_droplet" "minitwit-swarm-worker" {
     host = self.ipv4_address
     type = "ssh"
     private_key = file(var.pvt_key)
-    timeout = "5m"
+    timeout = "20m"
   }
 
   # ensure Terraform waits long enough for the droplet to be "created"
@@ -173,7 +173,7 @@ resource "null_resource" "swarm-deploy" {
     user        = "root"
     host        = digitalocean_droplet.minitwit-swarm-leader.ipv4_address
     private_key = file(var.pvt_key)
-    timeout     = "5m"
+    timeout     = "20m"
   }
 
   provisioner "remote-exec" {

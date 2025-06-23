@@ -20,13 +20,22 @@ echo -e "\n--> Checking that environment variables are set\n"
 [ -z "$DO_ACCESS_KEY_ID" ] && echo "DO_ACCESS_KEY_ID is not set" && exit
 [ -z "$DO_SECRET_ACCESS_KEY" ] && echo "DO_SECRET_ACCESS_KEY is not set" && exit
 
+export TF_VAR_do_access_key_id="$DO_ACCESS_KEY_ID"
+export TF_VAR_do_secret_access_key="$DO_SECRET_ACCESS_KEY"
+
 echo -e "\n--> Initializing terraform\n"
 # initialize terraform
 terraform init \
     -backend-config "bucket=$SPACE_NAME" \
     -backend-config "key=$STATE_FILE" \
+    -backend-config "region=us-east-1" \
+    -backend-config "endpoint=https://fra1.digitaloceanspaces.com" \
     -backend-config "access_key=$DO_ACCESS_KEY_ID" \
-    -backend-config "secret_key=$DO_SECRET_ACCESS_KEY"
+    -backend-config "secret_key=$DO_SECRET_ACCESS_KEY" \
+    -backend-config "skip_requesting_account_id=true" \
+    -backend-config "skip_credentials_validation=true" \
+    -backend-config "skip_metadata_api_check=true" \
+    -backend-config "force_path_style=true"
 
 # check that everything looks good
 echo -e "\n--> Validating terraform configuration\n"
@@ -38,7 +47,6 @@ terraform apply -auto-approve
 
 echo -e "\n--> Done bootstrapping Minitwit"
 echo -e "--> The dbs will need a moment to initialize, this can take up to a couple of minutes..."
-echo -e "--> Site will be avilable @ http://$(terraform output -raw public_ip)"
 echo -e "--> You can check the status of swarm cluster @ http://$(terraform output -raw minitwit-swarm-leader-ip-address):8888"
 echo -e "--> ssh to swarm leader with 'ssh root@\$(terraform output -raw minitwit-swarm-leader-ip-address) -i ssh_key/terraform'"
 echo -e "--> To remove the infrastructure run: terraform destroy -auto-approve"
