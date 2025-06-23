@@ -1,4 +1,4 @@
-﻿# credit: https://github.com/itu-devops/itu-minitwit-docker-swarm-teraform
+# credit: https://github.com/itu-devops/itu-minitwit-docker-swarm-teraform
 resource "digitalocean_droplet" "client-droplet" {
   image = "docker-20-04" // ubuntu-22-04-x64
   name = "client"
