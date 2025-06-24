@@ -1008,3 +1008,195 @@ Paste this into X, to get Y
   }
 }
 ```
+
+## Other charts
+
+```json
+{
+  "OwnerId": "user-admin",
+  "Title": "Experiments",
+  "IsProtected": false,
+  "SignalExpression": null,
+  "Charts": [
+    {
+      "Id": "chart-24",
+      "Title": "Messages with length > 100",
+      "SignalExpression": null,
+      "Queries": [
+        {
+          "Id": "chartquery-25",
+          "Measurements": [
+            {
+              "Value": "count(*)",
+              "Label": "col0"
+            }
+          ],
+          "Where": "RequestBody is not null and Length(RequestBody) > 100",
+          "SignalExpression": null,
+          "GroupBy": [],
+          "DisplayStyle": {
+            "Type": "Bar",
+            "LineFillToZeroY": false,
+            "LineShowMarkers": true,
+            "BarOverlaySum": false,
+            "SuppressLegend": false,
+            "Palette": "Blues"
+          },
+          "Having": null,
+          "OrderBy": [],
+          "Limit": null
+        }
+      ],
+      "DisplayStyle": {
+        "WidthColumns": 6,
+        "HeightRows": 1
+      }
+    },
+    {
+      "Id": "chart-26",
+      "Title": "Sofa mentioned",
+      "SignalExpression": null,
+      "Queries": [
+        {
+          "Id": "chartquery-27",
+          "Measurements": [
+            {
+              "Value": "count(*)",
+              "Label": "col0"
+            }
+          ],
+          "Where": "RequestBody is not null and RequestBody like '%sofa%'",
+          "SignalExpression": null,
+          "GroupBy": [],
+          "DisplayStyle": {
+            "Type": "Line",
+            "LineFillToZeroY": false,
+            "LineShowMarkers": false,
+            "BarOverlaySum": false,
+            "SuppressLegend": true,
+            "Palette": "Default"
+          },
+          "Having": null,
+          "OrderBy": [],
+          "Limit": null
+        }
+      ],
+      "DisplayStyle": {
+        "WidthColumns": 6,
+        "HeightRows": 1
+      }
+    },
+    {
+      "Id": "chart-28",
+      "Title": "Following",
+      "SignalExpression": null,
+      "Queries": [
+        {
+          "Id": "chartquery-29",
+          "Measurements": [
+            {
+              "Value": "count(*)",
+              "Label": "col0"
+            }
+          ],
+          "Where": "RequestMethod = 'POST' and RequestPath like '/fllws/%' and RequestBody like '%\"follow\":%'",
+          "SignalExpression": null,
+          "GroupBy": [],
+          "DisplayStyle": {
+            "Type": "Bar",
+            "LineFillToZeroY": false,
+            "LineShowMarkers": true,
+            "BarOverlaySum": true,
+            "SuppressLegend": false,
+            "Palette": "Greens"
+          },
+          "Having": null,
+          "OrderBy": [],
+          "Limit": null
+        }
+      ],
+      "DisplayStyle": {
+        "WidthColumns": 6,
+        "HeightRows": 1
+      }
+    },
+    {
+      "Id": "chart-30",
+      "Title": "Unfollowing",
+      "SignalExpression": null,
+      "Queries": [
+        {
+          "Id": "chartquery-31",
+          "Measurements": [
+            {
+              "Value": "count(*)",
+              "Label": "col0"
+            }
+          ],
+          "Where": "RequestMethod = 'POST' and RequestPath like '/fllws/%' and RequestBody like '%\"unfollow\":%'",
+          "SignalExpression": null,
+          "GroupBy": [],
+          "DisplayStyle": {
+            "Type": "Bar",
+            "LineFillToZeroY": false,
+            "LineShowMarkers": true,
+            "BarOverlaySum": true,
+            "SuppressLegend": false,
+            "Palette": "Reds"
+          },
+          "Having": null,
+          "OrderBy": [],
+          "Limit": null
+        }
+      ],
+      "DisplayStyle": {
+        "WidthColumns": 6,
+        "HeightRows": 1
+      }
+    },
+    {
+      "Id": "chart-36",
+      "Title": "Messages grouped by length (rounded down to 25's)",
+      "SignalExpression": null,
+      "Queries": [
+        {
+          "Id": "chartquery-37",
+          "Measurements": [
+            {
+              "Value": "count(*)",
+              "Label": "col0"
+            }
+          ],
+          "Where": "RequestMethod = 'POST' and RequestPath like '/msgs/%'",
+          "SignalExpression": null,
+          "GroupBy": [
+            "(Length(RequestBody)) - (Length(RequestBody)) % 25 as L"
+          ],
+          "DisplayStyle": {
+            "Type": "Table",
+            "LineFillToZeroY": false,
+            "LineShowMarkers": true,
+            "BarOverlaySum": false,
+            "SuppressLegend": false,
+            "Palette": "Default"
+          },
+          "Having": null,
+          "OrderBy": [
+            "L"
+          ],
+          "Limit": null
+        }
+      ],
+      "DisplayStyle": {
+        "WidthColumns": 6,
+        "HeightRows": 2
+      }
+    }
+  ],
+  "Id": "dashboard-19",
+  "Links": {
+    "Self": "api/dashboards/dashboard-19?version=39",
+    "Group": "api/dashboards/resources"
+  }
+}
+```
