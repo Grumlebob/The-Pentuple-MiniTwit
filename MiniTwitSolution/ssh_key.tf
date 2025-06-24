@@ -1,4 +1,4 @@
-﻿# this file ensures that droplets has all group members' ssh keys (credit to chatgpt)
+# this file ensures that droplets has all group members' ssh keys (credit to chatgpt)
 variable "team_key_names" {
   type    = list(string)
   # names taken from digital ocean ssh keys

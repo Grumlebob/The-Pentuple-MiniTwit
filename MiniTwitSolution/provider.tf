@@ -1,4 +1,4 @@
-﻿# api token
+# api token
 # export TF_VAR_do_token=xxx
 variable "do_token" {}
 

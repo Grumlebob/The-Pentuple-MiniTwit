@@ -1,4 +1,4 @@
-﻿#This is used to run a migration on the manager node in our swarm
+#This is used to run a migration on the manager node in our swarm
 services:
   migrator:
     image: ${DOCKER_USERNAME}/minitwit-migrator
