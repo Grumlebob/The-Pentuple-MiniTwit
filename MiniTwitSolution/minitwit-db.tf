@@ -1,9 +1,9 @@
-# credit: https://github.com/itu-devops/itu-minitwit-docker-swarm-teraform
+﻿# credit: https://github.com/itu-devops/itu-minitwit-docker-swarm-teraform
 resource "digitalocean_droplet" "db-droplet" {
   image = "docker-20-04" // ubuntu-22-04-x64
   name = "db"
   region = var.region
-  size = "s-1vcpu-1gb"
+  size = "s-1vcpu-1gb" # 1 cpu, 1 GB ram, 25 GB SSD - max of 1 TB transfer
   ssh_keys = [
     for key in data.digitalocean_ssh_key.team : key.fingerprint
   ]
