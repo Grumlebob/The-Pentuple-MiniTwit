@@ -16,7 +16,7 @@ jobs:
 
       # Compile LaTeX to report/main.pdf
       - name: Compile LaTeX document
-        uses: xu-cheng/latex-action@v3
+        uses: xu-cheng/latex-action@v4
         with:
           root_file: report/main.tex
           extra_system_packages: "inkscape" # for SVG support
