@@ -12,7 +12,7 @@ jobs:
       # allow it to push the generated report
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Compile LaTeX to report/main.pdf
       - name: Compile LaTeX document
